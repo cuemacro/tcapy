@@ -1,0 +1,79 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+
+# C extensions
+*.so
+
+# Credentials files
+*cred.py
+*credpro.py
+*creduser.py
+
+# orca executable
+orca-1.2.1-x86_64.AppImage
+
+# Distribution / packaging
+.idea/
+.pytest_cache
+.Python
+env/
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+htmlcov/
+lib/
+lib64/
+log/
+parts/
+sdist/
+var/
+*.egg-info/
+.installed.cfg
+*.egg
+output_data
+output_files
+dash/
+dash-master/
+tests/tests_data/
+*.log
+
+# PyInstaller
+#  Usually these files are written by a python script from a template
+#  before PyInstaller builds the exe, so as to inject date/other infos into it.
+*.manifest
+*.spec
+
+# Installer logs
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Unit test / coverage reports
+htmlcov/
+.tox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*,cover
+
+# Translations
+*.mo
+*.pot
+
+# Django stuff:
+*.log
+*.log.*
+
+# Sphinx documentation
+docs/_build/
+
+# PyBuilder
+target/
+
+# Output Files
+

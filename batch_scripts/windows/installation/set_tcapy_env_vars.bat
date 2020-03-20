@@ -1,0 +1,23 @@
+REM This script has various configuration flags for tcapy which need to be set
+REM It is unlikely you will need to change many of these, except possibly the folder where tcapy resides
+
+echo "Setting environment variables for tcapy for current script"
+
+REM Python environment settings ########################################################################################
+
+REM Folder where tcapy is, note, if you will need to change this in tcapy/conf/mongo.conf too
+set TCAPY_CUEMACRO=e:\Remote\tcapy
+
+REM Is the Python environment either "conda" or "virtualenv"?
+set TCAPY_PYTHON_ENV_TYPE=conda
+
+REM virtualenv folder or conda name
+REM set TCAPY_PYTHON_ENV=/home/$USER/py36tca/
+
+REM virtualenv folder or conda name
+set CONDA_ACTIVATE=C:\Anaconda3\Scripts\activate.bat
+set TCAPY_PYTHON_ENV=py36tca
+set TCAPY_PYTHON_ENV_BIN=%TCAPY_PYTHON_ENV%\bin\
+
+REM Only Python 3 is now supported
+set TCAPY_PYTHON_VERSION=3
