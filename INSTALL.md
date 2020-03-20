@@ -17,7 +17,7 @@ discuss later.
 tcapy is tested for use with Python 3.6 and does not support any version of Python 2, and do not use it with earlier
 versions of Python 3.
 
-In the future planning on making a Docker container to install tcapy and also to have tcapy available in `conda` and `pip`.
+In the future planning on making a Docker container to install tcapy (and potentionally also to have tcapy available in `conda` and `pip`).
 
 ## Download tcapy to your machine
 
@@ -37,6 +37,7 @@ it in other folders if you want
     ln -s /some/source/dir /home/$USER/cuemacro/tcapy
  
 ## Editing constants
+
 You will need to edit several files so tcapy knows where it has been installed
 * Edit file `/home/tcapyusercuemacro/tcapy/batch_scripts/linux/installation/set_tcapy_env_vars.sh` 
     * change `TCAPY_CUEMACRO` parameter to the installation folder

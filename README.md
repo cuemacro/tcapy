@@ -41,7 +41,7 @@ At its very simplest TCA can involve working out the spread (slippage) you paid.
 market impact. Trading firms need to do TCA for a variety of reasons:
 
 * regulations such as MiFID II which stipulate that buy side firms need to show best execution
-* to reduce the cost of trading, by analysing of your LP (liquidity providers) and hence increase alpha
+* to reduce the cost of trading, by analysing your LP (liquidity providers), execution styles etc. and hence increase alpha
 
 tcapy has been in development for several years and currently supports FX spot based trade/order data. In the future, we are 
 also planning adding other asset classes. It has several FX specific features that include:
@@ -84,6 +84,7 @@ Based on the benchmark you choose, it computes various metrics on your trade/ord
 * market impact - the price move following a trade/order
 
 It can then provide statistics based on the metrics such as
+
 * average
 * PDF
 * outlier
@@ -108,13 +109,14 @@ There are three ways to use tcapy, which are:
 * Programmatically
 * Via RESTful API (very basic functionality at present)
 
-A [comprehensive Jupyter notebook explains](tcapy_notebooks/introducing_tcapy.ipynb)) how to use tcapy in more detail 
-and in particular how to call it programmatically.
+A [comprehensive Jupyter notebook explains](tcapy_notebooks/introducing_tcapy.ipynb) how to use tcapy in more detail 
+and in particular how to call it programmatically. We are planning on adding more Jupyter notebooks with many more
+examples of how to use tcapy.
 
 A few things to note:
 
-* Please bear in mind at present tcapy is currently an alpha project and is partially documented, although we are
-working on adding more documentation, in particular Jupyter notebooks
+* Please bear in mind at present tcapy is currently an alpha project
+* tcapy is only partially documented, although we are working on adding more documentation, in particular Jupyter notebooks
 * Uses Apache 2.0 licence [see here](LICENCE)
 
 # How do you install tcapy?
@@ -134,50 +136,55 @@ database, which can be slow.
 # Contributors
 
 Contributors are always welcome for tcapy. If you'd like to contribute, have a look at
-[Planned Features](PLANNED_FEATURES.md) for areas we're looking for help on. If you have any ideas for improvements
+[planned features](PLANNED_FEATURES.md) for areas we're looking for help on. If you have any ideas for improvements
 to the libraries please let us know too.
 
 # Screenshots
 
-* Detailed TCA GUI
+Below we show screenshots of the web GUI for tcapy.
+
+### Detailed TCA GUI
 
 <img src="img/std_gui.png?raw=true" width="750"/>
 
-* Plot your trade executions/order
+### Plot your trade executions/order
 
 <img src="img/std_executions.png?raw=true" width="750"/>
 
-* Plot distribution of slippage by different criteria
+### Plot distribution of slippage by different criteria
 
 <img src="img/std_distribution.png?raw=true" width="750"/>
 
-* Write a TCA request in a Pythonic manner
+### Write a TCA request in a Pythonic manner
 
 <img src="img/std_tca_request.png?raw=true" width="750"/>
 
-* Plot timeline of slippage
+### Plot timeline of slippage
 
 <img src="img/std_timeline_slippage.png?raw=true" width="750"/>
 
-
 # Requirements
 
-To appear
+See [installation guide](https://github.com/cuemacro/finmarketpy/blob/master/INSTALL.md) for details on requirements.
 
 # Installation
 
-For detailed installation instructions for tcapy and its associated Python libraries go to
-[https://github.com/cuemacro/tcapy/blob/master/INSTALL.md](https://github.com/cuemacro/finmarketpy/blob/master/INSTALL.md). 
+For detailed installation instructions for tcapy and its associated Python libraries go to the
+[installation guide](https://github.com/cuemacro/finmarketpy/blob/master/INSTALL.md). 
 
 # tcapy examples
 
-In tcapy/tcapy_examples you will find several example scripts to demonstrate how to run tcapy
+In tcapy/tcapy_examples you will find several example scripts to demonstrate how to run tcapy, as well as in the 
+[introductory Jupyter notebook](tcapy_notebooks/introducing_tcapy.ipynb) 
 
-# Commercial support and sponsorship for new features
+# Support and sponsorship for new features
 
-If you are interested in getting commercial support for tcapy or would like to sponsor the addition of new features for tcapy
-please contact saeed@cuemacro.com - we've got lots of ideas for ways to improve tcapy! If you're a financial firm, and are
-keen to make TCA transparent, supporting tcapy is a great way to do achieve this objective.
+We'll of course try to answer your queries if you raise an issue on GitHub.
+
+If you are interested in getting commercial support for tcapy or would like to sponsor the addition of new features for tcapy, 
+please contact saeed@cuemacro.com - we've got lots of ideas for ways to improve tcapy, but need support to implement them.
+
+If you're a financial firm, and are keen to make TCA transparent, and would like to sponsor the project, let us know.
 
 # Release notes and coding log
 

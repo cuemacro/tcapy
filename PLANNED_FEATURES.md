@@ -25,4 +25,5 @@ database like SQLite
 * Investigating the use of Dask Dataframes for distributed computation and profiling the code more to make it faster
 * Adding full support for cloud services like AWS, Google Cloud and Azure to take advantage of serverless computing and
 easy setup on the various cloud services (eg. AWS Lambda, Cloud Functions & Azure Functions)
+* Adding more unit tests to cover more functionality
 
