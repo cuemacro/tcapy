@@ -2,8 +2,6 @@
 
 # [tcapy](https://github.com/cuemacro/tcapy)
 
-## Making TCA transparent
-
 tcapy is a Python library for doing transaction cost analysis (TCA), essentially finding the cost of your trading activity. 
 Across the industry many financial firms and corporates trading within financial markets spend a lot of money on TCA, either
 by developing in house tools or using external services. It is estimated that the typical buy side equities trading desk 
@@ -33,7 +31,8 @@ accessible)
 tcapy has also been written to distribute the computation and make a lot of use of caching. In the future, we are hoping to 
 add features to make it easy to use serverless computing features on the cloud. Since you can see all the code, it also
 makes the TCA totally transparent. If you are doing TCA for regulatory reasons, it makes sense that the process should
-be fully open, rather than a black box.
+be fully open, rather than a black box. Having an open source library, makes it easier to make changes and fitting it to your 
+use case.
 
 # What is TCA and why do traders need it?
 
