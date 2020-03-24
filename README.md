@@ -20,6 +20,7 @@ tcapy is one of the first open source libraries for TCA. You can run the library
 data can be kept private. It has been in development since June 2017, originally for a large asset manager and was open 
 sourced in March 2020.
 
+
 We've made tcapy to be vendor independent, hence for example it supports:
 
 * multiple database types for storing
@@ -164,12 +165,12 @@ Below we show screenshots of the web GUI for tcapy.
 
 # Requirements
 
-See [installation guide](https://github.com/cuemacro/finmarketpy/blob/master/INSTALL.md) for details on requirements.
+See [installation guide](INSTALL.md) for details on requirements.
 
 # Installation
 
 For detailed installation instructions for tcapy and its associated Python libraries go to the
-[installation guide](https://github.com/cuemacro/finmarketpy/blob/master/INSTALL.md). 
+[installation guide](INSTALL.md). 
 
 # tcapy examples
 
