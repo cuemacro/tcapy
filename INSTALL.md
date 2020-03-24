@@ -4,8 +4,8 @@
 
 tcapy has been tested with Linux. tcapy should work on different variants of Linux including:
 
-* Ubuntu
-* Red Hat
+* Ubuntu (I'd recommend this, as it's is generally easier to install and use)
+* Red Hat (note that it may require a subscription to install some dependencies)
 
 Installation scripts have been written to work with either Ubuntu or Red Hat (the main differences are using `apt-get`
 vs. `yum` installation managers, as well as differences in the package names on the two variants of Linux.
