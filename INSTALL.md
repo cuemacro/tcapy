@@ -208,6 +208,12 @@ If you only have a Windows machine, you have several options:
             * to host the web app via nginx web server and gunicorn
         
 4. install tcapy directly on Windows, but some libraries may not be fully supported (eg. Celery)
+    * we assume that you've already installed any databases you'd like to use (eg. MongoDB for market tick data, 
+    Microsoft SQL Server for your trade/order data)
+    * we strongly recommend that you install Ubuntu on WSL (with tcapy) before you install tcapy on Windows
+        * but if you aren't going to install WSL, you might also find it useful to install Redis for Windows, although
+    we note that this is an [old version 3.2 from Microsoft's archive on GitHub](https://github.com/microsoftarchive/redis/releases) 
+    and is also not supported by Redis 
     * download [Anaconda Python distribution for Windows](https://www.anaconda.com/distribution/) and then install in folder
     `C:\Anaconda3`
     * it is possible to use other distributions of Python, but the project has been setup by default to use
@@ -217,7 +223,8 @@ If you only have a Windows machine, you have several options:
     
             git clone https://github.com/cuemacro/tcapy.git e:\Remote\tcapy
     
-    * this will clone it in the `e:\Remote\tcapy` folder (you can choose to install it elsewhere)
+    * this will clone it in the `e:\Remote\tcapy` folder (you can choose to install it elsewhere), alternatively, you
+    can manually clone it from GitHub
     * edit `e:\Remote\tcapy\batch_scripts\windows\installation\set_tcapy_env_vars.bat` if necessary change the several variables
         * TCAPY_CUEMACRO - with the folder you installed tcapy (default: `e:\Remote\tcapy`)
         * CONDA_ACTIVATE - the path to Anaconda conda (default: `C:\Anaconda3\Scripts\activate.bat`)
