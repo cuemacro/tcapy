@@ -125,7 +125,7 @@ class DataFrameHolder(object):
             if 'df' in key:
 
                 try:
-                    df = Mediator.get_volatile_cache(version=tcapy_version).get_dataframe_handle(
+                    df = Mediator.get_volatile_cache().get_dataframe_handle(
                         Mediator.get_util_func().flatten_list_of_lists(dataframe_key_list), burn_after_reading=True)
                 except Exception as e:
                     # print("DATAFRAMEHOLDER ERROR" + str(e))
@@ -185,7 +185,7 @@ class DataFrameHolder(object):
             else:
                 # otherwise different type of metadata (don't attempt to combine it)
                 try:
-                    df = Mediator.get_volatile_cache(version=tcapy_version).get_dataframe_handle(
+                    df = Mediator.get_volatile_cache().get_dataframe_handle(
                         Mediator.get_util_func().flatten_list_of_lists(dataframe_key_list), burn_after_reading=True)
                 except Exception as e:
                     print(e)

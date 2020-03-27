@@ -83,12 +83,12 @@ class TCACaller(ComputationCaller, ABC):
         dict
         """
 
-        # fill the major fields
+        # Fill the major fields
 
         kwargs['ticker'] = self._util_func.remove_none_list(kwargs['ticker']);
         kwargs['venue'] = self._util_func.remove_none_list(kwargs['venue'])
 
-        # convert date strings into TimeStamp formats
+        # Convert date strings into TimeStamp formats
         kwargs['start_date'] = pd.Timestamp(self._util_func.parse_datetime(str(kwargs['start_date'])))
         kwargs['finish_date'] = pd.Timestamp(self._util_func.parse_datetime(str(kwargs['finish_date'])))
 
@@ -103,12 +103,12 @@ class TCACaller(ComputationCaller, ABC):
         if 'market_data' not in kwargs.keys():
             kwargs['market_data'] = constants.default_market_data_store
 
-        # fill empty fields with None
+        # Fill empty fields with None
         for f in fields:
             if f not in kwargs:
                 kwargs[f] = None
 
-        # add a trade filter for time day
+        # Add a trade filter for time day
         if kwargs['filter_time_of_day'] is not None:
             if kwargs['filter_time_of_day'] == 'yes':
                 if 'start_time_of_day' in kwargs and 'finish_time_of_day' in kwargs:
@@ -128,7 +128,7 @@ class TCACaller(ComputationCaller, ABC):
             kwargs = self.add_list_kwargs(kwargs, 'trade_order_filter',
                                           TradeOrderFilterTag(tag_value_combinations=tag_value_combinations))
 
-        # add metrics which have been specified (including as strings, which will be added with default parameters)
+        # Add metrics which have been specified (including as strings, which will be added with default parameters)
         if kwargs['metric_calcs'] is not None:
             if not (isinstance(kwargs['metric_calcs'], list)):
                 kwargs['metric_calcs'] = [kwargs['metric_calcs']]
@@ -167,7 +167,7 @@ class TCACaller(ComputationCaller, ABC):
 
             executed_price = 'executed_price'
 
-            # for placements, we wouldn't have an execution price, so closest we can do is the arrival price = mid for trades
+            # For placements, we wouldn't have an execution price, so closest we can do is the arrival price = mid for trades
             if event_type != 'trade':
                 executed_price = 'arrival'
 
@@ -205,12 +205,12 @@ class TCACaller(ComputationCaller, ABC):
         if 'tca_request' in kwargs.keys():
             return kwargs['tca_request']
 
-        # convert various string/objects into forms which can be accepted by TCARequest
+        # Convert various string/objects into forms which can be accepted by TCARequest
         kwargs = self.fill_computation_request_kwargs(
             kwargs, ['trade_order_mapping', 'trade_order_filter', 'benchmark_calcs', 'metric_calcs',
                      'join_tables', 'filter_time_of_day', 'broker', 'algo', 'dummy_market'])
 
-        # create a TCARequest object which can be consumed by TCAEngine, to run a TCA calculation
+        # Create a TCARequest object which can be consumed by TCAEngine, to run a TCA calculation
         return TCARequest(start_date=kwargs['start_date'],
                           finish_date=kwargs['finish_date'],
                           ticker=kwargs['ticker'],

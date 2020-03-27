@@ -497,7 +497,28 @@ class VolatileAdvCache(VolatileCache):
 
         return obj
 
-    def _chunk_dataframes(self, obj):
+    def _plotly_fig_2_json(self, fig):
+        """Serialize a plotly figure object to JSON so it can be persisted to disk.
+        Figure's persisted as JSON can be rebuilt using the plotly JSON chart API:
+
+        http://help.plot.ly/json-chart-schema/
+
+        If `fpath` is provided, JSON is written to file.
+
+        Modified from https://github.com/nteract/nteract/issues/1229
+        """
+
+        return json.dumps({'data': json.loads(json.dumps(fig.data, cls=PlotlyJSONEncoder)),
+                           'layout': json.loads(json.dumps(fig.layout, cls=PlotlyJSONEncoder))})
+
+    def _plotly_from_json(self, fig):
+        """Render a plotly figure from a json file"""
+
+        v = json.loads(fig)
+
+        return go.Figure(data=v['data'], layout=v['layout'])
+
+    def _chunk_dataframes(self, obj, chunk_size_mb=constants.volatile_cache_redis_max_cache_chunk_size_mb):
         logger = LoggerManager.getLogger(__name__)
 
         # Can sometime have very large dataframes, which need to be split, otherwise won't fit in a single Redis key
@@ -505,7 +526,7 @@ class VolatileAdvCache(VolatileCache):
         mem_float = round(float(mem) / (1024.0 * 1024.0), 3)
         mem = '----------- ' + str(mem_float) + ' MB -----------'
 
-        chunks = int(math.ceil(mem_float / constants.volatile_cache_max_cache_chunk_size_mb))
+        chunks = int(math.ceil(mem_float / chunk_size_mb))
 
         if chunks > 1:
             obj_list = self._time_series_ops.split_array_chunks(obj, chunks=chunks)
@@ -526,75 +547,41 @@ class VolatileAdvCache(VolatileCache):
 
         # For pandas DataFrames
         if '_df' in key and isinstance(obj, pd.DataFrame):
-            # if obj.empty:
-                # return None
-            obj_list = self._chunk_dataframes(obj)
+            obj_list = self._chunk_dataframes(obj, chunk_size_mb=constants.volatile_cache_redis_max_cache_chunk_size_mb)
 
             if '_comp' in key:
-                if constants.volatile_cache_format == 'msgpack':
-                    # def to_msgpack(convert):
-                    #     if convert is not None:
-                    #         return convert.to_msgpack(
-                    #                 compress=constants.volatile_cache_compression[constants.volatile_cache_format])
-                    #
-                    #     return convert
-                    #
-                    # with PoolExecutor(max_workers=100) as executor:
-                    #     obj_list = executor.map(to_msgpack, obj_list)
+                if constants.volatile_cache_redis_format == 'msgpack':
 
                     for i in range(0, len(obj_list)):
                        if obj_list[i] is not None:
                            obj_list[i] = obj_list[i].to_msgpack(
-                               compress=constants.volatile_cache_compression[constants.volatile_cache_format])
+                               compress=constants.volatile_cache_redis_compression[constants.volatile_cache_redis_format])
 
-                elif constants.volatile_cache_format == 'arrow':
-                    # Get the size of each compressed object
+                elif constants.volatile_cache_redis_format == 'arrow':
+                    # Set the size of each compressed object, so can read back later
                     # eg. key might be xxxx_size_354534_size_345345_endsize etc.
                     # Ignore bit before first '_size_' and after '_endsize'
-
-                    # context = pa.default_serialization_context()
-
-                    # def compress(convert):
-                    #     if convert is not None:
-                    #         ser = context.serialize(convert).to_buffer()
-                    #
-                    #         convert = pa.compress(ser,
-                    #                                 codec=constants.volatile_cache_compression[constants.volatile_cache_format],
-                    #                                 asbytes=True)
-                    #
-                    #         size = len(ser)
-                    #
-                    #     return convert, size
-                    #
-                    # with PoolExecutor(max_workers=100) as executor:
-                    #     obj_list, size_list = zip(*executor.map(compress, obj_list))
-                    #
-                    # # obj_list, size_list = zip(*temp)
-                    #
-                    # for s in size_list:
-                    #     key = key + '_size_' + str(s)
-
                     for i in range(0, len(obj_list)):
-                       if obj_list[i] is not None:
-                           ser = context.serialize(obj_list[i]).to_buffer()
+                        if obj_list[i] is not None:
+                            ser = context.serialize(obj_list[i]).to_buffer()
 
-                           obj_list[i] = pa.compress(ser,
-                                           codec=constants.volatile_cache_compression[constants.volatile_cache_format],
-                                           asbytes=True)
+                            obj_list[i] = pa.compress(ser,
+                                codec=constants.volatile_cache_redis_compression[constants.volatile_cache_redis_format],
+                                asbytes=True)
 
-                           key = key + '_size_' + str(len(ser))
+                            key = key + '_size_' + str(len(ser))
 
                     key = key + '_endsize_'
 
                 else:
                     raise Exception("Invalid volatile cache format specified.")
             elif '_comp' not in key:
-                if constants.volatile_cache_format == 'msgpack':
+                if constants.volatile_cache_redis_format == 'msgpack':
 
                     for i in range(0, len(obj_list)):
                         if obj_list[i] is not None:
                             obj_list[i] = obj_list[i].to_msgpack()
-                elif constants.volatile_cache_format == 'arrow':
+                elif constants.volatile_cache_redis_format == 'arrow':
                     # context = pa.default_serialization_context()
 
                     for i in range(0, len(obj_list)):
@@ -622,20 +609,12 @@ class VolatileAdvCache(VolatileCache):
             if not(isinstance(obj, list)):
                 obj = [obj]
 
-            if constants.volatile_cache_format == 'msgpack':
-                # def read_msgpack(convert):
-                #     if convert is not None:
-                #         return pd.read_msgpack(convert)
-                #
-                #     return convert
-                #
-                # with PoolExecutor(max_workers=100) as executor:
-                #     obj = executor.map(read_msgpack, obj)
+            if constants.volatile_cache_redis_format == 'msgpack':
 
                 for i in range(0, len(obj)):
                    if obj[i] is not None:
                        obj[i] = pd.read_msgpack(obj[i])
-            elif constants.volatile_cache_format == 'arrow':
+            elif constants.volatile_cache_redis_format == 'arrow':
 
                 # If compressed we need to know the size, to decompress it
                 if '_comp' in key:
@@ -649,30 +628,15 @@ class VolatileAdvCache(VolatileCache):
                     if len(obj) > 0:
                         key = self._util_func.find_sub_string_between(key, start, end)
                         siz = self._util_func.keep_numbers_list(key.split('_size_'))
-                    # else:
-                    #     siz = []
-                    #
-                    # # print(siz)
-                    #
-                    # def decompress(convert, size):
-                    #     if convert is not None:
-                    #         return context.deserialize(pa.decompress(convert,
-                    #             codec=constants.volatile_cache_compression[constants.volatile_cache_format],
-                    #             decompressed_size=size))
-                    #
-                    #     return convert
-                    #
-                    # with PoolExecutor(max_workers=100) as executor:
-                    #     obj = executor.map(decompress, obj, siz)
 
                     for i in range(0, len(obj)):
-                       if obj[i] is not None:
-                           obj[i] = pa.decompress(obj[i],
-                                                  codec=constants.volatile_cache_compression[
-                                                      constants.volatile_cache_format],
-                                                  decompressed_size=siz[i])
+                        if obj[i] is not None:
+                            obj[i] = pa.decompress(obj[i],
+                            codec=constants.volatile_cache_redis_compression[
+                                constants.volatile_cache_redis_format],
+                                decompressed_size=siz[i])
 
-                           obj[i] = context.deserialize(obj[i])
+                            obj[i] = context.deserialize(obj[i])
                 else:
                     for i in range(0, len(obj)):
                         if obj[i] is not None:
@@ -697,39 +661,6 @@ class VolatileAdvCache(VolatileCache):
             obj = self._plotly_from_json(obj[0])
 
         return obj
-
-    def _plotly_fig_2_json(self, fig):
-        """Serialize a plotly figure object to JSON so it can be persisted to disk.
-        Figure's persisted as JSON can be rebuilt using the plotly JSON chart API:
-
-        http://help.plot.ly/json-chart-schema/
-
-        If `fpath` is provided, JSON is written to file.
-
-        Modified from https://github.com/nteract/nteract/issues/1229
-        """
-
-        return json.dumps({'data': json.loads(json.dumps(fig.data, cls=PlotlyJSONEncoder)),
-                           'layout': json.loads(json.dumps(fig.layout, cls=PlotlyJSONEncoder))})
-
-
-    def _plotly_from_json(self, fig):
-        """Render a plotly figure from a json file"""
-
-        v = json.loads(fig)
-
-        return go.Figure(data=v['data'], layout=v['layout'])
-
-
-    def encode_df(self, df):
-        buf = io.BytesIO()
-        df.to_msgpack(buf) #, compress=constants.volatile_cache_compression)
-        buf.seek(0)
-        return base64.b64encode(buf.read())
-
-
-    def decode_df(self, s):
-        return pd.read_msgpack(io.BytesIO(base64.b64decode(s)))
 
 ########################################################################################################################
 
@@ -855,8 +786,12 @@ class VolatileRedis(VolatileAdvCache):
 
         if key is not None:
             if key != []:
+
+                execute = False
+
                 if pipeline is None:
                     pipeline = VolatileRedis._db
+                    execute = True
 
                 # UNLINK is *much* quicker when removing large valued keys compared to "delete" (only works with Redis 4 onwards)
                 try:
@@ -864,3 +799,6 @@ class VolatileRedis(VolatileAdvCache):
                 except:
                     # If fails try delete which works with older versions of Redis
                     pipeline.delete(*key)
+
+                if execute:
+                    pipeline.execute()

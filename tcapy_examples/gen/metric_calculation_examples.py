@@ -73,7 +73,7 @@ if __name__ == '__main__':
 
     start = time.time()
 
-    # example_calculate_market_impact()
+    example_calculate_market_impact()
     example_calculate_slippage_with_bid_mid_spreads()
 
     finish = time.time()

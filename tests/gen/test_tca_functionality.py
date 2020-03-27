@@ -367,7 +367,7 @@ def test_tag_filter_calculation():
 def test_executed_price_notional_calculation():
     """Test that the executed average price calculation from trades is correctly reflected in the order level
     """
-    Mediator.get_volatile_cache(version=tcapy_version).clear_cache()
+    Mediator.get_volatile_cache().clear_cache()
 
     market_df, trade_df, order_df = get_sample_data()
 
@@ -393,7 +393,7 @@ def test_data_offset():
     """Tests the offsetting of market and trade data by milliseconds by user. This might be useful if clocks are slightly
     offset when recording market or trade data
     """
-    Mediator.get_volatile_cache(version=tcapy_version).clear_cache()
+    Mediator.get_volatile_cache().clear_cache()
 
     tca_request = TCARequest(start_date=start_date, finish_date=finish_date, ticker=ticker,
                              trade_data_store=trade_data_store,
@@ -541,4 +541,4 @@ if __name__ == '__main__':
 
     test_create_tca_report()
 
-    import pytest; pytest.main()
+    # import pytest; pytest.main()

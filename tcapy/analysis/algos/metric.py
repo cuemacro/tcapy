@@ -264,7 +264,7 @@ class MetricSlippage(MetricCalc):
         ask_benchmark_list = [ask_benchmark]
         metric_list = [self._metric_name + '_benchmark']
 
-        # add the bid/mid spreads if they exist
+        # Add the bid/mid spreads if they exist
         if bid_mid_spread is not None and ask_mid_spread is not None:
             if bid_mid_spread in market_df.columns and ask_mid_spread in market_df.columns:
                 bid_benchmark_list.append(bid_mid_spread)
@@ -280,7 +280,7 @@ class MetricSlippage(MetricCalc):
         metric_df = self._get_benchmark_time_points(trade_order_df, market_df, metric_df, is_buy, ask_benchmark_list,
                                                     metric_list, just_before_point=True)
 
-        # make sign consistent for buys and sells for slippage (or negative is always a cost for the client)
+        # Make sign consistent for buys and sells for slippage (or negative is always a cost for the client)
         metric_df[self._metric_name] = np.multiply(
             ((metric_df[executed_price].values / metric_df[self._metric_name + '_benchmark'].values) - 1.0),
             -trade_order_df['side'].values)
@@ -290,7 +290,7 @@ class MetricSlippage(MetricCalc):
         metric_list.append(self._metric_name);
         metric_list.append('id')
 
-        # flag anomalous trades by slippage (compared to the spread to benchmark)
+        # Flag anomalous trades by slippage (compared to the spread to benchmark)
         if 'spread_to_benchmark' in metric_df.columns:
             metric_df[self._metric_name + '_anomalous'] = np.where(
                 metric_df[self._metric_name] < metric_df['spread_to_benchmark'], 1, 0)
@@ -374,7 +374,7 @@ class MetricMarketImpact(MetricCalc):
 
         metric_df[executed_price] = trade_order_df[executed_price]
 
-        # market impact
+        # Market impact
         time_delta = self._time_delta()
         metric_df = self._get_benchmark_time_points(trade_order_df, market_df, metric_df, is_sell, bid_benchmark,
                                                     self._metric_name + '_benchmark', timedelta_amount=time_delta,
@@ -384,8 +384,8 @@ class MetricMarketImpact(MetricCalc):
                                                     self._metric_name + '_benchmark', timedelta_amount=time_delta,
                                                     just_before_point=False)
 
-        # make sign consistent with trade direction, for buy trades a move higher afterwards is BAD (
-        # for sell trades a move lower is BAD afterwards
+        # Make sign consistent with trade direction, for buy trades a move higher afterwards is BAD (
+        # for sell trades a move lower is BAD afterwards)
         metric_df[self._metric_name] = np.multiply(((metric_df[executed_price].values /
                                                         metric_df[self._metric_name + '_benchmark'].values) - 1.0),
                                                       constants.market_impact_multiplier * trade_order_df['side'].values)

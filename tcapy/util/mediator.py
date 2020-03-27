@@ -50,16 +50,19 @@ class Mediator(object):
         pass
 
     @staticmethod
-    def get_volatile_cache(version=constants.tcapy_version):
-        if version not in Mediator._volatile_cache.keys():
+    def get_volatile_cache(volatile_cache_engine=constants.volatile_cache_engine):
+        if volatile_cache_engine not in Mediator._volatile_cache.keys():
             with Mediator._volatile_cache_lock:
-                from tcapy.data.volatilecache import VolatileRedis as VolatileCache
+                if volatile_cache_engine == 'redis':
+                    from tcapy.data.volatilecache import VolatileRedis
+                    Mediator._volatile_cache[volatile_cache_engine] = VolatileRedis()
 
-                # from tcapy.data.volatilecache import VolatileDictionary as VolatileCache
+                elif volatile_cache_engine == 'plasma':
+                    from tcapy.data.volatilecache import VolatilePlasma
+                    Mediator._volatile_cache[volatile_cache_engine] = VolatilePlasma()
 
-                Mediator._volatile_cache[version] = VolatileCache()
 
-        return Mediator._volatile_cache[version]
+        return Mediator._volatile_cache[volatile_cache_engine]
 
     @staticmethod
     def get_tca_market_trade_loader(version=constants.tcapy_version):

@@ -40,7 +40,7 @@ class TCATickerLoader(ABC):
 
     """
 
-    def __init__(self, version=constants.tcapy_version):
+    def __init__(self, version=constants.tcapy_version, volatile_cache_engine=constants.volatile_cache_engine):
         self._data_factory = DataFactory(version=version)
 
         self._util_func = UtilFunc()  # general utility operations (such as flatten lists)
@@ -53,6 +53,7 @@ class TCATickerLoader(ABC):
         self._benchmark_mid = BenchmarkMid()  # to calculate mid price from bid/ask quote market data
         self._trade_order_tag = TradeOrderFilterTag()  # to filter trade/orders according to the values of certain tags
         self._version = version
+        self._volatile_cache_engine = volatile_cache_engine
 
     def get_market_data(self, market_request):
         """Gets market data for a particular ticker. When we ask for non-standard FX crosses, only the mid-field is

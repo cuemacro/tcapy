@@ -9,6 +9,7 @@ __author__ = 'saeedamen'  # Saeed Amen / saeed@cuemacro.com
 #
 
 import numpy as np
+import pandas as pd
 from datetime import timedelta
 import abc
 
@@ -146,8 +147,10 @@ class BenchmarkSpreadToMid(BenchmarkMarket):
 
         # Calculate the bid-mid and ask-mid spreads from market data
         if bid in market_df.columns and ask in market_df.columns and not (overwrite_bid_ask):
-            market_df[bid + '_' + mid + '_spread'] = (market_df[bid].values / market_df[mid].values) - 1.0
-            market_df[ask + '_' + mid + '_spread'] = (market_df[mid].values / market_df[ask].values) - 1.0
+            # market_df[bid + '_' + mid + '_spread'] = (market_df[bid].values / market_df[mid].values) - 1.0
+            # market_df[ask + '_' + mid + '_spread'] = (market_df[mid].values / market_df[ask].values) - 1.0
+            market_df[bid + '_' + mid + '_spread'] = pd.eval('(market_df.bid / market_df.mid) - 1.0')
+            market_df[ask + '_' + mid + '_spread'] = pd.eval('(market_df.mid / market_df.ask) - 1.0')
 
         # If we have been asked to overwrite bid/ask columns with an artificial proxy
         elif bid in market_df.columns and ask in market_df.columns and overwrite_bid_ask:
@@ -155,15 +158,24 @@ class BenchmarkSpreadToMid(BenchmarkMarket):
             # create a synthetic bid/ask and use the user specified spread
             market_df[bid + '_' + mid + '_spread'] = -bid_mid_bp / 10000.0
             market_df[ask + '_' + mid + '_spread'] = -ask_mid_bp / 10000.0
-            market_df[bid] = (market_df[mid].values) * (1.0 - bid_mid_bp / 10000.0)
-            market_df[ask] = (market_df[mid].values) / (1.0 - ask_mid_bp / 10000.0)
+            # market_df[bid] = (market_df[mid].values) * (1.0 - bid_mid_bp / 10000.0)
+            # market_df[ask] = (market_df[mid].values) / (1.0 - ask_mid_bp / 10000.0)
+            # market_df[bid + '_' + mid + '_spread'] = pd.eval('-bid_mid_bp / 10000.0')
+            # market_df[ask + '_' + mid + '_spread'] = pd.eval('-ask_mid_bp / 10000.0')
+            market_df[bid] = pd.eval('(market_df[mid]) * (1.0 - bid_mid_bp / 10000.0)')
+            market_df[ask] = pd.eval('(market_df[mid]) / (1.0 - ask_mid_bp / 10000.0)')
+
 
         # If we only have the mid column
         elif mid in market_df.columns and bid not in market_df.columns and ask not in market_df.columns:
             market_df[bid + '_' + mid + '_spread'] = -bid_mid_bp / 10000.0
             market_df[ask + '_' + mid + '_spread'] = -ask_mid_bp / 10000.0
-            market_df[bid] = (market_df[mid].values) * (1.0 - bid_mid_bp / 10000.0)
-            market_df[ask] = (market_df[mid].values) / (1.0 - ask_mid_bp / 10000.0)
+            # market_df[bid] = (market_df[mid].values) * (1.0 - bid_mid_bp / 10000.0)
+            # market_df[ask] = (market_df[mid].values) / (1.0 - ask_mid_bp / 10000.0)
+            # market_df[bid + '_' + mid + '_spread'] = pd.eval('-bid_mid_bp / 10000.0')
+            # market_df[ask + '_' + mid + '_spread'] = pd.eval('-ask_mid_bp / 10000.0')
+            market_df[bid] = pd.eval('(market_df.mid) * (1.0 - bid_mid_bp / 10000.0)')
+            market_df[ask] = pd.eval('(market_df.mid) / (1.0 - ask_mid_bp / 10000.0)')
         else:
             LoggerManager().getLogger(__name__).warn("Couldn't calculate spread from mid, check market data has appropriate fields.")
 

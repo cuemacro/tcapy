@@ -27,13 +27,13 @@ class TCATickerLoaderImpl(TCATickerLoader):
     speed up data fetching rather than hammering a database repeatedly.
     """
 
-    def __init__(self, version=constants.tcapy_version):
-        super(TCATickerLoaderImpl, self).__init__(version=version)
+    def __init__(self, version=constants.tcapy_version, volatile_cache_engine=constants.volatile_cache_engine):
+        super(TCATickerLoaderImpl, self).__init__(version=version, volatile_cache_engine=volatile_cache_engine)
 
         self._plot_render = PlotRender()
 
     def _convert_tuple_to_market_trade(self, market_trade_order_tuple):
-        volatile_cache = Mediator.get_volatile_cache(version=self._version)
+        volatile_cache = Mediator.get_volatile_cache(volatile_cache_engine=self._volatile_cache_engine)
 
         # Gather market and trade/order data (which might be stored in a list)
         if isinstance(market_trade_order_tuple, list):
@@ -88,7 +88,7 @@ class TCATickerLoaderImpl(TCATickerLoader):
     def get_market_data(self, market_request, return_cache_handles=False):
         # Handles returns a pointer
 
-        volatile_cache = Mediator.get_volatile_cache(version=self._version)
+        volatile_cache = Mediator.get_volatile_cache(volatile_cache_engine=self._volatile_cache_engine)
 
         cache = True
 
@@ -147,7 +147,7 @@ class TCATickerLoaderImpl(TCATickerLoader):
         # return_cache_handles returns a pointer
 
         logger = LoggerManager().getLogger(__name__)
-        volatile_cache = Mediator.get_volatile_cache(version=self._version)
+        volatile_cache = Mediator.get_volatile_cache(volatile_cache_engine=self._volatile_cache_engine)
 
         # by default, assume we want trade data (rather than order data)
         if trade_order_type is None:
@@ -209,7 +209,7 @@ class TCATickerLoaderImpl(TCATickerLoader):
         return trade_df
 
     def calculate_metrics_single_ticker(self, market_trade_order_combo, tca_request, dummy_market):
-        volatile_cache = Mediator.get_volatile_cache(version=self._version)
+        volatile_cache = Mediator.get_volatile_cache(volatile_cache_engine=self._volatile_cache_engine)
 
         market_df, trade_order_df_values, ticker, trade_order_df_keys \
             = super(TCATickerLoaderImpl, self).calculate_metrics_single_ticker(market_trade_order_combo, tca_request, dummy_market)
@@ -231,7 +231,7 @@ class TCATickerLoaderImpl(TCATickerLoader):
             cache = False
 
         if market_request.multithreading_params['cache_period_market_data'] and cache:
-            volatile_cache = Mediator.get_volatile_cache(version=self._version)
+            volatile_cache = Mediator.get_volatile_cache(volatile_cache_engine=self._volatile_cache_engine)
 
             start_date, finish_date, market_key, market_df = \
                 volatile_cache.get_data_request_cache(market_request, market_request.data_store, 'market_df',

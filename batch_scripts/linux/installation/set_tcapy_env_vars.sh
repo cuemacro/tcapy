@@ -21,6 +21,8 @@ export CONDA_ACTIVATE=/home/tcapyuser/anaconda3/bin/activate
 
 export TCAPY_USER=$USER # which user to run tcapy
 
+export TCAPY_CELERY_WORKERS=12
+
 # Add Anaconda to the path (you might need to change this)
 # export PATH=~/anaconda3/bin:$PATH
 

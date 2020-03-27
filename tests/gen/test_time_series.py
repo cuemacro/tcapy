@@ -9,8 +9,9 @@ __author__ = 'saeedamen'  # Saeed Amen / saeed@cuemacro.com
 # See the License for the specific language governing permissions and limitations under the License.
 #
 
+import pandas as pd
 import pandas
-import numpy
+import numpy as np
 from datetime import timedelta
 
 try:
@@ -30,33 +31,33 @@ def test_vlookup():
     """Runs a test for the VLOOKUP function which is used extensively in a lot of the metric construction
     """
 
-    dt = pandas.date_range(start='01 Jan 2018', end='05 Jan 2018', freq='1min')
+    dt = pd.date_range(start='01 Jan 2018', end='05 Jan 2018', freq='1min')
 
-    rand_data = numpy.random.random(len(dt))
+    rand_data = np.random.random(len(dt))
 
-    df_before = pandas.DataFrame(index=dt, columns=['rand'], data=rand_data)
+    df_before = pd.DataFrame(index=dt, columns=['rand'], data=rand_data)
 
     millseconds_tests = [100, 500]
 
     # try perturbing by nothing, then 100 and 500 milliseconds
     for millseconds in millseconds_tests:
-        df_perturb = pandas.DataFrame(index=dt - timedelta(milliseconds=millseconds), columns=['rand'],
+        df_perturb = pd.DataFrame(index=dt - timedelta(milliseconds=millseconds), columns=['rand'],
                                       data=rand_data)
 
         # do a VLOOKUP (which should give us all the previous ones) - take off the last point (which would be AFTER
         # our perturbation)
         search, dt_search = TimeSeriesOps().vlookup_style_data_frame(dt[0:-1], df_perturb, 'rand')
 
-        df_after = pandas.DataFrame(index=dt_search + timedelta(milliseconds=millseconds), data=search.values,
+        df_after = pd.DataFrame(index=dt_search + timedelta(milliseconds=millseconds), data=search.values,
                                     columns=['rand'])
 
         # check the search dataframes are equal
         assert_frame_equal(df_before[0:-1], df_after, check_dtype=False)
 
     # in this case, our lookup series doesn't overlap at all with our range, so we should get back and exception
-    dt_lookup = pandas.date_range(start='30 Dec 2017', end='31 Dec 2018', freq='1min')
+    dt_lookup = pd.date_range(start='30 Dec 2017', end='31 Dec 2018', freq='1min')
 
-    df_perturb = pandas.DataFrame(index=dt + timedelta(milliseconds=millseconds), columns=['rand'],
+    df_perturb = pd.DataFrame(index=dt + timedelta(milliseconds=millseconds), columns=['rand'],
                                   data=rand_data)
 
     exception_has_been_triggered = False
@@ -74,9 +75,9 @@ def test_filter_between_days_times():
     """
     from tcapy.analysis.tradeorderfilter import TradeOrderFilterTimeOfDayWeekMonth
 
-    dt = pandas.date_range(start='01 Jan 2018', end='05 Jan 2018', freq='1min')
+    dt = pd.date_range(start='01 Jan 2018', end='05 Jan 2018', freq='1min')
 
-    df = pandas.DataFrame(index=dt, columns=['Rand'], data=numpy.random.random(len(dt)))
+    df = pd.DataFrame(index=dt, columns=['Rand'], data=np.random.random(len(dt)))
     df = df.tz_localize('utc')
 
     trade_order_filter = TradeOrderFilterTimeOfDayWeekMonth(time_of_day={'start_time': '07:00:00',
@@ -89,13 +90,13 @@ def test_filter_between_days_times():
 def test_remove_consecutive_duplicates():
     """Tests that consecutive duplicates are removed correctly in time series
     """
-    dt = pandas.date_range(start='01 Jan 2018', end='05 Jan 2018', freq='30s')
+    dt = pd.date_range(start='01 Jan 2018', end='05 Jan 2018', freq='30s')
 
-    df = pandas.DataFrame(index=dt, columns=['bid', 'mid', 'ask'])
+    df = pd.DataFrame(index=dt, columns=['bid', 'mid', 'ask'])
 
-    df['mid'] = numpy.random.random(len(dt))
-    df['bid'] = numpy.random.random(len(dt))
-    df['ask'] = numpy.random.random(len(dt))
+    df['mid'] = np.random.random(len(dt))
+    df['bid'] = np.random.random(len(dt))
+    df['ask'] = np.random.random(len(dt))
 
     # filter by 'mid'
     df2 = df.copy()
@@ -124,11 +125,11 @@ def test_remove_consecutive_duplicates():
 def test_ohlc():
     """Tests the open/high/low/close resampling works on time series
     """
-    dt = pandas.date_range(start='01 Jan 2018', end='05 Jan 2018', freq='1s')
+    dt = pd.date_range(start='01 Jan 2018', end='05 Jan 2018', freq='1s')
 
-    df = pandas.DataFrame(index=dt, columns=['bid', 'mid', 'ask'])
+    df = pd.DataFrame(index=dt, columns=['bid', 'mid', 'ask'])
 
-    df['mid'] = numpy.random.random(len(dt))
+    df['mid'] = np.random.random(len(dt))
 
     df_ohlc = TimeSeriesOps().resample_time_series(df, resample_amount=1, how='ohlc', unit='minutes', field='mid')
 
@@ -138,14 +139,14 @@ def test_ohlc():
 def test_chunk():
     """Tests the chunking of dataframes works
     """
-    dt = pandas.date_range(start='01 Jan 2018', end='05 Jan 2018', freq='1min')
+    dt = pd.date_range(start='01 Jan 2018', end='05 Jan 2018', freq='1min')
 
-    df = pandas.DataFrame(index=dt, columns=['bid', 'mid', 'ask'])
+    df = pd.DataFrame(index=dt, columns=['bid', 'mid', 'ask'])
 
-    df['mid'] = numpy.random.random(len(dt))
+    df['mid'] = np.random.random(len(dt))
 
     df_chunk = TimeSeriesOps().split_array_chunks(df, chunks=None, chunk_size=100)
-    df_chunk = pandas.concat(df_chunk)
+    df_chunk = pd.concat(df_chunk)
 
     assert_frame_equal(df_chunk, df)
 
@@ -155,10 +156,10 @@ def test_cache_handle():
     from tcapy.data.volatilecache import VolatileRedis as VolatileCache
     volatile_cache = VolatileCache()
 
-    dt = pandas.date_range(start='01 Jan 2017', end='05 Jan 2019', freq='1m')
-    df = pandas.DataFrame(index=dt, columns=['bid', 'mid', 'ask'])
+    dt = pd.date_range(start='01 Jan 2017', end='05 Jan 2019', freq='1m')
+    df = pd.DataFrame(index=dt, columns=['bid', 'mid', 'ask'])
 
-    df['mid'] = numpy.ones(len(dt))
+    df['mid'] = np.ones(len(dt))
     ch = volatile_cache.put_dataframe_handle(df, use_cache_handles=True)
 
     df_1 = volatile_cache.get_dataframe_handle(ch, burn_after_reading=True)
@@ -174,12 +175,12 @@ def test_data_frame_holder():
     volatile_cache = VolatileCache()
 
     # Create a very large DataFrame, which needs to be chunked in storage
-    dt = pandas.date_range(start='01 Jan 2000', end='05 Jan 2020', freq='15s')
-    df = pandas.DataFrame(index=dt, columns=['bid', 'mid', 'ask'])
+    dt = pd.date_range(start='01 Jan 2000', end='05 Jan 2020', freq='10s')
+    df = pd.DataFrame(index=dt, columns=['bid', 'mid', 'ask'])
 
-    df['bid'] = numpy.ones(len(dt))
-    df['mid'] = numpy.ones(len(dt))
-    df['ask'] = numpy.ones(len(dt))
+    df['bid'] = np.ones(len(dt))
+    df['mid'] = np.ones(len(dt))
+    df['ask'] = np.ones(len(dt))
 
     df_list = TimeSeriesOps().split_array_chunks(df, chunks=2)
     df_lower = df_list[0]

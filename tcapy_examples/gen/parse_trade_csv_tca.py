@@ -139,11 +139,13 @@ def dataframe_compliance_tca_example():
                                  # Display a table of all the anomalous trades by slippage (ie. outside bid/ask)
                                  TableResultsForm(trade_order_list=['trade_df'],
                                                   metric_name='slippage',
-                                                  filter_by='worst_all',  # order by the worst slippage
+                                                  filter_by='worst_all',  # Order by the worst slippage
                                                   tag_value_combinations={'slippage_anomalous': 1.0},
-                                                  # only flag trades outside bid/ask
+
+                                                  # Only flag trades outside bid/ask
                                                   keep_fields=['executed_notional_in_reporting_currency', 'side'],
-                                                  # display only side and executed notionals
+
+                                                  # Display only side and executed notionals
                                                   round_figures_by=None),
 
                                  # Get the total notional executed by broker (in reporting currency)

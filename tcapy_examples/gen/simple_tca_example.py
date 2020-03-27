@@ -58,11 +58,13 @@ def single_ticker_tca_example():
     weights by reporting currency)
     """
 
-    # Note: running Orca might not work in WSL
+    # Note: running Orca might not work in WSL, also when generating Plotly charts, might get an error with WSL, if
+    # it doesn't have silent_display=True, as it will try to open a web page in a browser (which isn't supported in WSL1
+    # but is in WSL2)
     PLOT = False
 
     # clear entire cache
-    # Mediator.get_volatile_cache(version='pro').clear_cache()
+    # Mediator.get_volatile_cache().clear_cache()
 
     tca_engine = TCAEngineImpl(version=tca_version)
 
@@ -237,8 +239,7 @@ def venue_tca_aggregated_example():
                                                      weighting_field='executed_notional')
 
     # Plot PDF of slippage, split up by venue
-    Chart(engine='plotly').plot(summary_slippage_df, style=
-    Style(plotly_plot_mode='offline_html', connect_line_gaps=True))
+    Chart(engine='plotly').plot(summary_slippage_df, style=Style(plotly_plot_mode='offline_html', connect_line_gaps=True))
 
 def compare_multithreading_type():
     """Compares different type of multithreading types

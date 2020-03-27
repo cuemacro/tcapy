@@ -46,6 +46,7 @@ class TCAResults(ComputationResults):
             bar_charts = {}
             dist_charts = {}
             styled_tables = {}
+            styled_join_tables = {}
 
             # timeline charts
             for t in self._util_func.dict_key_list(self.timeline.keys()):
@@ -79,11 +80,16 @@ class TCAResults(ComputationResults):
             for t in self._util_func.dict_key_list(self.table.keys()):
                 styled_tables[t] = self._plot_render.generate_table(self.table[t])
 
+            # join tables
+            for t in self._util_func.dict_key_list(self.join_tables.keys()):
+                styled_join_tables[t] = self._plot_render.generate_table(self.join_tables[t])
+
             self.timeline_charts = timeline_charts
             self.sparse_market_charts = sparse_market_charts
             self.bar_charts = bar_charts
             self.dist_charts = dist_charts
             self.styled_tables = styled_tables
+            self.styled_join_tables = styled_join_tables
 
             self._rendered = True
 
@@ -122,6 +128,7 @@ class TCAResults(ComputationResults):
         dist = DataFrames with distribution style data
         table = DataFrames intended to be displayed as tables
         market = DataFrames with high frequency tick market data
+        jointables = DataFrames intended to be displayed as tables
 
         Here are some examples:
             'candlestick_fig' - Plotly Figure of market data in candlestick format
@@ -133,6 +140,7 @@ class TCAResults(ComputationResults):
             'dist_trade_df_slippage_by_side' - distribution chart of slippage split by side
             'market_df' - market data for a single ticker
             'EURUSD_df' - market data for EURUSD (when we are doing aggregated TCA analysis)
+            'jointables_broker_id' - table of broker aggregates
 
         Parameters
         ----------
@@ -149,6 +157,7 @@ class TCAResults(ComputationResults):
         dist = {}
         table = {}
         market = {}
+        join_tables = {}
 
         candlestick_chart = {}
         
@@ -176,6 +185,11 @@ class TCAResults(ComputationResults):
 
                 simpler_d = d.replace('dist_', '')
                 dist[simpler_d] = dict_of_df[d]
+                
+            elif d.find('jointables_') == 0:
+
+                simpler_d = d.replace('jointables_', '')
+                join_tables[simpler_d] = dict_of_df[d]
                 
             elif d.find('table_') == 0:
 
@@ -219,6 +233,7 @@ class TCAResults(ComputationResults):
         self.bar = bar
         self.dist = dist
         self.table = table
+        self.join_tables = join_tables
         self.market = market
 
         self.candlestick_charts = candlestick_chart
@@ -299,6 +314,14 @@ class TCAResults(ComputationResults):
     def table(self, table):
         self.__table = table
         
+    @property
+    def join_tables(self):
+        return self.__join_tables
+
+    @join_tables.setter
+    def join_tables(self, join_tables):
+        self.__join_tables = join_tables
+        
     ##### charts
     
     @property
@@ -348,6 +371,14 @@ class TCAResults(ComputationResults):
     @styled_tables.setter
     def styled_tables(self, styled_tables):
         self.__styled_tables = styled_tables
+        
+    @property
+    def styles_join_tables(self):
+        return self.__styles_join_tables
+
+    @styles_join_tables.setter
+    def styles_join_tables(self, styles_join_tables):
+        self.__styles_join_tables = styles_join_tables
 
 
 

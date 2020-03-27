@@ -41,7 +41,7 @@ class ComputationResults(ABC):
         """
         pass
 
-    ##### other data (eg. text)
+    ##### Other data (eg. text)
     @property
     def text_preamble(self):
         return self.__text_preamble

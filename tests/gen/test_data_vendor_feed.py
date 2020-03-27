@@ -250,8 +250,8 @@ def test_weekend_download_boundary_from_data_vendor():
         database_populator = database_populator_dict[data_vendor_name]
         chunk_int_min = chunk_int_min_dict[data_vendor_name]
 
-        start_date = '12 Jan 2018 19:00';
-        finish_date = '15 Jan 2018 05:00';
+        # start_date = '12 Jan 2018 19:00';
+        # finish_date = '15 Jan 2018 05:00';
 
         start_date = '12 Jan 2018 21:00';
         finish_date = '15 Jan 2018 01:00';

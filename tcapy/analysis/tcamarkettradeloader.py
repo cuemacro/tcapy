@@ -106,6 +106,17 @@ class TCAMarketTradeLoader(ABC):
         return df_dict
 
     def get_trade_order_holder(self, tca_request):
+        """Gets the trades/orders in the form of a TradeOrderHolder
+
+        Parameters
+        ----------
+        tca_request : TCARequest
+            Parameters for the TCA computation
+
+        Returns
+        -------
+        TradeOrderHolder
+        """
 
         tca_ticker_loader = Mediator.get_tca_ticker_loader(version=self._version)
 

@@ -109,14 +109,17 @@ There are three ways to use tcapy, which are:
 * Programmatically
 * Via RESTful API (very basic functionality at present)
 
-A [comprehensive Jupyter notebook explains](tcapy_notebooks/introducing_tcapy.ipynb) how to use tcapy in more detail 
-and in particular how to call it programmatically. We are planning on adding more Jupyter notebooks with many more
-examples of how to use tcapy.
+# Jupyter notebook to show how to use tcpay
+
+* [Introducing tcapy and explaining TCA](tcapy_notebooks/introducing_tcapy.ipynb) - how to use tcapy in more detail 
+and gives many examples of how to call it programmatically
+* [Compliance and other more involved TCA calculations](tcapy_notebooks/compliance_tca_calculations) - shows how to do 
+TCA calculations for compliance and other more involved use cases
 
 A few things to note:
 
 * Please bear in mind at present tcapy is currently an alpha project
-* tcapy is only partially documented, although we are working on adding more documentation, in particular Jupyter notebooks
+* tcapy is only partially documented, although we are working on adding more documentation, in particular more Jupyter notebooks
 * Uses Apache 2.0 licence [see here](LICENCE)
 
 # How do you install tcapy?

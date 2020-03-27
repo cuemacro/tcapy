@@ -41,9 +41,9 @@ it in other folders if you want
 You will need to edit several files so tcapy knows where it has been installed
 * Edit file `/home/tcapyusercuemacro/tcapy/batch_scripts/linux/installation/set_tcapy_env_vars.sh` 
     * change `TCAPY_CUEMACRO` parameter to the installation folder
-    * adjust any other parameters (eg. related to web server)
+    * adjust any other parameters (eg. related to web server, `conda` path etc)
 * Edit file `/home/tcapyuser/cuemacro/tcapy/tcapy/conf/mongo.conf` so the logpath parameter points to the log file area under
-the tcapy folder eg. `logpath = /home/redhat/cuemacro/tcapy/log/mongo.log`
+the tcapy folder eg. `logpath = /home/tcapyuser/cuemacro/tcapy/log/mongo.log`
 * Edit file `/home/tcapyuser/cuemacro/tcapy/tcapy/conf/redis.conf` if necessary to change how it deals with ejecting elements
 from the cache and also the memory size of the store
 
@@ -198,13 +198,14 @@ If you only have a Windows machine, you have several options:
     * some dependencies may work, but they are not officially supported on WSL 
         * eg. MongoDB on WSL, although in this instance, there is a Windows version of MongoDB you could use
     * also WSL doesn't support all Linux functionality such as UI, although this will likely change in newer versions
-3. install Linux using Microsoft's own Windows subsystem for Linux (WSL) and install tcapy directly on Windows
+3. install Linux using Microsoft's own Windows subsystem for Linux (WSL) (step 2) and then install tcapy directly on Windows (step 4)
     * this gives you the ability to utilise some of the Linux specific features of tcapy, which may not
     be fully supported on Windows
     * at the same time you can call tcapy programmatically from Windows
         * so we can interact with Windows applications such as Excel (eg. using xlwings)
         * you still use the Linux supported features
-            * to speed up computations using Celery
+            * to speed up computations using Celery (via Redis as a message broker and Memcached as a results backend)
+            * use Redis to cache trade/order and market data
             * to host the web app via nginx web server and gunicorn
         
 4. install tcapy directly on Windows, but some libraries may not be fully supported (eg. Celery)

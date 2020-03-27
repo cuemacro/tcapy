@@ -108,7 +108,7 @@ def test_multithreading_full_basic_tca():
     aggregated and compliance. Note that we need a running Celery server for multithreading to work (as well as the
     usual SQL and Arctic databases running, if the test_csv option has not been selected). Uses a very large data sample
     """
-    Mediator.get_volatile_cache(version=tcapy_version).clear_cache()  # clear cache to ensure all test code runs!
+    Mediator.get_volatile_cache().clear_cache()  # clear cache to ensure all test code runs!
 
     tca_request = TCARequest(start_date=multithreading_start_date, finish_date=multithreading_finish_date,
                              ticker=valid_ticker_list,
@@ -181,7 +181,7 @@ def test_invalid_dates_missing_data_tca():
     aggregated and compliance. Note that we need a running Celery server for multithreading to work (as well as the
     usual SQL and Arctic databases running, if the test_csv option has not been selected). Uses a very large data sample
     """
-    Mediator.get_volatile_cache(version=tcapy_version).clear_cache()  # clear cache to ensure all test code runs!
+    Mediator.get_volatile_cache().clear_cache()  # clear cache to ensure all test code runs!
 
     tca_request = TCARequest(start_date=large_start_date, finish_date=large_finish_date, ticker=valid_ticker_list,
                              trade_data_store=trade_data_store,
@@ -200,8 +200,7 @@ def test_invalid_dates_missing_data_tca():
 
     for t in tca_type:
         for m in multithreading:
-            Mediator.get_volatile_cache(
-                version=tcapy_version).clear_cache()  # clear cache to ensure all test code runs!
+            Mediator.get_volatile_cache().clear_cache()  # clear cache to ensure all test code runs!
             tca_request.use_multithreading = m
             tca_request.tca_type = t
 
@@ -251,7 +250,7 @@ def test_stress_tca():
         return
 
     # Clear cache to ensure all test code runs!
-    Mediator.get_volatile_cache(version=tcapy_version).clear_cache()
+    Mediator.get_volatile_cache().clear_cache()
 
     tca_request = TCARequest(start_date=large_start_date, finish_date=large_finish_date, ticker=['All'],
                              dummy_market=True,

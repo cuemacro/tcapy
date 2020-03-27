@@ -373,8 +373,8 @@ class Constants(object):
     arctic_timeout_ms = 10 * 1000  # How many millisections should we have a timeout for in Arctic/MongoDB
 
     arctic_trade_order_mapping = OrderedDict(
-        [('trade_df', 'trade'),  # Name of the table which holds broker messages to clients
-         ('order_df', 'child')])  # Name of the table which has orders from client
+        [('trade_df', 'trade'),     # Name of the table which holds broker messages to clients
+         ('order_df', 'order')])    # Name of the table which has orders from client
 
     arctic_lib_type = 'VERSION_STORE'  # VERSION_STORE (default) or TICK_STORE
 
@@ -460,6 +460,9 @@ class Constants(object):
 
     ##### Volatile cache settings ##########################################################################################
 
+    # Note that if you change any of these settings, make sure to empty the in-memory cache
+    volatile_cache_engine = 'redis' # 'redis' (TODO 'plasma')
+
     # Redis settings (for internal usage - not Celery message broker - those settings need to be specified seperately)
     volatile_cache_host_redis = '127.0.0.1'
     volatile_cache_port_redis = '6379'
@@ -472,14 +475,16 @@ class Constants(object):
     # Expiry time for user data (60 minutes)
     volatile_cache_expiry_seconds = 60 * 60
 
-    volatile_cache_format = 'msgpack' # 'msgpack' or 'arrow' (currently testing arrow)
+    # note: msgpack is slightly faster, but is not supported in Pandas in later versions
+    # at current stage arrow is not fully tested
+    volatile_cache_redis_format = 'msgpack' # 'msgpack' or 'arrow'
 
-    volatile_cache_compression = {'msgpack' : 'blosc',
-                                  'arrow' : 'snappy'} # 'lz4' or 'snappy'
+    volatile_cache_redis_compression = {'msgpack' : 'blosc',
+                                        'arrow' : 'snappy'} # 'lz4' or 'snappy'
 
     # Above this size we need to break apart our keys into different chunks before pushing into Redis
-    # Redis has a maximum size of what we can store in a single value
-    volatile_cache_max_cache_chunk_size_mb = 500
+    # Redis has a maximum size of what we can store in a single value (512 is maximum, can tweak lower)
+    volatile_cache_redis_max_cache_chunk_size_mb = 500
 
     ##### celery settings ##################################################################################################
 

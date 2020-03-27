@@ -68,11 +68,11 @@ class ComputationCaller(ABC):
             page_flags = [];
             line_flags = []
 
-            # for redrawing plots
+            # For redrawing plots
             for gen_flag in self._generic_plot_flags:
                 key = page + gen_flag
 
-                # append a plot flag if it exists
+                # Append a plot flag if it exists
                 if key in layout.id_flags:
                     page_flags.append(self._session_manager.create_calculated_flags(
                         'redraw-' + page, session_manager.create_calculated_flags(
@@ -82,11 +82,11 @@ class ComputationCaller(ABC):
 
             plot_flags[page] = UtilFunc().flatten_list_of_lists(page_flags)
 
-            # for clicking on charts
+            # For clicking on charts
             for gen_flag in self._generic_line_flags:
                 key = page + gen_flag
 
-                # append a line clicking flag if it exists
+                # Append a line clicking flag if it exists
                 if key in layout.id_flags:
                     line_flags.append(self._session_manager.create_calculated_flags(
                         'redraw-' + page,
@@ -121,7 +121,7 @@ class ComputationCaller(ABC):
             callback_dict = constants.dash_callbacks
 
         for k in callback_dict.keys():
-            # dash callbacks for detailed page
+            # Dash callbacks for detailed page
             app.callback(
                 callback_manager.output_callback(k, 'status'),
                 callback_manager.input_callback(k, callback_dict[k]))(
@@ -191,7 +191,7 @@ class ComputationCaller(ABC):
 
         cached_list = []
 
-        # first try to get from the cache (only need the key for this, no hash!)
+        # First try to get from the cache (only need the key for this, no hash!)
         if not (force_calculate):
             if not (isinstance(key, list)):
                 key = [key]
@@ -240,17 +240,17 @@ class ComputationCaller(ABC):
             session_id = ''
             session_id_computation = ''
 
-        # try to fetch some TCA analysis output from the cache
+        # Try to fetch some TCA analysis output from the cache
         cached_list = self._fetch_cached_list(force_calculate=force_calculate, computation_type=computation_type,
                                               session_id=session_id, key=key)
 
-        # otherwise force the calculation (or if doesn't exist in the cache!)
+        # Otherwise force the calculation (or if doesn't exist in the cache!)
         # when a button is pressed, typically force calculate will be set to True
         if force_calculate:
 
             computation_request = self.create_computation_request(**kwargs)
 
-            # delete any existing keys for the current session
+            # Delete any existing keys for the current session
             self._glob_volatile_cache.clear_key_match("*" + session_id + "*")
 
             dict_of_df = self.run_computation_request(computation_request)
@@ -258,7 +258,7 @@ class ComputationCaller(ABC):
             dict_key_list = [];
             dict_element_list = []
 
-            # cache all the dataframes in Redis/or other memory space (will likely need for later calls!)
+            # Cache all the dataframes in Redis/or other memory space (will likely need for later calls!)
             # from security perspective probably better not to cache the TCAEngine objects on a database (which can execute code)
             for dict_key in dict_of_df.keys():
 
@@ -273,7 +273,7 @@ class ComputationCaller(ABC):
 
             # self._glob_volatile_cache.put(session_id_computation + dict_key, dict_of_df[dict_key])
 
-            # put it back into Redis cache (to be fetched by Dash callbacks)
+            # Put it back into Redis cache (to be fetched by Dash callbacks)
             self._glob_volatile_cache.put(dict_key_list, dict_element_list)
 
             logger = LoggerManager.getLogger(__name__)
