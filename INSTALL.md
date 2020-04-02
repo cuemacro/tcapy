@@ -17,7 +17,7 @@ discuss later.
 tcapy is tested for use with Python 3.6 and does not support any version of Python 2, and do not use it with earlier
 versions of Python 3.
 
-In the future planning on making a Docker container to install tcapy (and potentionally also to have tcapy available in `conda` and `pip`).
+In the future, I'm planning on making a Docker container to install tcapy (and potentionally also to have tcapy available in `conda` and `pip`).
 
 ## Download tcapy to your machine
 
@@ -41,7 +41,7 @@ it in other folders if you want
 You will need to edit several files so tcapy knows where it has been installed
 * Edit file `/home/tcapyusercuemacro/tcapy/batch_scripts/linux/installation/set_tcapy_env_vars.sh` 
     * change `TCAPY_CUEMACRO` parameter to the installation folder
-    * adjust any other parameters (eg. related to web server, `conda` path etc)
+    * adjust any other parameters (eg. related to web server, what is your `conda` path etc.)
 * Edit file `/home/tcapyuser/cuemacro/tcapy/tcapy/conf/mongo.conf` so the logpath parameter points to the log file area under
 the tcapy folder eg. `logpath = /home/tcapyuser/cuemacro/tcapy/log/mongo.log`
 * Edit file `/home/tcapyuser/cuemacro/tcapy/tcapy/conf/redis.conf` if necessary to change how it deals with ejecting elements
@@ -66,15 +66,15 @@ project. These values include those related to the:
     * accounts
     * algos
 * parallelisation parameters
-    * whether to `use_multithreading` (generally recommended except when debugging)
+    * whether to `use_multithreading` (generally recommended to be set to `True`, except when debugging)
 * volatile caching for Redis
 * Celery settings
 * web server parameters
 
 In `/home/tcapyuser/cuemacro/tcapy/tcapygen/constantsgen.py` are parameters specifically related to the GUI
 * Dash callbacks
-* which lines to plot
-* colors of lines
+* which lines to plot on charts for Dash
+* colors of lines to be plotted
 
 It is recommended you make an additional file `constantscred.py` in `/home/tcapyuser/cuemacro/tcapy/tcapy/conf/`, such as 
 below, where you can set any parameters you want to override from `constants.py` and `constantsgen.py`, in particular 
@@ -105,12 +105,15 @@ class ConstantsCred(object):
 tcapy has many dependencies, which need to be installed after cloning the tcapy project locally. We discuss what you 
 should install below.
 
-* Anaconda Python - It is recommended you install Anaconda first. This includes `conda` installation manager, which tends
-to be easier to use when installing certain libraries. First change directory by running 
+* Anaconda Python - It is recommended you install the Anaconda distribution of Python first, if you don't already have it. 
+This includes `conda` installation manager, which tends to be easier to use when installing certain libraries, which are more
+difficult to install using `pip`. First change directory by running 
 `cd /home/tcapyuser/cuemacro/tcapy/batch_scripts/linux/installation` and then run `./install_anaconda.sh` 
 
-* Make sure the `conda` command is accessible from your Bash shell (usually after Anaconda installation, you'll have to reopen
-the Bash shell to test this)
+* Check if `conda` command is accessible from your Bash shell (usually after Anaconda installation, you'll have to reopen
+the Bash shell to test this) - and also make sure you have changed the `CONDA_ACTIVATE` parameter in `set_tcapy_env_vars.sh`
+to wherever your Anaconda is installed (below shows the default path)
+    * `CONDA_ACTIVATE` by default is `/home/tcapyuser/anaconda3/bin/activate`
     
 Once you have installed Anaconda, we first change directory by running `cd /home/tcapyuser/cuemacro/tcapy/batch_scripts/linux/installation`
 and then run `./install_all_tcapy.sh` which will install a number of dependencies (some of which are optional, so you 
@@ -177,58 +180,54 @@ of issues in a corporate environment will be due to firewall issues.
 
 # tcapy installation on Windows
 
-If you only have a Windows machine, you have several options:
+If you only have a Windows machine, you have several options, when it comes to installing tcapy:
 
-1. install Linux on Windows in a virtual machine using software like [VirtualBox](https://www.virtualbox.org/) 
+1. install Linux on Windows in a virtual machine using [VirtualBox](https://www.virtualbox.org/) (or similar applications) 
+and then install tcapy on VirtualBox/Linux
     * instructions are [here](https://itsfoss.com/install-linux-in-virtualbox/) for installing Ubuntu in VirtualBox
     * then follow the instructions earlier ie. *tcapy installation on Linux*
         * you might need to enable shared folders (so you can read Windows folders in Linux)
         and enable your permissions to read these `sudo usermod -G vboxsf -a tcapyuser`
-        * to create a link run `ln -s /some/source/dir /home/$USER/cuemacro/tcapy`
-2. install Linux using Microsoft's own Windows subsystem for Linux (WSL)
+        * to create a link run `ln -s /some/source/dir /home/tcapyuser/cuemacro/tcapy`
+        * you can SSH into your VirtualBox Ubuntu using a tool like Putty
+            * to do this you can enable the VirtualBox Host Adapter
+            * install SSH on Ubuntu by running `sudo apt-get install openssh-server`
+            
+2. install Linux using Microsoft's own Windows subsystem for Linux (WSL) and then install tcapy on WSL/Linux
     * WSL is a compatibility layer for running Linux binary executables natively on Windows 10
-    * Makes it easier to run Linux under Windows
-    * Some of the distributions that can be installed relatively easily on WSL include Ubuntu
+    * makes it easier to run Linux under Windows compared to using a virtual machine application such as VirtualBox
+    * some of the Linux distributions that can be installed relatively easily on WSL include Ubuntu
     * instructions are [here](https://docs.microsoft.com/en-us/windows/wsl/install-win10) for WSL 1
     * instructions are [here](https://docs.microsoft.com/en-us/windows/wsl/wsl2-install) for WSL 2
         * WSL2 is currently in preview, but will be made 
-        [generally available shortly in the full  Windows 10 version 2004.](https://devblogs.microsoft.com/commandline/wsl2-will-be-generally-available-in-windows-10-version-2004/)
+        [generally available shortly in the full  Windows 10 version 2004](https://devblogs.microsoft.com/commandline/wsl2-will-be-generally-available-in-windows-10-version-2004/)
         * WSL2 offers better compatibility with Linux and offers much faster IO
     * then follow the instructions earlier ie. *tcapy installation on Linux*
     * some dependencies may work, but they are not officially supported on WSL 
         * eg. MongoDB on WSL, although in this instance, there is a Windows version of MongoDB you could use
     * also WSL doesn't support all Linux functionality such as UI, although this will likely change in newer versions
-3. install Linux using Microsoft's own Windows subsystem for Linux (WSL) (step 2) and then install tcapy directly on Windows (step 4)
-    * this gives you the ability to utilise some of the Linux specific features of tcapy, which may not
-    be fully supported on Windows
-    * at the same time you can call tcapy programmatically from Windows
-        * so we can interact with Windows applications such as Excel (eg. using xlwings)
-        * you still use the Linux supported features
-            * to speed up computations using Celery (via Redis as a message broker and Memcached as a results backend)
-            * use Redis to cache trade/order and market data
-            * to host the web app via nginx web server and gunicorn
-        
-4. install tcapy directly on Windows, but some libraries may not be fully supported (eg. Celery)
+
+3. install tcapy directly on Windows, but some libraries may not be fully supported (eg. Celery)
     * we assume that you've already installed any databases you'd like to use (eg. MongoDB for market tick data, 
     Microsoft SQL Server for your trade/order data)
     * we strongly recommend that you install Ubuntu on WSL (with tcapy) before you install tcapy on Windows
         * but if you aren't going to install WSL, you might also find it useful to install Redis for Windows, although
-    we note that this is an [old version 3.2 from Microsoft's archive on GitHub](https://github.com/microsoftarchive/redis/releases) 
+    we note that this is a compiled [old version 3.2 from Microsoft's archive on GitHub](https://github.com/microsoftarchive/redis/releases) 
     and is also not supported by Redis 
     * download [Anaconda Python distribution for Windows](https://www.anaconda.com/distribution/) and then install in folder
     `C:\Anaconda3`
     * it is possible to use other distributions of Python, but the project has been setup by default to use
-    Anaconda and conda installation manager
+    Anaconda Python and conda installation manager
     * as with all the other cases, we need to clone the tcapy project from GitHub
     * install [Git for Windows](https://gitforwindows.org/) and then run
     
             git clone https://github.com/cuemacro/tcapy.git e:\Remote\tcapy
     
     * this will clone it in the `e:\Remote\tcapy` folder (you can choose to install it elsewhere), alternatively, you
-    can manually clone it from GitHub
+    can manually clone it from the GitHub website
     * edit `e:\Remote\tcapy\batch_scripts\windows\installation\set_tcapy_env_vars.bat` if necessary change the several variables
-        * TCAPY_CUEMACRO - with the folder you installed tcapy (default: `e:\Remote\tcapy`)
-        * CONDA_ACTIVATE - the path to Anaconda conda (default: `C:\Anaconda3\Scripts\activate.bat`)
+        * `TCAPY_CUEMACRO` - with the folder you installed tcapy (default: `e:\Remote\tcapy`)
+        * `CONDA_ACTIVATE` - the path to Anaconda conda (default: `C:\Anaconda3\Scripts\activate.bat`)
     * run `e:\Remote\tcapy\batch_scripts\windows\installation\install_virtual_env.bat` which will setup a new 
     conda environment called `py36tca`
     * run `e:\Remote\tcapy\batch_scripts\windows\installation\install_pip_python_packages.bat` which will install
@@ -251,10 +250,31 @@ If you only have a Windows machine, you have several options:
     
         in your Anaconda prompt or you can run `e:\Remote\tcapy\batch_scripts\windows\installation\activate_python_environment.bat`
         which will activate it and also add the tcapy folder to your `PYTHONPATH`
+        
+    * to create PDF reports from tcapy output on Windows you'll need to separately install wkhtmltopdf and weasyprint, 
+    which are converters for HTML to PDF
+        * [wkhtmltopdf installation guide on Windows](https://github.com/JazzCore/python-pdfkit/wiki/Installing-wkhtmltopdf)
+            * also requires adding the `wkhtmltopdf/bin folder` to your Windows path
+        * [weasyprint installation guide on Windows](https://weasyprint.readthedocs.io/en/latest/install.html#windows)
+            * also requires downloading and installation of GTK64, which is detailed in the above instructions     
+    
+4. install Linux using Microsoft's own Windows subsystem for Linux (WSL) and then install tcapy on WSL/Linux (step 2) and then 
+install tcapy directly on Windows (step 4)
+    * this gives you the ability to utilise some of the Linux specific features of tcapy, which may not
+    be fully supported on Windows
+    * at the same time you can call tcapy programmatically from Windows
+        * so we can interact with Windows applications such as Excel (eg. using xlwings)
+        * you still use the Linux supported features (which can run on your WSL Linux instances)
+            * to speed up computations using Celery (via Redis as a message broker and Memcached as a results backend)
+            * use Redis to cache trade/order and market data
+            * to host the web app via nginx web server and gunicorn
 
-We would generally recommend option 3, and we have tested that. Whilst option 4. is feasible, note, that doing this might 
+We would generally recommend option 4 (install Linux using WSL, tcapy on WSL/Linux and then install tcapy directly on Windows), 
+and we have been testing that. 
+
+Whilst option 3 (install tcapy directly on Windows) is feasible, note, that doing this might 
 make it difficult to run certain features such as Celery which is not fully supported. We have not tested other functionality 
-such as the use of [nginx for Windows](http://nginx.org/en/docs/windows.html) to host the web GUI of tcapy.
+such as the use of [nginx for Windows](http://nginx.org/en/docs/windows.html) to host the web GUI of tcapy directly on Windows.
 
 # Running tcapy
 
@@ -267,8 +287,8 @@ In order to start tcapy, we need to first run `cd /home/tcapyuser/cuemacro/tcapy
 * Memcached - for a results backend for Celery
 
 * You can may need to edit this file, if
-    * you use different databases (eg. InfluxDB or KDB for market tick data) 
-    * or your databases are running on a different server
+    * you use different database types (eg. InfluxDB or KDB for market tick data) 
+    * or your databases are running on different servers (and you don't need to run locally)
 
 Once all the databases/caches have been started, we can run `./restart_tcapy.sh` from the same folder.
 This will do several things, which includes:
@@ -280,10 +300,18 @@ This will do several things, which includes:
     * http://localhost:9000/tcapyapi/ - RESTful API endpoint
 * Start Celery for distributed computation, which can also be accessed programmatically
     * If we do TCA on multiple assets, each asset is sent to a different Celery worker for computation
+    * Celery also distributes the loading of data from the databases/caches by using different Celery workers
 
 If you change `use_multithreading` to `False` in `constantscred.py` you can avoid using Celery, which reduces the number
 of dependencies and is often easier to setup, particularly if you need to run Celery workers on Windows, where newer 
-versions of Celery need a workaround to work (see https://www.distributedpython.com/2018/08/21/celery-4-windows/).
+versions of Celery need a workaround to work (see https://www.distributedpython.com/2018/08/21/celery-4-windows/). Note, 
+that calculations can be quite slow if Celery is not used (it will also reduce the caching opportunities)
+
+# Installing new tcapy versions
+
+If you install an updated version of tcapy, it is recommended you go through all the steps again, because there
+often likely to be new (or updated) dependencies, which may include additional/updated Python libraries or external
+applications
 
     
 

@@ -305,6 +305,9 @@ class MetricSlippage(MetricCalc):
 
         return metric_trade_df, metric_df
 
+    def get_metric_name(self):
+        return self._metric_name
+
 ########################################################################################################################
 
 class MetricImpShortfall(MetricSlippage):

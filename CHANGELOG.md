@@ -6,6 +6,11 @@
 
 ## Coding log
 
+* 02 April 2020
+    * Added HTML versions of Jupyter notebooks
+    * Added `DataNorm` as a parameter to `DataRequest`
+    * Made chart titles neater for `TCAResults` with Jinja/WeasyPrint PDF creation and refactored report generator
+    * Added scatter charts and associated methods/classes
 * 27 March 2020
     * Various bug fixes 
         * In particular for `VolatileCache`

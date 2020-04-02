@@ -45,12 +45,14 @@ class TCAResults(ComputationResults):
             sparse_market_charts = {}
             bar_charts = {}
             dist_charts = {}
+            scatter_charts = {}
             styled_tables = {}
             styled_join_tables = {}
 
             # timeline charts
             for t in self._util_func.dict_key_list(self.timeline.keys()):
-                timeline_charts[t] = self._plot_render.plot_timeline(self.timeline[t], t,
+                title = self._prettify_title(t)
+                timeline_charts[t] = self._plot_render.plot_timeline(self.timeline[t], title,
                                                                      width=self._chart_width, height=self._chart_height)
 
             lines_to_plot = self._util_func.dict_key_list(constants.detailed_timeline_plot_lines.keys())
@@ -59,22 +61,35 @@ class TCAResults(ComputationResults):
             # sparse market charts
             for s in self._util_func.dict_key_list(self.sparse_market.keys()):
                 sparse_ticker = s.split('_')[0]
+
+                title = self._prettify_title(s)
                 sparse_market_charts[s] = self._plot_render.plot_market_trade_timeline(
-                    s, self.sparse_market[s], candlestick_fig=self.candlestick_charts[sparse_ticker],
+                    title=title, sparse_market_trade_df=self.sparse_market[s], candlestick_fig=self.candlestick_charts[sparse_ticker],
                     lines_to_plot=lines_to_plot, width=self._chart_width, height=self._chart_height)
 
             # bar charts
             for b in self._util_func.dict_key_list(self.bar.keys()):
-                bar_charts[b] = self._plot_render.plot_bar(self.bar[b], b,
-                                                                     width=self._chart_width, height=self._chart_height)
+                title = self._prettify_title(b)
+                bar_charts[b] = self._plot_render.plot_bar(bar_df=self.bar[b], title=title,
+                                                        width=self._chart_width, height=self._chart_height)
 
             # dist charts
             for d in self._util_func.dict_key_list(self.dist.keys()):
                 tag_dict = self._split_df_tag(d)
+                title = self._prettify_title(d) + ' PDF'
 
                 dist_charts[d] = self._plot_render.plot_dist(
-                    dist_df=self.dist[d], metric=tag_dict['metric'], title=None, split_by=tag_dict['split_by'],
-                                                                     width=self._chart_width, height=self._chart_height)
+                    dist_df=self.dist[d], metric=tag_dict['metric'], title=title, split_by=tag_dict['split_by'],
+                    width=self._chart_width, height=self._chart_height)
+
+            # scatter charts
+            for s in self._util_func.dict_key_list(self.scatter.keys()):
+                tag_dict = self._split_df_tag(s)
+                title = self._prettify_title(s)
+                scatter_charts[s] = self._plot_render.plot_scatter(scatter_df=self.scatter[s], title=title,
+                                                        scatter_fields=tag_dict['scatter_fields'],
+                                                        width=self._chart_width, height=self._chart_height)
+
 
             # styled tables
             for t in self._util_func.dict_key_list(self.table.keys()):
@@ -88,13 +103,56 @@ class TCAResults(ComputationResults):
             self.sparse_market_charts = sparse_market_charts
             self.bar_charts = bar_charts
             self.dist_charts = dist_charts
+            self.scatter_charts = scatter_charts
             self.styled_tables = styled_tables
             self.styled_join_tables = styled_join_tables
 
             self._rendered = True
 
+    def _prettify_title(self, title):
+        # Now replace terms like 'trade_df' with 'Trades' and remove underscores
+        for k in constants.pretty_trade_order_mapping.keys():
+            title = title.replace(k, constants.pretty_trade_order_mapping[k])
+
+        title = title.replace('_', ' ')
+        title = title.capitalize()
+
+        # Make case of assets same as tickers
+        tickers = constants.available_tickers_dictionary['All'].copy()
+        lowercase_tickers = [t.lower() for t in tickers]
+
+        title_lst = title.split()
+
+        for i in range(0, len(title_lst)):
+            found = -1
+
+            try:
+                found = lowercase_tickers.index(title_lst[i].lower())
+            except:
+                pass
+
+            if found >= 0:
+                title_lst[i] = tickers[found]
+
+        title = " ".join(title_lst)
+
+        return title
+
+
     def _split_df_tag(self, tag):
-        tag_dict = {'split_by' : '', 'trade_order' : '', 'metric' : ''}
+        """Parses the key of the DataFrame into an easier to read dict format, describing fields such as the trade/order,
+        what metric is in the table etc.
+
+        Parameters
+        ----------
+        tag : str
+            Original key
+
+        Returns
+        -------
+        dict
+        """
+        tag_dict = {'split_by' : '', 'trade_order' : '', 'metric' : '', 'scatter_fields' : ''}
 
         tag_middle = tag
 
@@ -107,7 +165,11 @@ class TCAResults(ComputationResults):
             tag_df_split = tag_middle.split('_df_')
 
             tag_dict['trade_order'] = tag_df_split[0]
-            tag_dict['metric'] = tag_df_split[1]
+
+            if '_vs_' in tag_df_split[1]:
+                tag_dict['scatter_fields'] = tag_df_split[1].split('_vs_')
+            else:
+                tag_dict['metric'] = tag_df_split[1]
 
         return tag_dict
 
@@ -155,6 +217,7 @@ class TCAResults(ComputationResults):
         sparse_market = {}
         bar = {}
         dist = {}
+        scatter = {}
         table = {}
         market = {}
         join_tables = {}
@@ -186,6 +249,11 @@ class TCAResults(ComputationResults):
                 simpler_d = d.replace('dist_', '')
                 dist[simpler_d] = dict_of_df[d]
                 
+            elif d.find('scatter_') == 0:
+
+                simpler_d = d.replace('scatter_', '')
+                scatter[simpler_d] = dict_of_df[d]
+                
             elif d.find('jointables_') == 0:
 
                 simpler_d = d.replace('jointables_', '')
@@ -215,7 +283,7 @@ class TCAResults(ComputationResults):
         #### for situations when we have multiple tickers
 
         # market, candlesticks
-        for t in self._computation_request.ticker:
+        for t in self.computation_request.ticker:
             if t + '_df' in keys:
                 market[t] = dict_of_df[t + '_df']
             elif t + '_candlestick_fig' in keys:
@@ -223,7 +291,7 @@ class TCAResults(ComputationResults):
 
         # sparse market
         for k in keys:
-            for t in self._computation_request.ticker:
+            for t in self.computation_request.ticker:
                 if k.find(t + '_sparse_market_') == 0:
                     sparse_market[k.replace('_sparse_market_', '')] = dict_of_df[k]
         
@@ -232,6 +300,7 @@ class TCAResults(ComputationResults):
         self.sparse_market = sparse_market
         self.bar = bar
         self.dist = dist
+        self.scatter = scatter
         self.table = table
         self.join_tables = join_tables
         self.market = market
@@ -307,6 +376,14 @@ class TCAResults(ComputationResults):
         self.__dist = dist
         
     @property
+    def scatter(self):
+        return self.__scatter
+
+    @scatter.setter
+    def scatter(self, scatter):
+        self.__scatter = scatter
+        
+    @property
     def table(self):
         return self.__table
 
@@ -355,6 +432,14 @@ class TCAResults(ComputationResults):
     @dist_charts.setter
     def dist_charts(self, dist_charts):
         self.__dist_charts = dist_charts
+        
+    @property
+    def scatter_charts(self):
+        return self.__scatter_charts
+
+    @scatter_charts.setter
+    def scatter_charts(self, scatter_charts):
+        self.__scatter_charts = scatter_charts
 
     @property
     def candlestick_charts(self):

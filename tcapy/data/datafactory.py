@@ -24,7 +24,7 @@ import numpy as np
 class DataFactory(object):
     """This class takes in DataRequests and then gets the underlying DatabaseSource (eg. CSV) to
     fetch a DataFrame filled with market data or trade/order data. Also calls the underlying DataNorm object to shift
-    the DataFrame which we have fetched into an appropriate format for tcapy.
+    the DataFrame (or a user specified one) which we have fetched into an appropriate format for tcapy.
 
     """
 
@@ -46,7 +46,10 @@ class DataFactory(object):
         # Fetch table from the underlying database (CSV, SQL or RESTful etc.)
         logger = LoggerManager().getLogger(__name__)
 
-        data_norm = Mediator.get_data_norm(version=self._version)
+        data_norm = data_request.data_norm
+
+        if data_norm is None:
+            data_norm = Mediator.get_data_norm(version=self._version)
 
         # Where do we get data from?
         database_source = Mediator.get_database_source_picker().get_database_source(data_request)

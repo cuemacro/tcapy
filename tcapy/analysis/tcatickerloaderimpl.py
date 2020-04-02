@@ -298,7 +298,8 @@ class TCATickerLoaderImpl(TCATickerLoader):
 
                         trade_order_df_dict[ticker_label + 'sparse_market_' + trade_order.replace('df', 'fig')]\
                             = self._plot_render.plot_market_trade_timeline(
-                            title, trade_order_df_dict[ticker_label + 'sparse_market_' + trade_order], lines_to_plot,
+                            title=title, sparse_market_trade_df=trade_order_df_dict[ticker_label + 'sparse_market_' + trade_order],
+                            lines_to_plot=lines_to_plot,
                             candlestick_fig=trade_order_df_dict[ticker_label + 'candlestick_fig'])
 
         return trade_order_df_dict

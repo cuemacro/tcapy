@@ -26,7 +26,7 @@ class ComputationResults(ABC):
         self._util_func = UtilFunc()
         self.text_preamble = text_preamble
 
-        self._computation_request = computation_request
+        self.computation_request = computation_request
 
         self._rendered = False
 
@@ -49,3 +49,11 @@ class ComputationResults(ABC):
     @text_preamble.setter
     def text_preamble(self, text_preamble):
         self.__text_preamble = text_preamble
+
+    @property
+    def computation_request(self):
+        return self.__computation_request
+
+    @computation_request.setter
+    def computation_request(self, computation_request):
+        self.__computation_request = computation_request

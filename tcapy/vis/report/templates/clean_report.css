@@ -1,0 +1,372 @@
+@charset "UTF-8";
+@import url(https://fonts.googleapis.com/css?family=Open+Sans);
+
+/*@font-face {*/
+/*  font-family: Open Sans;*/
+/*  font-weight: 400;*/
+/*  src: url(OpenSans-Regular.ttf); }*/
+
+/*@font-face {*/
+/*  font-family: Open Sans;*/
+/*  font-style: italic;*/
+/*  font-weight: 400;*/
+/*  src: url(OpenSans-Italic.ttf); }*/
+
+/*@font-face {*/
+/*  font-family: Open Sans;*/
+/*  font-weight: 300;*/
+/*  src: url(OpenSans-Light.ttf); }*/
+
+/*@font-face {*/
+/*  font-family: Open Sans;*/
+/*  font-style: italic;*/
+/*  font-weight: 300;*/
+/*  src: url(OpenSans-LightItalic.ttf); }*/
+
+/*@font-face {*/
+/*  font-family: Open Sans;*/
+/*  font-weight: bold;*/
+/*  src: url(OpenSans-Bold.ttf); }*/
+
+
+/*@font-face {*/
+/*  font-family: Open Sans;*/
+/*  font-weight: 400;}*/
+
+/*@font-face {*/
+/*  font-family: Open Sans;*/
+/*  font-style: italic;*/
+/*  font-weight: 400;}*/
+
+/*@font-face {*/
+/*  font-family: Open Sans;*/
+/*  font-weight: 300;}*/
+
+/*@font-face {*/
+/*  font-family: Open Sans;*/
+/*  font-style: italic;*/
+/*  font-weight: 300;}*/
+
+/*@font-face {*/
+/*  font-family: Open Sans;*/
+/*  font-weight: bold;}*/
+
+@page {
+  @top-left {
+    background: #DCDCDC;
+    content: counter(page);
+    height: 1cm;
+    text-align: center;
+    width: 1cm; }
+  @top-center {
+    background: #DCDCDC;
+    content: '';
+    display: block;
+    height: .05cm;
+    opacity: .5;
+    width: 100%; }
+  @top-right {
+    content: string(heading);
+    font-size: 9pt;
+    height: 1cm;
+    vertical-align: middle;
+    width: 100%; } }
+
+@page :blank {
+  @top-left {
+    background: none;
+    content: ''; }
+  @top-center {
+    content: none; }
+  @top-right {
+    content: none; } }
+
+@page no-chapter {
+  @top-left {
+    background: none;
+    content: none; }
+  @top-center {
+    content: none; }
+  @top-right {
+    content: none; } }
+
+@page :first {
+  background-size: cover;
+  margin: 0; }
+
+@page chapter {
+  background: #DCDCDC;
+  margin: 0;
+  @top-left {
+    content: none; }
+  @top-center {
+    content: none; }
+  @top-right {
+    content: none; } }
+
+html {
+  color: #393939;
+  font-family: Open Sans;
+  font-size: 11pt;
+  font-weight: 300;
+  line-height: 1.5; }
+  html body h1 {
+    color: black;
+    font-size: 32pt;
+    font-weight: 300;
+    margin: 5cm 2cm 0 2cm;
+    page: no-chapter;
+    width: 100%; }
+  html body h2, html body h3, html body h4 {
+    color: black;
+    font-weight: 400; }
+  html body h2 {
+    break-before: always;
+    font-size: 28pt;
+    string-set: heading content(); }
+  html body h3 {
+    font-weight: 300;
+    font-size: 15pt; }
+  html body h4 {
+    font-size: 13pt; }
+  html body article#cover {
+    align-content: space-between;
+    display: flex;
+    flex-wrap: wrap;
+    height: 297mm; }
+    html body article#cover address {
+      background: #FFFFFF;
+      flex: 1 50%;
+      margin: 0 -2cm;
+      padding: 1cm 0;
+      font-style: normal;
+      white-space: pre-wrap; }
+      html body article#cover address:first-of-type {
+        padding-left: 3cm; }
+  html body article#contents {
+    break-before: right;
+    break-after: left;
+    page: no-chapter; }
+    html body article#contents h2 {
+      font-size: 20pt;
+      font-weight: 400;
+      margin-bottom: 3cm; }
+    html body article#contents h3 {
+      font-weight: 500;
+      margin: 3em 0 1em; }
+      html body article#contents h3::before {
+        background: #DCDCDC;
+        content: '';
+        display: block;
+        height: .08cm;
+        margin-bottom: .25cm;
+        width: 2cm; }
+    html body article#contents ul {
+      list-style: none;
+      padding-left: 0; }
+      html body article#contents ul li {
+        border-top: .25pt solid #c1c1c1;
+        margin: .25cm 0;
+        padding-top: .25cm; }
+        html body article#contents ul li::before {
+          color: #DCDCDC;
+          content: '• ';
+          font-size: 40pt;
+          line-height: 16pt;
+          vertical-align: bottom; }
+        /* html body article#contents ul li a {
+          color: inherit;
+          text-decoration: inherit; }
+          html body article#contents ul li a::before {
+            content: target-text(attr(href)); }
+          html body article#contents ul li a::after {
+            color: #DCDCDC;
+            content: target-counter(attr(href), page);
+            float: right; } */
+  html body article#charts section {
+    columns: 1;
+    column-gap: 1cm;
+    padding-top: 1cm; }
+    html body article#charts section p {
+      text-align: justify; }
+      html body article#charts section p:first-of-type {
+        font-weight: 700; }
+  html body article#tables section {
+    columns: 1;
+    column-gap: 1cm;
+    padding-top: 1cm; }
+    html body article#tables section p {
+      text-align: justify; }
+      html body article#tables section p:first-of-type {
+        font-weight: 700; }    
+  html body article#largepoints h3 {
+    background: #DCDCDC;
+    margin: 0 -3cm 1cm;
+    padding: 1cm 1cm 1cm 3cm;
+    width: 21cm; }
+  html body article#largepoints section {
+    padding: .5cm 0; }
+    html body article#largepoints section#table-content::before {
+      /* background: url(table-content.svg) no-repeat center #DCDCDC; */
+      background-size: 50%;
+      content: '';
+      display: inline-block;
+      float: left;
+      height: 2cm;
+      margin-right: .5cm;
+      vertical-align: middle;
+      width: 2cm; }
+    html body article#largepoints section#heading::before {
+      /* background: url(heading.svg) no-repeat center #DCDCDC; --> */
+      background-size: 50%;
+      content: '';
+      display: inline-block;
+      float: left;
+      height: 2cm;
+      margin-right: .5cm;
+      vertical-align: middle;
+      width: 2cm; }
+    html body article#largepoints section#multi-columns::before {
+      /* background: url(multi-columns.svg) no-repeat center #DCDCDC; --> */
+      background-size: 50%;
+      content: '';
+      display: inline-block;
+      float: left;
+      height: 2cm;
+      margin-right: .5cm;
+      vertical-align: middle;
+      width: 2cm; }
+    html body article#largepoints section#internal-links::before {
+      /* background: url(internal-links.svg) no-repeat center #DCDCDC; --> */
+      background-size: 50%;
+      content: '';
+      display: inline-block;
+      float: left;
+      height: 2cm;
+      margin-right: .5cm;
+      vertical-align: middle;
+      width: 2cm; }
+    html body article#largepoints section#style::before {
+      /* background: url(style.svg) no-repeat center #DCDCDC; */
+      background-size: 50%;
+      content: '';
+      display: inline-block;
+      float: left;
+      height: 2cm;
+      margin-right: .5cm;
+      vertical-align: middle;
+      width: 2cm; }
+    html body article#largepoints section h4 {
+      margin: 0; }
+    html body article#largepoints section p {
+      margin-top: 0; }
+  html body article#offers {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between; }
+    html body article#offers h2, html body article#offers h3 {
+      width: 100%; }
+    html body article#offers section {
+      width: 30%; }
+      html body article#offers section h4 {
+        margin-bottom: 0; }
+      html body article#offers section ul {
+        list-style: none;
+        margin: 0;
+        padding-left: 0; }
+        html body article#offers section ul li:not(:last-of-type) {
+          margin: .5cm 0; }
+      html body article#offers section p {
+        background: #DCDCDC;
+        display: block;
+        font-size: 15pt;
+        font-weight: 700;
+        margin-bottom: 0;
+        padding: .25cm 0;
+        text-align: center; }
+  html body article#chapter {
+    align-items: center;
+    display: flex;
+    height: 297mm;
+    justify-content: center;
+    page: chapter; }
+  html body article#textpreamble {
+    align-items: center;
+    display: flex;
+    height: 297mm;
+    justify-content: center;
+    page: textpreamble; }
+  html body article#listpoints section {
+    display: flex;
+    flex-wrap: wrap;
+    margin: 1cm 0; }
+    html body article#listpoints section h4 {
+      border-top: 1pt solid;
+      border-top-width: thin;
+      flex: 1 25%;
+      margin: 0; }
+    html body article#listpoints section h4 + * {
+      flex: 1 75%;
+      margin: 0;
+      padding-left: .5cm; }
+    html body article#listpoints section p {
+      text-align: justify; }
+    html body article#listpoints section ul {
+      line-height: 2;
+      list-style: none; }
+    html body article#listpoints section#small-caps p {
+      font-variant: small-caps; }
+    html body article#listpoints section#ligatures dl {
+      display: flex;
+      flex-wrap: wrap; }
+      html body article#listpoints section#ligatures dl dt {
+        font-weight: 400;
+        width: 30%; }
+      html body article#listpoints section#ligatures dl dd {
+        flex: 1 70%;
+        margin: 0;
+        padding: 0; }
+    html body article#listpoints section#ligatures .none {
+      font-variant-ligatures: none; }
+    html body article#listpoints section#ligatures .common {
+      font-variant-ligatures: common-ligatures; }
+    html body article#listpoints section#ligatures .discretionary {
+      font-variant-ligatures: discretionary-ligatures; }
+    html body article#listpoints section#ligatures .contextual {
+      font-variant-ligatures: contextual; }
+    html body article#listpoints section#numbers dl {
+      display: flex;
+      flex-wrap: wrap; }
+      html body article#listpoints section#numbers dl dt {
+        font-weight: 400;
+        width: 30%; }
+      html body article#listpoints section#numbers dl dd {
+        flex: 1 70%;
+        margin: 0;
+        padding: 0; }
+    html body article#listpoints section#numbers #fractions {
+      font-variant-numeric: diagonal-fractions; }
+    html body article#listpoints section#numbers #ordinals {
+      font-variant-numeric: ordinal; }
+    html body article#listpoints section#numbers #slashed {
+      font-variant-numeric: slashed-zero; }
+    html body article#listpoints section#numbers #super {
+      font-variant-position: super; }
+    html body article#listpoints section#numbers #sub {
+      font-variant-position: sub; }
+    html body article#listpoints section#figures dl {
+      columns: 4; }
+      html body article#listpoints section#figures dl dt {
+        font-weight: 400; }
+      html body article#listpoints section#figures dl dd {
+        display: flex;
+        margin: 0;
+        padding: 0; }
+        html body article#listpoints section#figures dl dd ul {
+          padding: 0 1em 0 0; }
+    html body article#listpoints section#figures #oldstyle {
+      font-variant-numeric: oldstyle-nums; }
+    html body article#listpoints section#figures #tabular {
+      font-variant-numeric: tabular-nums; }
+    html body article#listpoints section#figures #old-tabular {
+      font-variant-numeric: oldstyle-nums tabular-nums; }

@@ -9,6 +9,7 @@ __author__ = 'saeedamen'  # Saeed Amen / saeed@cuemacro.com
 #
 
 import abc
+import pandas as pd
 
 from tcapy.analysis.algos.resultssummary import ResultsSummary
 
@@ -24,7 +25,8 @@ ABC = abc.ABCMeta('ABC', (object,), {'__slots__': ()})
 
 class ResultsForm(ABC):
     """Takes in trade and then creates aggregated metrics which can be displayed in multiple forms by its
-    implementations (such as tables, bar charts, distributions etc).
+    implementations (such as tables, bar charts, distributions, scatter charts etc). Note, this does not create the charts
+    themselves, more preparing the DataFrames for later plotting
 
     """
     def __init__(self, trade_order_list=None, metric_name=None, aggregate_by_field=None, aggregation_metric='mean',
@@ -59,7 +61,7 @@ class TableResultsForm(ResultsForm):
     """
     def __init__(self, trade_order_list=None, metric_name=None, filter_by=['all'], tag_value_combinations={},
                  keep_fields=['executed_notional', 'side'], replace_text={}, round_figures_by=1, scalar=1.0,
-                 weighting_field=constants.table_weighting_field, exclude_fields_from_avg=[]):
+                 weighting_field=constants.table_weighting_field, exclude_fields_from_avg=[], remove_index=False):
         self._trade_order_list = trade_order_list
         self._metric_name = metric_name
         self._results_summary = ResultsSummary()
@@ -70,6 +72,7 @@ class TableResultsForm(ResultsForm):
         self._weighting_field = weighting_field
         self._scalar = scalar
         self._exclude_fields_from_avg = exclude_fields_from_avg
+        self._remove_index = remove_index
 
         self._tag_value_combinations = tag_value_combinations
         self._trade_order_filter_tag = TradeOrderFilterTag()
@@ -83,7 +86,7 @@ class TableResultsForm(ResultsForm):
                           weighting_field=None,
                           tag_value_combinations={}, keep_fields=[], remove_fields=[], replace_text={},
                           round_figures_by=None, scalar=None,
-                          exclude_fields_from_avg=None):
+                          exclude_fields_from_avg=None, remove_index=False):
         if not (self._check_calculate_results(trade_order_name)): return [None, None]
 
         if metric_name is None: metric_name = self._metric_name
@@ -95,6 +98,7 @@ class TableResultsForm(ResultsForm):
         if tag_value_combinations == {}: tag_value_combinations = self._tag_value_combinations
         if scalar is None: scalar = self._scalar
         if exclude_fields_from_avg is None: exclude_fields_from_avg = self._exclude_fields_from_avg
+        if remove_index is None: remove_index = self._remove_index
 
         if not (isinstance(metric_name, list)): metric_name = [metric_name]
         if not (isinstance(filter_by, list)): filter_by = [filter_by]
@@ -146,11 +150,71 @@ class TableResultsForm(ResultsForm):
 
                     results_df = self._util_func.replace_text_in_cols(results_df, replace_text)
 
+                    if remove_index:
+                        results_df = results_df.reset_index()
+                        results_df = results_df.set_index(results_df.columns[0])
+
                     results.append(
                         (results_df, self._results_form_tag + '_' + trade_order_name + '_' + met + '_by_' + filt))
 
         return results
 
+class ScatterResultsForm(ResultsForm):
+    """Takes in trade/orders and then creates aggregated metrics which are likely to be displayed as a scatter plot.
+
+    """
+    def __init__(self, trade_order_list=None, filter_by=['all'], tag_value_combinations={},
+                 scatter_fields=['executed_notional', 'slippage'], replace_text={}, round_figures_by=1, scalar=1.0):
+        self._trade_order_list = trade_order_list
+        self._results_summary = ResultsSummary()
+        self._scatter_fields = scatter_fields
+        self._filter_by = filter_by
+        self._replace_text = replace_text
+        self._round_figures_by = round_figures_by
+        self._scalar = scalar
+
+        self._tag_value_combinations = tag_value_combinations
+        self._trade_order_filter_tag = TradeOrderFilterTag()
+        self._results_form_tag = 'scatter'
+        self._util_func = UtilFunc()
+        self._time_series_ops = TimeSeriesOps()
+
+    def aggregate_results(self, trade_order_df=None, market_df=None, trade_order_name=None,
+                          scatter_fields=None,
+                          tag_value_combinations={}, replace_text={},
+                          round_figures_by=None, scalar=None):
+        if not (self._check_calculate_results(trade_order_name)): return [None, None]
+
+        if scatter_fields is None: scatter_fields = self._scatter_fields
+        if round_figures_by is None: round_figures_by = self._round_figures_by
+        if replace_text == {}: replace_text = self._replace_text
+        if tag_value_combinations == {}: tag_value_combinations = self._tag_value_combinations
+        if scalar is None: scalar = self._scalar
+
+        trade_order_df = self._trade_order_filter_tag.filter_trade_order(trade_order_df,
+                                                                         tag_value_combinations=tag_value_combinations)
+
+        results = []
+
+        if trade_order_df is not None:
+            for s in scatter_fields:
+                if s not in trade_order_df.columns:
+                    return [None]
+
+        else:
+            return [None]
+
+        results_df = pd.DataFrame(index=trade_order_df[scatter_fields[0]].values, data=trade_order_df[scatter_fields[1:]].values, columns=scatter_fields[1:])
+        results_df.index.name = scatter_fields[0]
+
+        results_df = self._time_series_ops.multiply_scalar_dataframe(results_df, scalar=scalar)
+        results_df = self._time_series_ops.round_dataframe(results_df, round_figures_by)
+
+        results_df = self._util_func.replace_text_in_cols(results_df, replace_text)
+
+        results.append((results_df, self._results_form_tag + '_' + trade_order_name + '_' + "_vs_".join(scatter_fields)))
+
+        return results
 
 class DistResultsForm(ResultsForm):
     """Takes in trade/orders and then creates aggregated metrics which are liked to be displayed as a distribution

@@ -47,6 +47,9 @@ start_date = '15 Jun 2016'; finish_date = '10 Sep 2016' # Jul
 
 long_start_date = '05 Jan 2016'; long_finish_date = '10 Feb 2016'
 
+import os
+print(os.environ['PATH'])
+
 def single_ticker_tca_example():
     """Example for doing detailed TCA analysis on the trades of a single ticker, calculating metrics for slippage,
     transient market impact & permanent market impact. It also calculates benchmarks for arrival price of each trade and
@@ -61,7 +64,7 @@ def single_ticker_tca_example():
     # Note: running Orca might not work in WSL, also when generating Plotly charts, might get an error with WSL, if
     # it doesn't have silent_display=True, as it will try to open a web page in a browser (which isn't supported in WSL1
     # but is in WSL2)
-    PLOT = False
+    PLOT = True
 
     # clear entire cache
     # Mediator.get_volatile_cache().clear_cache()
@@ -69,7 +72,7 @@ def single_ticker_tca_example():
     tca_engine = TCAEngineImpl(version=tca_version)
 
     trade_order_type = 'trade_df'
-    trade_order_list = ['trade_df']
+    trade_order_list = ['trade_df', 'order_df']
 
     # Ensure orca is started, if want to convert to PDF (sometimes you may need to specify the path)
     # Can be slow to start
@@ -79,21 +82,44 @@ def single_ticker_tca_example():
 
     # specify the TCA request
     tca_request = TCARequest(start_date=start_date, finish_date=finish_date, ticker=ticker,
-                             tca_type='aggregated',
+                             tca_type='detailed',
                              dummy_market=False,
                              trade_data_store=trade_data_store, market_data_store=market_data_store,
-                             metric_calcs=[MetricSlippage(trade_order_list=trade_order_list),
+                             metric_calcs=[# Calculate the slippage for trades/order
+                                           MetricSlippage(trade_order_list=trade_order_list),
+
+                                           # Calculate the shorter and longer term market impact after every trade/order
                                            MetricTransientMarketImpact(transient_market_impact_gap={'ms': 100},
                                                                        trade_order_list=trade_order_list),
                                            MetricPermanentMarketImpact(permanent_market_impact_gap={'h': 1},
                                                                        trade_order_list=trade_order_list)],
-                             results_form=[TimelineResultsForm(metric_name='slippage', by_date='datehour', scalar=10000.0),
+                             results_form=[# Aggregate the slippage average by date and hour
+                                           TimelineResultsForm(metric_name='slippage', by_date='datehour', scalar=10000.0),
+
+                                           # Aggregate the total executed notional in reporting currency (usually USD)
+                                           # for every hour
                                            TimelineResultsForm(metric_name='executed_notional_in_reporting_currency',
                                                                by_date='datehour',
-                                                               aggregation_metric='sum'),
-                                           BarResultsForm(metric_name='slippage', aggregate_by_field='venue', scalar=10000.0),
-                                           DistResultsForm(metric_name='slippage', aggregate_by_field='side', scalar=10000.0)],
-                             benchmark_calcs=[BenchmarkArrival(), BenchmarkSpreadToMid()],
+                                                               aggregation_metric='sum', scalar=1.0),
+
+                                           # Aggregate the average slippage on trades by venue
+                                           BarResultsForm(metric_name='slippage', aggregate_by_field='venue', scalar=10000.0,
+                                                          trade_order_list='trade_df'),
+
+                                           # Aggregate the average slippage on trades/orders by broker_id
+                                           BarResultsForm(metric_name='slippage', aggregate_by_field='broker_id', scalar=10000.0),
+
+                                           # Aggregate the average slippage on trades/orders by broker_id
+                                           DistResultsForm(metric_name='slippage', aggregate_by_field='side', scalar=10000.0),
+
+                                           # Create a scatter chart of slippage vs. executed notional
+                                           ScatterResultsForm(scatter_fields=['slippage', 'executed_notional_in_reporting_currency'],
+                                                              scalar={'slippage' : 10000.0})],
+                             benchmark_calcs=[# At the arrival price for every trade/order
+                                              BenchmarkArrival(),
+
+                                              # At the spread at the time of every trade/order
+                                              BenchmarkSpreadToMid()],
                              trade_order_mapping=trade_order_list, use_multithreading=False)
 
     # Dictionary of dataframes as output from TCA calculation
@@ -109,41 +135,25 @@ def single_ticker_tca_example():
 
     print(metric_df.head(500))
 
+    from tcapy.vis.report.computationreport import JinjaRenderer
+
     if PLOT:
         ### Generate TCA report using high level object
         # Use higher level TCAResults object to encapsulate results (easier to deal with than a dictionary of DataFrames)
         tca_results = TCAResults(dict_of_df, tca_request)
         tca_results.render_computation_charts()
 
-        tca_report = TCAReport(tca_results)
+        tca_report = TCAReport(tca_results, renderer=JinjaRenderer())
 
-        tca_report.create_report(output_filename='test_tca_report.htm', output_format='html')
+        tca_report.create_report(output_filename='test_tca_report.htm', output_format='html', offline_js=False)
 
         # Note needs plotly orca + wkhtmltopdf installed to render PDFs
         try:
             tca_report.create_report(output_filename='test_tca_report.pdf', output_format='pdf')
-        except:
-            pass
+        except Exception as e:
+            print(str(e))
 
         ### Lower level creation of TCA report
-        from chartpy import Chart, Style, Canvas
-
-        # Generate HTML file directly
-        Chart(engine='plotly').plot(tca_results.sparse_market_charts['GBPUSD_trade_df'], style=Style(plotly_plot_mode='offline_html'))
-
-        # Get an HTML string which can be used elsewhere (eg. could use these in other webpages!)
-        html_string = Chart(engine='plotly').plot(tca_results.sparse_market_charts['GBPUSD_trade_df'],
-                                                  style=Style(plotly_plot_mode='offline_embed_js_div'))
-
-        img_png_string = Chart(engine='plotly').plot(tca_results.sparse_market_charts['GBPUSD_trade_df'],
-                                                     style=Style(plotly_plot_mode='offline_image_png_in_html'))
-
-        # Using plain template
-        canvas = Canvas([[img_png_string]])
-        canvas.generate_canvas(silent_display=True, canvas_plotter='plain', page_title='Cuemacro TCA', render_pdf=False)
-
-        with open('test_tca.html', "w") as text_file:
-            text_file.write(html_string)
 
         ### Plot charts individually
 

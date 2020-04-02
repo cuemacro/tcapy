@@ -58,16 +58,8 @@ from dash.dependencies import Output, Input
 import os
 import sys
 
-# utility stuff
-from tcapy.conf.constants import Constants
-from tcapy.util.loggermanager import LoggerManager
-from tcapy.util.utilfunc import UtilFunc
-
 # for caching data (in Redis)
 from tcapy.util.mediator import Mediator
-
-## for getting paths and general file operations
-import sys
 
 # utility stuff
 from tcapy.conf.constants import Constants

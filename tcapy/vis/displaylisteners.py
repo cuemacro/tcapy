@@ -13,20 +13,10 @@ import numpy as np
 
 import copy
 
-from tcapy.conf.constants import Constants
-from tcapy.util.loggermanager import LoggerManager
-from tcapy.util.timeseries import TimeSeriesOps
-from tcapy.util.utilfunc import UtilFunc
-
 try:
     from StringIO import StringIO
 except ImportError:
     from io import StringIO
-
-# use a modified version of Plotly's figure_factory (which is much quicker with pd/NumPy data)
-import tcapy.vis.candlestick as figure_factory
-
-from tcapy.analysis.algos.metric import MetricWideBenchmarkMarkout
 
 import dash_html_components as html
 
@@ -35,6 +25,20 @@ import dash
 from chartpy import Chart, Style
 
 from collections import OrderedDict
+
+from tcapy.conf.constants import Constants
+from tcapy.util.loggermanager import LoggerManager
+from tcapy.util.timeseries import TimeSeriesOps
+from tcapy.util.utilfunc import UtilFunc
+
+# use a modified version of Plotly's figure_factory (which is much quicker with pd/NumPy data)
+import tcapy.vis.candlestick as figure_factory
+
+from tcapy.analysis.algos.metric import MetricWideBenchmarkMarkout
+
+constants = Constants()
+
+final_scale_factor=constants.chart_scale_factor
 
 # from plotly import figure_factory
 
@@ -265,8 +269,8 @@ class DisplayListeners(object):
 
                         markout_detail_df = metric_df.transpose()
 
-                        return self._plot_render.plot_markout(markout_detail_df,
-                                                              self._session_manager.get_session_flag(tca_type + '-title'))
+                        return self._plot_render.plot_markout(markout_detail_df=markout_detail_df,
+                                        title=self._session_manager.get_session_flag(tca_type + '-title'))
 
                 logger.warn("Couldn't find a markout point for " + str(date_val_dt) + " with closest index " + str(closest_index))
 
@@ -297,7 +301,7 @@ class DisplayListeners(object):
         def callback(_):
             # make sure all the parameters have been selected
             if self._session_manager.check_session_reset_tag('redraw-' + tca_type + '-' + trade_order + '-bar-plot'):
-                key, _, _ = self._create_df_dictionary_key(trade_order_tag)
+                key, _, _, _ = self._create_df_dictionary_key(trade_order_tag)
 
                 # print(key)
 
@@ -335,7 +339,7 @@ class DisplayListeners(object):
             # Make sure all the parameters have been selected
             if self._session_manager.check_session_reset_tag(
                     'redraw-' + tca_type + '-' + trade_order + '-timeline-plot'):
-                key, _, _ = self._create_df_dictionary_key(trade_order_tag)
+                key, _, _, _ = self._create_df_dictionary_key(trade_order_tag)
 
                 return self._plot_render.plot_timeline(
                     title=self._session_manager.get_session_flag(tca_type + '-title'),
@@ -370,7 +374,7 @@ class DisplayListeners(object):
             if self._session_manager.check_session_reset_tag('redraw-' + tca_type + '-' + trade_order + '-dist-plot'): # and \
                 # self._session_manager.check_session_tag(tca_type + '-visualization'):
 
-                key, metric, split_by = self._create_df_dictionary_key(trade_order_tag)
+                key, metric, split_by, _ = self._create_df_dictionary_key(trade_order_tag)
 
                 # raise dash.exceptions.PreventUpdate("No data changed - dist")
                 return self._plot_render.plot_dist(
@@ -378,6 +382,42 @@ class DisplayListeners(object):
                     metric=metric, title=self._session_manager.get_session_flag(tca_type + '-title'), split_by=split_by)
 
             raise dash.exceptions.PreventUpdate("No data changed - dist") # not very elegant but only way to prevent plots disappearing
+
+        return callback
+
+    def plot_scatter(self, trade_order, trade_order_tag, tca_type):
+        """Scatter plot to be generated with only x and y variables
+
+        Parameters
+        ----------
+        trade_order : str
+            Which trade/order does it refer to (eg. 'execution-by-ticker')
+
+        trade_order_tag : str
+            The DataFrame we need to fetch (eg. 'dist_trade_df_by_ticker')
+
+        tca_type : str
+            Type of TCA (eg. 'aggregated)
+
+        Returns
+        -------
+        plotly.Fig
+        """
+
+        # Callback triggered by Dash application
+        def callback(_):
+            # Make sure all the parameters have been selected
+            if self._session_manager.check_session_reset_tag('redraw-' + tca_type + '-' + trade_order + '-scatter-plot'): # and \
+                # self._session_manager.check_session_tag(tca_type + '-visualization'):
+
+                key, _, _, scatter_fields = self._create_df_dictionary_key(trade_order_tag)
+
+                # raise dash.exceptions.PreventUpdate("No data changed - scatter")
+                return self._plot_render.plot_scatter(
+                    scatter_df=self._tca_caller.get_cached_computation_analysis(key=key),
+                    title=self._session_manager.get_session_flag(tca_type + '-title'), scatter_fields=scatter_fields)
+
+            raise dash.exceptions.PreventUpdate("No data changed - scatter") # not very elegant but only way to prevent plots disappearing
 
         return callback
 
@@ -489,11 +529,16 @@ class DisplayListeners(object):
 
         metric = '';
         by_partition = ''
+        scatter_fields = ''
 
         # Handle those cases where metrics are specified on the fly (eg. user specified metric)
         if 'df_by' in trade_order_tag:
             metric = self._session_manager.get_session_flag('metric')
             return t[0] + '_' + metric + '_by_' + t[1], metric, t[1]
+
+        # Handle those cases we are planning to do scatter plots
+        elif 'df_' in trade_order_tag and '_vs_' in trade_order_tag:
+            scatter_fields = trade_order_tag.split('df_')[1].split('_vs_')
 
         # These instances, the metrics have been hardcoded in, before runtime
         try:
@@ -506,7 +551,7 @@ class DisplayListeners(object):
         except:
             pass
 
-        return trade_order_tag, metric, by_partition
+        return trade_order_tag, metric, by_partition, scatter_fields
 
     ##### click/change callback listeners on each plot, table component etc. ###########################################
 
@@ -565,6 +610,16 @@ class DisplayListeners(object):
                         callback_manager.input_callback(p, 'status')
                     )(self.plot_dist(t, layout.id_flags[key][t], p))
 
+            ## Scatter plots
+            key = p + '_scatter_trade_order'
+
+            if key in self._util_func.dict_key_list(layout.id_flags.keys()):
+                for t in self._util_func.dict_key_list(layout.id_flags[key].keys()):
+                    app.callback(
+                        callback_manager.output_callback(p, t + '-scatter-plot'),
+                        callback_manager.input_callback(p, 'status')
+                    )(self.plot_scatter(t, layout.id_flags[key][t], p))
+
             ## Markout tables
             key = p + '_table_trade_order'
 
@@ -620,7 +675,7 @@ class PlotRender(object):
     """PlotRender helper class taking in DataFrames, which have been generated in the course of TCA analysis.
     It then specifies various style based properties (like colors, dashs, title etc.) renders these as charts (using chartpy/Plotly as
     dependency). The rendered charts are plotly.Fig objects which can be displayed by a Dash web application, or can be
-    rendered in HTML files elsewhere.
+    rendered in HTML files elsewhere, or ingested by other processes.
 
     It supports a number of basic chart types such as
      - markouts
@@ -652,7 +707,7 @@ class PlotRender(object):
             raise dash.exceptions.PreventUpdate("No data changed - empty plot")
 
 
-    def plot_markout(self, markout_detail_df, title, width=constants.chart_width, height=constants.chart_height):
+    def plot_markout(self, markout_detail_df=None, title=None, width=constants.chart_width, height=constants.chart_height):
         """Renders a plot for a markout around a pre-specified time point.
 
         Parameters
@@ -685,7 +740,7 @@ class PlotRender(object):
                       y_title='Cumulative Move (bp)',
                       x_title='Timeline (' + constants.wide_benchmark_unit_of_measure + ')',
                       line_shape=['hv', 'linear'],
-                      width=width, height=height, scale_factor=1,
+                      width=width, height=height, scale_factor=final_scale_factor,
                       plotly_plot_mode=constants.plotly_plot_mode,
                       plotly_webgl=constants.plotly_webgl
                       )
@@ -706,7 +761,7 @@ class PlotRender(object):
         except Exception as e:
             logger.debug('No data for printing detail markout plot: ' + str(e))
 
-    def plot_market_trade_timeline(self, title, sparse_market_trade_df, lines_to_plot=constants.detailed_timeline_plot_lines,
+    def plot_market_trade_timeline(self, title=None, sparse_market_trade_df=None, lines_to_plot=constants.detailed_timeline_plot_lines,
                                    candlestick_fig=None,
                                    relayoutData=None, debug_msg='', width=constants.chart_width, height=constants.chart_height):
         """Plots market data as lines on chart (or summarised into candlesticks), accompanied by trade data as bubbles
@@ -846,7 +901,7 @@ class PlotRender(object):
 
                       # Control how it is displayed
                       plotly_plot_mode=constants.plotly_plot_mode,
-                      width=width, height=height, scale_factor=1,
+                      width=width, height=height, scale_factor=final_scale_factor,
                       plotly_webgl=constants.plotly_webgl
                       )
 
@@ -904,7 +959,7 @@ class PlotRender(object):
                                                          line_shape=constants.timeline_lineshape,
                                                          connect_line_gaps=constants.timeline_connect_line_gaps,
                                                          width=width,
-                                                         height=height, scale_factor=1, plotly_webgl=constants.plotly_webgl))
+                                                         height=height, scale_factor=final_scale_factor, plotly_webgl=constants.plotly_webgl))
 
     def plot_bar(self, bar_df=None, title=None, width=constants.chart_width, height=constants.chart_height):
         """Plots a bar chart as a plotly Fig object
@@ -932,7 +987,7 @@ class PlotRender(object):
 
         style = Style(title=title, chart_type='bar',
                       plotly_plot_mode=constants.plotly_plot_mode, width=width,
-                      height=height, scale_factor=1, plotly_webgl=constants.plotly_webgl)
+                      height=height, scale_factor=final_scale_factor, plotly_webgl=constants.plotly_webgl)
 
         plot = self._chart.plot(bar_df, style=style)
 
@@ -981,6 +1036,9 @@ class PlotRender(object):
                 ticker = title[0:6]
         except:
             ticker = 'dist'
+
+        if title is None:
+            title = 'dist'
 
         # Add lines for bid/ask only this exists in the underlying data
         x_y_line = []
@@ -1051,21 +1109,21 @@ class PlotRender(object):
                 # Select PDF and histogram series only
                 dist_df = dist_df[cols_plot]
 
-            style = Style(title=ticker, subplots=False, color=color,
+            style = Style(title=title, subplots=False, color=color,
                         linewidth=linewidth, x_title=metric.replace('_', ' ') + ' (bp)', connect_line_gaps=True,
                         x_y_line=x_y_line, y_title='Notional', plotly_plot_mode=constants.plotly_plot_mode,
-                        width=width, height=height, scale_factor=1, plotly_webgl=constants.plotly_webgl)
+                        width=width, height=height, scale_factor=final_scale_factor, plotly_webgl=constants.plotly_webgl)
         else:
             style = Style(title=title, x_title=metric.replace('_', ' ') + ' (bp)', connect_line_gaps=True,
                           x_y_line=x_y_line,
                           y_title='Notional', plotly_plot_mode=constants.plotly_plot_mode,
-                          width=width, height=height, scale_factor=1, plotly_webgl=constants.plotly_webgl)
+                          width=width, height=height, scale_factor=final_scale_factor, plotly_webgl=constants.plotly_webgl)
 
         if 'Bid' in dist_df.columns: dist_df = dist_df.drop('Bid', axis=1)
         if 'Ask' in dist_df.columns: dist_df = dist_df.drop('Ask', axis=1)
 
-        if title is None:
-            title = ''
+        # if title is None:
+        #     title = ''
 
         logger.debug('Plotting distribution ' + title)
 
@@ -1075,26 +1133,44 @@ class PlotRender(object):
 
         return plot
 
-    # TODO incomplete
-    def plot_scatter(self, trade_order_df=None, metric=None, title=None, notional_field='executed_notional', split_by='all'):
+    def plot_scatter(self, scatter_df=None, title=None, scatter_fields=None, width=constants.chart_width,
+                  height=constants.chart_height):
+        """
 
-        scatter_df = trade_order_df
+        Parameters
+        ----------
+        scatter_df : DataFrame
+            DataFrame to be plotted as a scatter chart
 
-        if not(isinstance(metric, list)):
-            metric = [metric]
-        else:
-            notional_series = trade_order_df[notional_field]
+        title : str
+            Title of chart
 
-        # TODO
+        scatter_fields : str(list)
+            Variables to be plotted (first one is assumed to be index)
+
+        width : int
+            Width of chart
+
+        height : int
+            Height of chart
+
+        Returns
+        -------
+
+        """
+
+        if title is None:
+            title = 'scatter'
+
         self._check_empty(scatter_df)
 
-        style = Style(title=title, chart_type='scatter',
-                        plotly_plot_mode=constants.plotly_plot_mode, width=constants.chart_width,
-                        bubble_series = {'buy trade': notional_series,
-                           'sell trade': notional_series},
-                        height=constants.chart_height, scale_factor=1, plotly_webgl=constants.plotly_webgl)
+        scatter_fields_pretty = self._util_func.pretty_str_within_list(scatter_fields)
 
-        plot = self._chart(scatter_df, style=style)
+        style = Style(title=title, chart_type='scatter', x_title=scatter_fields_pretty[0], y_title=scatter_fields_pretty[1],
+                        plotly_plot_mode=constants.plotly_plot_mode, width=width,
+                        height=height, scale_factor=final_scale_factor, plotly_webgl=constants.plotly_webgl)
+
+        plot = self._chart.plot(scatter_df, style=style)
 
         return plot
 

@@ -23,5 +23,5 @@ execfile(activate_this, dict(__file__=activate_this))
 sys.path.insert(0, tcapy_cuemacro)
 # os.chdir(tcapy_cuemacro+ '/tcapypro/vis/')
 
-from tcapypro.vis.app import server as application
-application.root_path = tcapy_cuemacro + '/tcapypro/vis/'
+from tcapy.vis.app import server as application
+application.root_path = tcapy_cuemacro + '/tcapy/vis/'

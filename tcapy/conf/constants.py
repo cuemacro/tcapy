@@ -112,6 +112,7 @@ class Constants(object):
                          'USDJPY': 'USDNOK', 'USDSEK': 'USDSEK', 'USDTRY': 'USDTRY', 'USDZAR': 'USDZAR'}
 
     dukascopy_data_store = 'arctic-dukascopy'
+    dukascopy_threads = 1 # Dukascopy downloader not thread-safe so only use 1!
 
     ##### Metric parameters/hard constants for TCA calculation #########################################################
 
@@ -282,6 +283,8 @@ class Constants(object):
     trade_order_list = ['trade_df', 'order_df']
     test_trade_order_list = ['trade_df', 'order_df']
 
+    pretty_trade_order_mapping = {'trade_df' : 'trades', 'order_df' : 'orders'}
+
     order_name = 'ancestor'
 
     # Downsample data internally to save memory/speed up TCA computation
@@ -428,7 +431,7 @@ class Constants(object):
     # Allow use of multithreading in general (if set to False, will avoid eg. using celery)
     use_multithreading = True
 
-    parallel_library = 'multiprocess' # For the DatabasePopulator
+    parallel_library = 'multiprocess' # For the default swim
 
     # This will split the TCA request by date, and work on those dates independently
     # may end up (very rarely) having slightly different output if trades are right at the start/end of a monthly boundary

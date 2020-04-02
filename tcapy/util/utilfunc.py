@@ -112,6 +112,31 @@ class UtilFunc(object):
 
         return str_pretty + " & " + list_str[-1]
 
+    def pretty_str_within_list(self, list_str):
+        """Goes through a str list and makes it pretty removing things like underscores to make it more readable
+
+        Parameters
+        ----------
+        list_str : str(list)
+            List to be prettified
+
+        Returns
+        -------
+        str(list)
+        """
+
+        list_str = list_str.copy()
+        list_str = [ele.replace('_', ' ') for ele in list_str]
+
+        return list_str
+
+    def pretty_columns(self, df):
+
+        df.columns = self.pretty_str_within_list(df.columns)
+
+        return df
+
+
     def remove_empty_str_list(self, list_str):
         """Removes the empty elements from a str list
 

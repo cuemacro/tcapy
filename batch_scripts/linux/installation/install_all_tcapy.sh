@@ -15,11 +15,12 @@
 # - install tcapy on nginx, so the tcapy web app is accessable
 # - install MongoDB to store market tick data (optional KDB/InfluxDB/CSV/DataFrame)
 # - install MySQL to store trade/order data (optional Microsoft SQL Server/PostgreSQL/MySQL/CSV)
-# - install Redis to cache market/trade/order data and as a message broker with Celery
 # - install Memcached as a results backend for Celery
 # - install tcapy on Apache, which is deprecated
 # - install wkhtmltopdf for converting HTML to PDF
+# - install dependencies for Weasyprint another converter for HTML to PDF
 # - install Jupyter extensions
+# - install Redis to cache market/trade/order data and as a message broker with Celery
 #
 # The various scripts will work either on Red Hat or Ubuntu. You might need to make minor changes if you want to run
 # on similar Linux variants to Red Hat (eg. CentOS) or Ubuntu (eg. Debian)
@@ -36,6 +37,7 @@ source install_python_tools_apache.sh
 source install_virtual_env.sh
 
 # Install the Microsoft SQL Server driver on Linux (only necessary if we want to use SQL Server for trade data)
+# assumes that Microsoft SQL Server has already been installed (or you are accessing it over a network)
 sudo ./install_sql_driver.sh
 
 # Install all the Python packages in the py36tca environment
@@ -65,6 +67,9 @@ source install_tcapy_on_nginx_gunicorn.sh
 
 # Install wkhtmltopdf for converting HTML to PDF
 source install_pdf.sh
+
+# Install weasyprint dependencies
+source install_weasyprint.sh
 
 # Install Jupyter extensions
 source install_jupyter_extensions.sh

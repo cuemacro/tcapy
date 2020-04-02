@@ -802,7 +802,7 @@ class DatabasePopulatorDukascopy(DatabasePopulatorNCFX):
         return self.tickers
 
     def _get_threads(self):
-        return 1
+        return constants.dukascopy_threads
 
     def _get_download_chunk_min_size(self):
         return None

@@ -29,7 +29,7 @@ class DataRequest(object):
 
     def __init__(self, start_date=None, finish_date=None, ticker=None, data_store=constants.default_data_store, data_offset_ms=None,
                  reload=False, instrument=constants.default_instrument, asset_class=constants.default_asset_class, access_control=None,
-                 use_multithreading=constants.use_multithreading, multithreading_params=constants.multithreading_params):
+                 use_multithreading=constants.use_multithreading, multithreading_params=constants.multithreading_params, data_norm=None):
 
         self.start_date = start_date
         self.finish_date = finish_date
@@ -40,6 +40,7 @@ class DataRequest(object):
         self.instrument = instrument
         self.asset_class = asset_class
         self.access_control = access_control
+        self.data_norm = data_norm
 
         self.use_multithreading = use_multithreading
         self.multithreading_params = multithreading_params
@@ -132,6 +133,14 @@ class DataRequest(object):
     def multithreading_params(self, multithreading_params):
         self.__multithreading_params = multithreading_params
 
+    @property
+    def data_norm(self):
+        return self.__data_norm
+
+    @data_norm.setter
+    def data_norm(self, data_norm):
+        self.__data_norm = data_norm
+
     def _check_data_store(self, data_store):
         try:
             # constants = Constants()
@@ -158,7 +167,7 @@ class MarketRequest(DataRequest):
     def __init__(self, market_request=None, start_date=None, finish_date=None, ticker=None, data_store=constants.default_market_data_store,
                  data_offset_ms=None,
                  reload=False, instrument=constants.default_instrument, asset_class=constants.default_asset_class, access_control=None,
-                 use_multithreading=constants.use_multithreading, multithreading_params=constants.multithreading_params,
+                 use_multithreading=constants.use_multithreading, multithreading_params=constants.multithreading_params, data_norm=None,
                  market_data_database_table=None):
         # constants = Constants()
 
@@ -181,6 +190,8 @@ class MarketRequest(DataRequest):
             access_control = market_request.access_control
             use_multithreading = market_request.use_multithreading
             multithreading_params = market_request.multithreading_params
+            data_norm = market_request.data_norm
+
             market_data_database_table = market_request.market_data_database_table
 
         self.start_date = start_date
@@ -195,6 +206,7 @@ class MarketRequest(DataRequest):
 
         self.use_multithreading = use_multithreading
         self.multithreading_params = multithreading_params
+        self.data_norm = data_norm
 
         self.market_data_database_table = market_data_database_table
 
@@ -216,7 +228,7 @@ class TradeRequest(DataRequest):
 
     def __init__(self, trade_request=None, start_date=None, finish_date=None, ticker=None, data_store=constants.default_data_store, data_offset_ms=None,
                  reload=False, instrument=constants.default_instrument, asset_class=constants.default_asset_class, access_control=None,
-                 use_multithreading=constants.use_multithreading, multithreading_params=constants.multithreading_params,
+                 use_multithreading=constants.use_multithreading, multithreading_params=constants.multithreading_params, data_norm=None,
                  trade_order_type=None, trade_order_mapping=None, event_type='trade'):
 
         if trade_request is not None:
@@ -238,6 +250,7 @@ class TradeRequest(DataRequest):
             access_control = trade_request.access_control
             use_multithreading = trade_request.use_multithreading
             multithreading_params = trade_request.multithreading_params
+            data_norm = trade_request.data_norm
 
             if hasattr(trade_request, 'trade_order_type'): # only TradeRequest has trade_order_type
                 trade_order_type = trade_request.trade_order_type
@@ -258,6 +271,7 @@ class TradeRequest(DataRequest):
 
         self.use_multithreading = use_multithreading
         self.multithreading_params = multithreading_params
+        self.data_norm = data_norm
 
         self.trade_order_type = trade_order_type
         self.event_type = event_type
@@ -330,11 +344,10 @@ class TCARequest(TradeRequest, ComputationRequest):
                  benchmark_calcs=[],
                  metric_calcs=[], results_form=[], metric_display=[], join_tables=[], tca_type='detailed',
                  reporting_currency=constants.reporting_currency, dummy_market=False, summary_display=None, access_control=None,
-                 use_multithreading=constants.use_multithreading, multithreading_params=constants.multithreading_params,
+                 use_multithreading=constants.use_multithreading, multithreading_params=constants.multithreading_params, data_norm=None,
                  tca_provider=constants.tcapy_provider):
 
-        # self.logger = LoggerManager().getLogger(__name__)
-        #constants = Constants()
+        # constants = Constants()
 
         if tca_request is not None:
             start_date = tca_request.start_date
@@ -369,6 +382,7 @@ class TCARequest(TradeRequest, ComputationRequest):
             access_control = tca_request.access_control
             use_multithreading = tca_request.use_multithreading
             multithreading_params = tca_request.multithreading_params
+            data_norm = tca_request.data_norm
             
             tca_provider = tca_request.tca_provider
 
@@ -420,6 +434,7 @@ class TCARequest(TradeRequest, ComputationRequest):
         self.access_control = access_control
         self.use_multithreading = use_multithreading
         self.multithreading_params = multithreading_params
+        self.data_norm = data_norm
         
         self.tca_provider = tca_provider
 

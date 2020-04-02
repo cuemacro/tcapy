@@ -25,12 +25,12 @@ if [ $TCAPY_PYTHON_ENV_TYPE == "virtualenv" ]; then
         boto3==1.5.11 \
         pyodbc==4.0.23 \
         pytest==5.1.0 pytest-cov==2.5.1 \
-        IPython==7.13.0 chartpy findatapy dash-auth==1.3.1 cufflinks==0.17 plotly_express==0.4.1 \
-        dash==1.9.0 dash-html-components==1.0.2 dash-core-components==1.8.1 plotly==4.5.4 dash-table==4.6.1 \
+        IPython==7.13.0 chartpy==0.1.5 findatapy==0.1.7 dash-auth==1.3.1 cufflinks==0.17 plotly_express==0.4.1 \
+        dash==1.9.0 dash-html-components==1.0.2 dash-core-components==1.8.1 plotly==4.5.4 dash-table==4.6.1 dtale==1.8.1 \
         qpython==2.0.0 influxdb==5.2.2 \
         Flask-Session==0.3.1 \
-        celery==4.4.0 msgpack-python pytest-tap kombu==4.6.7 python-memcached==1.59 numba==0.48.0 vispy==0.6.4 \
-        jupyterlab jupyter_contrib_nbextensions jupyter_nbextensions_configurator RISE
+        celery==4.4.0 msgpack-python pytest-tap kombu==4.6.7 python-memcached==1.59 numba==0.48.0 vispy==0.6.4 jinja2==2.11.1 \
+        jupyterlab jupyter_contrib_nbextensions jupyter_nbextensions_configurator RISE bqplot WeasyPrint==51
 
     # Can't install orca with pip (has to be done manually or via conda)
     sudo apt-get install nodejs npm
@@ -48,17 +48,17 @@ elif [ $TCAPY_PYTHON_ENV_TYPE == "conda" ]; then
         boto3=1.5.11 \
         pyodbc=4.0.23 \
         pytest=5.1.0 pytest-cov=2.5.1 \
-        numba=0.48.0 pyarrow=0.16.0 vispy=0.6.4 \
-        jupyterlab jupyter_contrib_nbextensions jupyter_nbextensions_configurator nodejs rise --yes
+        numba=0.48.0 pyarrow=0.16.0 vispy=0.6.4 jinja2=2.11.1 \
+        jupyterlab jupyter_contrib_nbextensions jupyter_nbextensions_configurator nodejs rise bqplot --yes
 
     # Install charting libraries
     # for flash recording of session variables
     # to allow celery to use Redis
-    pip install chartpy findatapy dash-auth==1.3.1 cufflinks==0.17 plotly_express==0.4.1 \
-        dash==1.9.0 dash-html-components==1.0.2 dash-core-components==1.8.0 plotly==4.5.4 dash-table==4.6.0 \
-      qpython==2.0.0 influxdb==5.2.2 \
-      Flask-Session==0.3.1 \
-      celery==4.4.0 msgpack-python pytest-tap kombu==4.6.7 python-memcached==1.59
+    pip install chartpy==0.1.5 findatapy==0.1.7 dash-auth==1.3.1 cufflinks==0.17 plotly_express==0.4.1 \
+        dash==1.9.0 dash-html-components==1.0.2 dash-core-components==1.8.0 plotly==4.5.4 dash-table==4.6.0 dtale==1.8.1 \
+        qpython==2.0.0 influxdb==5.2.2 \
+        Flask-Session==0.3.1 \
+        celery==4.4.0 msgpack-python pytest-tap kombu==4.6.7 python-memcached==1.59 WeasyPrint==51
 
     # celery[redis]==4.1.1 celery[msgpack]==4.1.1
     # To allow printing of Plotly to PDF/creation of PNG files

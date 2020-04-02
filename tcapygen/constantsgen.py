@@ -22,8 +22,7 @@ class ConstantsGen(object):
     """The constants of 'gen' version of tcapy are stored here. They govern behavior such as:
 
        - GUI listeners and lines
-
-       - we can override any of these settings in constantsgencred.py
+       - we can override any of these settings in constantsgencred.py or constantscred.py
 
     """
 ##### dash callbacks and web GUI lines #################################################################################
@@ -46,7 +45,7 @@ class ConstantsGen(object):
                                  'visualization-val',
                                  'calculation-button']
 
-##### default colors/lines for the detailed timeline chart #############################################################
+##### Default colors/lines for the detailed timeline chart #############################################################
 
     detailed_timeline_plot_lines = {'mid': {'color': 'blue', 'linewidth': 3, 'chart_type': 'line'},
                                     'bid': {'color': 'black', 'linewidth': 0.5, 'chart_type': 'line'},
@@ -60,10 +59,10 @@ class ConstantsGen(object):
                                     'buy trade': {'color': 'green', 'linewidth': 1, 'chart_type': 'bubble'},
                                     'sell trade': {'color': 'red', 'linewidth': 1, 'chart_type': 'bubble'}}
 
-    # max number of days lookback window for any TCA calculation versus today
+    # Max number of days lookback window for any TCA calculation versus today
     gui_lookback_window = 3*365
 
-    # max number of days to allow plotting on detailed calculation
+    # Max number of days to allow plotting on detailed calculation
     max_plot_days = 180
 
     gui_table_type = 'html' # 'html' or 'dash'
@@ -75,10 +74,10 @@ class ConstantsGen(object):
     else:
         chart_max_time_points = 1440 / 4.0
 
-        # max number of time points for Plotly (note: this will be multiplied by number of columns)
+        # Max number of time points for Plotly (note: this will be multiplied by number of columns)
         # having too many points plotted, slows down plotly significantly
 
-        # for plots
+    # For plots
     chart_silent_display = False
 
     chart_default_engine = "plotly"  # which backend plotting engine should we use (only plotly supported)
@@ -94,9 +93,13 @@ class ConstantsGen(object):
     # orca can be used to generate PNG files from Plotly charts
     orca_server_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__))) + "/batch_scripts/orca"
 
-    # default size for Plotly charts we use
+    # Default size for Plotly charts we use
     chart_width = 980
     chart_height = 500
+
+    # Default setting for Plotly charts we use to create reports (should generally be smaller)
+    chart_report_width = 600
+    chart_report_height = 400
 
     ########## PLOTLY SETTINGS
     plotly_world_readable = False
@@ -120,9 +123,9 @@ class ConstantsGen(object):
 
     bubble_size_scalar = 35
 
-    # properties for plotting timelines on their own (ie. excludes line+candlestick plots)
+    # Properties for plotting timelines on their own (ie. excludes line+candlestick plots)
 
-    # what should we do with DataFrames which have NaNs before attempting to plot?
+    # What should we do with DataFrames which have NaNs before attempting to plot?
     # eg. should we fill down NaN? Apply some interpolation of some sort? Do nothing?
     timeline_fillna = 'nofill'  # do nothing - 'nofill'
     # fill down NA values with zero - 'zero'
@@ -147,25 +150,25 @@ class ConstantsGen(object):
 
     chart_default_colormap = 'Blues'
 
-    # nicer than the default colors of matplotlib (fully editable!)
+    # Nicer than the default colors of matplotlib (fully editable!)
     # list of colors from http://www.github.com/santosjorge/cufflinks project
     # where I've overwritten some of the primary colours (with the above)
     chart_color_overwrites = colors.chart_color_overwrites
 
-#### metrics ###########################################################################################################
+#### Metrics ###########################################################################################################
 
-    ##### markout windows (in unit of measure milliseconds, seconds or minutes)
+    ##### Markout windows (in unit of measure milliseconds, seconds or minutes)
     markout_windows = [-120, -60, -20, 0, 20, 60, 120]
 
     markout_unit_of_measure = 's'  # ms, s or m
 
-    ##### wide benchmark markout windows (as multiples of wide benchmark window)
+    ##### Wide benchmark markout windows (as multiples of wide benchmark window)
     wide_benchmark_markout_windows_multiplier = range(-10, 10 + 1, 1)
 
     wide_benchmark_markout_unit = 1
     wide_benchmark_unit_of_measure = 's'  # ms, s or m
 
-    ##### when calculating PDF and histograms weight the slippage by this field (select None if want to remove this)
+    ##### When calculating PDF and histograms weight the slippage by this field (select None if want to remove this)
 
     # or can use 'executed_notional' - it is preferred to use reporting currency when aggregating amongst many currency
     # pairs

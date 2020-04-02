@@ -1114,6 +1114,9 @@ class TimeSeriesOps(object):
                     # For cases when the type is numerical and are not excluded, multiply them
                     if s in df.columns and s not in exclude and df[s].dtype.kind in 'iufc':
                         df[s] = df[s] * np.float(scalar[s])
+
+                    if s == df.index.name and s not in exclude and df.index.dtype.kind in 'iufc':
+                        df.index = df.index * np.float(scalar[s])
             else:
                 # Otherwise multiply every column by the same scalar (if it's numerical)
                 df = df.apply(lambda x: x * np.float(scalar) if x.dtype.kind in 'iufc' else x)
