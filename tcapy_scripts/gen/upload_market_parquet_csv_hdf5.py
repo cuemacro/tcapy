@@ -79,13 +79,6 @@ if __name__ == '__main__':
         if_exists_table = 'append' #
         if_append_replace_ticker = 'replace'
 
-        ticker_mkt = ['EURUSD', 'GBPUSD', 'AUDUSD', 'NZDUSD', 'USDCAD', 'USDCHF',
-                      'EURNOK', 'EURSEK',
-                      'USDJPY']
-
-        data_vendor = 'ncfx'
-        csv_folder = '/home/tcapyuser/ncfx_agg/'
-
         file_extension = 'parquet'  # 'parquet' or 'csv' or 'h5' on disk
 
         # Files dumped by DatabasePopulator look like this
