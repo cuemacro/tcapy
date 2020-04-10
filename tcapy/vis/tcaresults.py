@@ -60,12 +60,15 @@ class TCAResults(ComputationResults):
 
             # sparse market charts
             for s in self._util_func.dict_key_list(self.sparse_market.keys()):
-                sparse_ticker = s.split('_')[0]
 
-                title = self._prettify_title(s)
-                sparse_market_charts[s] = self._plot_render.plot_market_trade_timeline(
-                    title=title, sparse_market_trade_df=self.sparse_market[s], candlestick_fig=self.candlestick_charts[sparse_ticker],
-                    lines_to_plot=lines_to_plot, width=self._chart_width, height=self._chart_height)
+                # sometimes we might have already generated the chart earlier
+                if s not in sparse_market_charts.keys():
+                    sparse_ticker = s.split('_')[0]
+
+                    title = self._prettify_title(s)
+                    sparse_market_charts[s] = self._plot_render.plot_market_trade_timeline(
+                        title=title, sparse_market_trade_df=self.sparse_market[s], candlestick_fig=self.candlestick_charts[sparse_ticker],
+                        lines_to_plot=lines_to_plot, width=self._chart_width, height=self._chart_height)
 
             # bar charts
             for b in self._util_func.dict_key_list(self.bar.keys()):
@@ -161,6 +164,11 @@ class TCAResults(ComputationResults):
             tag_middle = tag_by_split[0]
             tag_dict['split_by'] = tag_by_split[1]
 
+        if '_by/' in tag:
+            tag_by_split = tag_middle.split('/')
+            tag_middle = tag_by_split[0]
+            tag_dict['split_by'] = tag_by_split[-1]
+
         if '_df_' in tag:
             tag_df_split = tag_middle.split('_df_')
 
@@ -215,6 +223,7 @@ class TCAResults(ComputationResults):
         trade_order = {}
         timeline = {}
         sparse_market = {}
+        sparse_market_charts = {}
         bar = {}
         dist = {}
         scatter = {}
@@ -277,23 +286,25 @@ class TCAResults(ComputationResults):
                 sparse_market[simpler_d] = dict_of_df[d]
                 
             elif d.find('candlestick_fig') == 0:
-                simpler_d = d.replace('candlestick_fig', self.ticker [0])
+                simpler_d = d.replace('candlestick_fig', self.ticker[0])
                 candlestick_chart[simpler_d] = dict_of_df[d]
 
         #### for situations when we have multiple tickers
 
         # market, candlesticks
         for t in self.computation_request.ticker:
-            if t + '_df' in keys:
+            if t + '_candlestick_fig' in keys:
+                candlestick_chart[t] = dict_of_df[t + '_candlestick_fig']
+            elif t + '_df' in keys:
                 market[t] = dict_of_df[t + '_df']
-            elif t + '_candlestick_fig' in keys:
-                candlestick_chart[t] = dict_of_df[d + '_candlestick_fig']
 
         # sparse market
         for k in keys:
             for t in self.computation_request.ticker:
-                if k.find(t + '_sparse_market_') == 0:
-                    sparse_market[k.replace('_sparse_market_', '')] = dict_of_df[k]
+                if k.find(t + '_sparse_market') == 0 and '_df' in k:
+                    sparse_market[k.replace('_sparse_market', '')] = dict_of_df[k]
+                elif k.find(t + '_sparse_market') == 0 and '_fig' in k:
+                    sparse_market_charts[k.replace('_sparse_market', '')] = dict_of_df[k]
         
         self.trade_order = trade_order
         self.timeline = timeline
@@ -305,6 +316,7 @@ class TCAResults(ComputationResults):
         self.join_tables = join_tables
         self.market = market
 
+        self.sparse_market_charts = sparse_market_charts
         self.candlestick_charts = candlestick_chart
         
     ##### basic properties (strings) of a TCA request

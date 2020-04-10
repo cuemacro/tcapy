@@ -37,10 +37,16 @@ class Metric(ABC):
 
     def __init__(self, trade_order_list=None):
         # self.logger = LoggerManager().getLogger(__name__)
+        if not(isinstance(trade_order_list, list)) and trade_order_list is not None:
+            trade_order_list = [trade_order_list]
+
         self._trade_order_list = trade_order_list
         self._time_series_ops = Mediator.get_time_series_ops()
 
     def set_params(self, trade_order_list=None):
+        if not(isinstance(trade_order_list, list)) and trade_order_list is not None:
+            trade_order_list = [trade_order_list]
+
         self._trade_order_list = trade_order_list
 
     @abc.abstractmethod
@@ -244,8 +250,8 @@ class MetricSlippage(MetricCalc):
         if bid_mid_spread is None: bid_mid_spread = self._bid_mid_spread
         if ask_mid_spread is None: ask_mid_spread = self._ask_mid_spread
 
-        # get fields for benchmarks for bid/ask
-        # note: if these don't exist in the market data, we by default use the 'mid' field
+        # Get fields for benchmarks for bid/ask
+        # Note: if these don't exist in the market data, we by default use the 'mid' field
         bid_benchmark = self._get_benchmark_field(market_df, bid_benchmark)
         ask_benchmark = self._get_benchmark_field(market_df, ask_benchmark)
 

@@ -8,47 +8,78 @@ __author__ = 'saeedamen'  # Saeed Amen / saeed@cuemacro.com
 # See the License for the specific language governing permissions and limitations under the License.
 #
 
-from tcapy.util.swim import Swim
-
-import abc
-
-import pandas as pd
-
-import datetime
-
-from tcapy.conf.constants import Constants
-from tcapy.util.utilfunc import UtilFunc
-from tcapy.util.loggermanager import LoggerManager
-from tcapy.util.timeseries import TimeSeriesOps
-from tcapy.analysis.tcarequest import MarketRequest, TradeRequest
-
-from tcapy.util.customexceptions import *
-
-import os
-
 import abc
 import pandas as pd
 import numpy as np
 import glob
 import os
-import pytz
-import re
 
 import datetime
-
-from tcapy.util.utilfunc import UtilFunc
-from tcapy.util.loggermanager import LoggerManager
-from tcapy.analysis.tcarequest import MarketRequest, TradeRequest
-from tcapy.conf.constants import Constants
-
-from tcapy.util.customexceptions import *
-
-from tcapy.data.accesscontrol import AccessControl
 
 import sqlalchemy
 
 from sqlalchemy import MetaData, Column, Table
 from sqlalchemy import String, DateTime, event, create_engine
+
+# CSVBinary
+import base64, io
+
+# SQL
+from sqlalchemy.sql import text
+
+# Arctic
+from arctic import Arctic
+import pymongo
+
+from arctic.date import DateRange
+from arctic.exceptions import NoDataFoundException
+
+import arctic
+
+# PyStore
+import numba
+import pystore
+
+# InfluxDB
+from influxdb import DataFrameClient
+
+# KDB
+import qpython.qconnection as qconnection
+
+from qpython import MetaData as MetaDataQ
+from qpython.qtype import QKEYED_TABLE, QDATETIME_LIST
+
+# NCFX
+from datetime import timedelta
+import time
+
+import pytz
+import requests
+
+try:
+    import urllib2 as urllib_gen
+except:
+    import urllib.request as urllib_gen
+
+try:
+    from StringIO import StringIO
+except ImportError:
+    from io import StringIO
+
+# Dukascopy
+from findatapy.market import Market, MarketDataGenerator, MarketDataRequest
+
+
+from tcapy.analysis.tcarequest import MarketRequest, TradeRequest
+from tcapy.conf.constants import Constants
+
+from tcapy.data.accesscontrol import AccessControl
+
+from tcapy.util.mediator import Mediator
+from tcapy.util.loggermanager import LoggerManager
+from tcapy.util.swim import Swim
+from tcapy.util.utilfunc import UtilFunc
+from tcapy.util.customexceptions import *
 
 # Compatible with Python 2 *and* 3:
 ABC = abc.ABCMeta('ABC', (object,), {'__slots__': ()})
@@ -68,8 +99,8 @@ class DatabaseSource(ABC):
     """
 
     def __init__(self, postfix=None):
-        self._time_series_ops = TimeSeriesOps()
-        self._util_func = UtilFunc()
+        self._time_series_ops = Mediator.get_time_series_ops()
+        self._util_func = Mediator.get_util_func()
 
         self.set_postfix(postfix=postfix)
 
@@ -193,7 +224,7 @@ class DatabaseSource(ABC):
         raise Exception("Not implemented")
 
     def _fetch_table(self, path):
-        """
+        """Low level query to fetch database table
 
         Parameters
         ----------
@@ -510,7 +541,14 @@ class DatabaseSourcePicker(object):
 
         database_source = None
 
-        if isinstance(data_request.data_store, pd.DataFrame) or data_request.data_store == 'dataframe':
+        if isinstance(data_request.data_store, DatabaseSource):
+            database_source = data_request.data_store
+        elif isinstance(data_request.data_store, pd.DataFrame):
+            if isinstance(data_request, MarketRequest):
+                database_source = DatabaseSourceDataFrame(market_df=data_request.data_store)
+            elif isinstance(data_request, TradeRequest):
+                database_source = DatabaseSourceDataFrame(trade_df=data_request.data_store)
+        elif data_request.data_store == 'dataframe':
 
             if isinstance(data_request, MarketRequest):
                 database_source = DatabaseSourceDataFrame(market_df=data_request.data_store)
@@ -545,19 +583,23 @@ class DatabaseSourcePicker(object):
             elif data_store == 'mysql':
                 database_source = DatabaseSourceMySQL(username=access_control.mysql_username,
                                                       password=access_control.mysql_password)
+            elif data_store == 'sqlite':
+                database_source = DatabaseSourceSQLite()
             elif data_store == 'arctic':
-                # allow multiple datasources to be stored in arctic (by using a postfix)
+                # Allow multiple datasources to be stored in arctic (by using a postfix)
                 # eg. EURUSD-ncfx, EURUSD-dukascopy
                 database_source = DatabaseSourceArctic(postfix=postfix, username=access_control.arctic_username,
                                                        password=access_control.arctic_password)
             elif data_store == 'influxdb':
-                # allow multiple datasources to be stored in influxdb (by using a postfix)
+                # Allow multiple datasources to be stored in influxdb (by using a postfix)
                 # eg. EURUSD-ncfx, EURUSD-dukascopy
                 database_source = DatabaseSourceInfluxDB(postfix=postfix, username=access_control.influxdb_username,
                                                          password=access_control.influxdb_password)
             elif data_store == 'kdb':
                 database_source = DatabaseSourceKDB(postfix=postfix, username=access_control.kdb_username,
                                                     password=access_control.kdb_password)
+            elif data_store == 'pystore':
+                database_source = DatabaseSourcePyStore(postfix=postfix)
             elif 'csv' in data_store or '.h5' in data_store or '.gzip' in data_store or '.parquet' in data_store:
                 if os.path.isfile(data_store):
                     if isinstance(data_request, MarketRequest):
@@ -667,8 +709,6 @@ class DatabaseSourceCSV(DatabaseSource):
         return df
 
 ########################################################################################################################
-import base64, io
-
 
 class DatabaseSourceCSVBinary(DatabaseSourceCSV):
     """Implements DatabaseSource for CSV/H5/JSON datasets which are read from disk (or are in binary format, such as through
@@ -723,7 +763,7 @@ class DatabaseSourceCSVBinary(DatabaseSourceCSV):
 
                 raise Exception(err_msg)
 
-            # Read CSV file
+            # Read Parquet file
             df = pd.read_parquet(csv_file_path)
 
         elif '.h5' in csv_file_path:
@@ -790,6 +830,9 @@ class DatabaseSourceSQL(DatabaseSource):
 
         self._trade_data_database_name = trade_data_database_name
 
+        self._sql_dump_record_chunksize = constants.sql_dump_record_chunksize
+        self._sql_dialect = 'SQL'
+
     @abc.abstractmethod
     def _get_database_engine(self, server_host=None, server_port=None,
                              username=None, password=None,
@@ -855,13 +898,16 @@ class DatabaseSourceSQL(DatabaseSource):
         where_clause = ''
 
         # Create start date condition as part of WHERE clause
+        # Note different dialects of SQL have different way to deal with reserved keywords
+        # - [date] for SQL Server
+        # - MySQL
         if start_date is not None:
-            where_clause = self._combine_where_clause(where_clause, "([date] >= '"
+            where_clause = self._combine_where_clause(where_clause, "(" + self._reserved_keywords('date') + " >= '"
                                                       + self._format_date_time_milliseconds(start_date) + "')")
 
         # Create start date condition as part of WHERE clause
         if finish_date is not None:
-            where_clause = self._combine_where_clause(where_clause, "([date] <= '"
+            where_clause = self._combine_where_clause(where_clause, "(" + self._reserved_keywords('date') + " <= '"
                                                       + self._format_date_time_milliseconds(finish_date) + "')")
 
         # Ensure ticker is also selected
@@ -945,10 +991,10 @@ class DatabaseSourceSQL(DatabaseSource):
             if df is not None:
                 records = len(df.index)
 
-            logger.debug('Excecuted SQL query: ' + sql_query + ", " + str(records) + " returned")
+            logger.debug('Excecuted ' + self._sql_dialect + ' query: ' + sql_query + ", " + str(records) + " returned")
 
         except Exception as e:
-            logger.error("Error fetching SQL query: " + str(e))
+            logger.error("Error fetching " + self._sql_dialect + " query: " + str(e))
 
         # Careful: don't ask for too many dates at once, otherwise could make the database roll over
         return df
@@ -1087,7 +1133,7 @@ class DatabaseSourceSQL(DatabaseSource):
         else:
             sqlalchemy_table_name_tick = table_name_tick
 
-        logger.debug("About to write to SQL database...")
+        logger.debug("About to write to " + self._sql_dialect + " database...")
 
         # Force sorted by date before dumping (otherwise makes searches difficult)
         df = df.sort_index()
@@ -1109,6 +1155,14 @@ class DatabaseSourceSQL(DatabaseSource):
             pass
 
         metadata = MetaData(bind=engine)
+
+        # Make sure date column is 'date' not 'Date', mismatches cause problems!
+        df = df.rename(columns={'Date': 'date'})
+
+        try:
+            df.index.name = 'date'
+        except:
+            pass
 
         cols = self._sql_col_maker(df)
 
@@ -1162,7 +1216,7 @@ class DatabaseSourceSQL(DatabaseSource):
         metadata.create_all(engine)
 
         con = engine.connect()
-        from sqlalchemy.sql import text
+
 
         # Create an primary on the Date/id/ticker (will fail if there's already an index) for trade data
         # want to prevent a situation where someone mistakenly adds same trade/order again
@@ -1171,14 +1225,14 @@ class DatabaseSourceSQL(DatabaseSource):
                 result = con.execute(
                     text('ALTER TABLE ' + table_name_tick + ' ADD CONSTRAINT ' + self._replace_table_name_chars(
                         table_name_tick)
-                         + '_PK_trade PRIMARY KEY ("date", id, ticker)'))
+                         + '_PK_trade PRIMARY KEY ('+ self._reserved_keywords('date') + ', id, ticker)'))
         except Exception as e:
             print(str(e))
             logger.warn("Primary key already exists...")
 
         try:
             result = con.execute(
-                text('CREATE INDEX ' + table_name_tick + '_idx_date ON ' + table_name_tick + '("date" ASC)'))
+                text('CREATE INDEX ' + table_name_tick + '_idx_date ON ' + table_name_tick + '('+ self._reserved_keywords('date') + ' ASC)'))
         except:
             logger.warn("Index already exists...")
 
@@ -1187,9 +1241,19 @@ class DatabaseSourceSQL(DatabaseSource):
         # Just before dumping to database check data columns
         self._check_data_integrity(df, market_trade_data=market_trade_data)
 
+        #df = df[0:1000]
+        # This will fail if we try to insert the *SAME* trades/orders, which have the same dates/id/tickers
+        # df.to_sql(sqlalchemy_table_name_tick, engine, if_exists='append', index=True,
+        #          schema=schema, method=self._default_multi, chunksize=constants.sql_dump_record_chunksize)
         # This will fail if we try to insert the *SAME* trades/orders, which have the same dates/id/tickers
         df.to_sql(sqlalchemy_table_name_tick, engine, if_exists='append', index=True,
-                  chunksize=constants.sql_dump_record_chunksize, schema=schema)
+                  schema=schema, chunksize=self._sql_dump_record_chunksize)
+
+    # def _write_df_to_sql(self, df, sqlalchemy_table_name_tick, engine, schema):
+    #
+    #     # This will fail if we try to insert the *SAME* trades/orders, which have the same dates/id/tickers
+    #     df.to_sql(sqlalchemy_table_name_tick, engine, if_exists='append', index=True,
+    #               schema=schema, method=self._default_multi, chunksize=constants.sql_dump_record_chunksize)
 
     def _replace_table_name_chars(self, table_name):
 
@@ -1197,6 +1261,9 @@ class DatabaseSourceSQL(DatabaseSource):
             table_name = table_name.replace(i, "")
 
         return table_name
+
+    def _reserved_keywords(self, keyword):
+        return '`' + keyword + '`'
 
     def _sql_col_maker(self, df):
         """For a DataFrame creates columns which map pd data types to SQL data types
@@ -1234,6 +1301,7 @@ class DatabaseSourceSQL(DatabaseSource):
 
         fieldtype : str
             Field data type
+
         Returns
         -------
         Column
@@ -1273,6 +1341,8 @@ class DatabaseSourceMSSQLServer(DatabaseSourceSQL):
         super(DatabaseSourceMSSQLServer, self).__init__(server_host=server_host, server_port=server_port,
                                                         username=username, password=password,
                                                         trade_data_database_name=trade_data_database_name)
+
+        self._sql_dialect = 'ms_sql_server'
 
     def _get_database_engine(self, database_name=None, table_name=None):
         """Gets an SQLAlchemy engine associated with a MS SQL Server, which can be used elsewhere to interact with the
@@ -1374,6 +1444,9 @@ class DatabaseSourceMSSQLServer(DatabaseSourceSQL):
     def _datetime(self):
         return sqlalchemy.dialects.mssql.DATETIME2(precision=6)
 
+    def _reserved_keywords(self, keyword):
+        return "[" + keyword + "]"
+
 
 class DatabaseSourcePostgres(DatabaseSourceSQL):
     """Implements the DatabaseSourceSQL class for Postgres instances.
@@ -1391,6 +1464,8 @@ class DatabaseSourcePostgres(DatabaseSourceSQL):
                                                      username=username, password=password,
                                                      trade_data_database_name=trade_data_database_name)
 
+        self._sql_dialect = 'postgres'
+
     def _get_database_engine(self, database_name=None, table_name=None):
 
         con_exp = "postgresql://" + self._username + ":" + self._password \
@@ -1398,6 +1473,33 @@ class DatabaseSourcePostgres(DatabaseSourceSQL):
 
         if database_name is not None:
             con_exp = con_exp + "/" + database_name
+
+            if table_name is not None:
+                con_exp = con_exp + "::" + table_name
+
+        return sqlalchemy.create_engine(con_exp), con_exp
+
+class DatabaseSourceSQLite(DatabaseSourceSQL):
+    """Implements the DatabaseSourceSQL class for SQLite instances.
+
+    """
+
+    def __init__(self, trade_data_database_name=constants.sqlite_trade_data_database_name):
+        """Initialises SQL object.
+
+        """
+
+        super(DatabaseSourceSQLite, self).__init__(trade_data_database_name=trade_data_database_name)
+
+        self._sql_dialect = 'sqlite'
+
+    def _get_database_engine(self, database_name=None, table_name=None):
+
+        # Careful use three slashes for SQLite!
+        con_exp = "sqlite:///"
+
+        if database_name is not None:
+            con_exp = con_exp + database_name
 
             if table_name is not None:
                 con_exp = con_exp + "::" + table_name
@@ -1421,9 +1523,26 @@ class DatabaseSourceMySQL(DatabaseSourceSQL):
                                                   username=username, password=password,
                                                   trade_data_database_name=trade_data_database_name)
 
+        # MySQL should generally have a smaller chunksize
+        self._sql_dump_record_chunksize = constants.mysql_dump_record_chunksize
+
+        self._sql_dialect = 'mysql'
+
+        # # pandas.to_sql can be very slow, using this monkey patched version
+        #
+        # # https://stackoverflow.com/questions/52927213/how-to-speed-up-insertion-from-pandas-dataframe-to-sql
+        # # https://stackoverflow.com/questions/58772330/sqltable-object-has-no-attribute-insert-statement
+        # from pandas.io.sql import SQLTable
+        #
+        # def _execute_insert(self, conn, keys, data_iter):
+        #     data = [dict((k, v) for k, v in zip(keys, row)) for row in data_iter]
+        #     conn.execute(self.table.insert().values(data))
+        #
+        # SQLTable._execute_insert = _execute_insert
+
     def _get_database_engine(self, database_name=None, table_name=None):
 
-        con_exp = "mysql+mysqldb://" + self._username + ":" + self._password \
+        con_exp = "mysql+mysqlconnector://" + self._username + ":" + self._password \
                   + "@" + self._server_host + ":" + self._server_port
 
         if database_name is not None:
@@ -1432,11 +1551,12 @@ class DatabaseSourceMySQL(DatabaseSourceSQL):
             if table_name is not None:
                 con_exp = con_exp + "::" + table_name
 
-        return sqlalchemy.create_engine(con_exp), con_exp
+        engine = sqlalchemy.create_engine(con_exp)
 
-    # def _sql_text_type(self):
-    #     return sqlalchemy.types.NVARCHAR(length=45)
+        return engine, con_exp
 
+    def _datetime(self):
+        return sqlalchemy.dialects.mysql.DATETIME(fsp=6)
 
 ########################################################################################################################
 
@@ -1615,9 +1735,12 @@ class DatabaseSourceTickData(DatabaseSource):
                 logger.info("Parsing " + str(
                     mini_csv_file[m]) + " before tick database dump for ticker " + ticker_postfix)
 
-                # can't process HDF5 fixed file in chunks
-                if ".h5" in mini_csv_file[m]:
-                    df = UtilFunc().read_dataframe_from_binary(mini_csv_file[m])
+                # Can't process HDF5 fixed file or Parquet in chunks
+                if ".h5" in mini_csv_file[m] or ".parquet" in mini_csv_file[m]:
+                    if ".h5" in mini_csv_file[m]: format = 'hdf5'
+                    elif ".parquet" in mini_csv_file[m]: format = 'parquet'
+
+                    df = UtilFunc().read_dataframe_from_binary(mini_csv_file[m], format=format)
 
                     self._process_chunk(df, ticker[i], mini_csv_file[m], table_name, ticker_postfix,
                                         if_exists_ticker, market_trade_data, engine, store,
@@ -1696,18 +1819,8 @@ class DatabaseSourceTickData(DatabaseSource):
 
 ########################################################################################################################
 
-from arctic import Arctic
-import pymongo
-
-from arctic.date import DateRange
-from arctic.exceptions import NoDataFoundException
-
-import arctic
-import threading
-
-
 class DatabaseSourceArctic(DatabaseSourceTickData):
-    """Implements DatabaseSource for Arctic/MongoDB database for both trade/order data and market data. It is
+    """Implements DatabaseSource for Arctic/MongoDB database for market data only. It is
     recommended to use Arctic/MongoDB to store market data. It also allows us to store market data from multiple sources,
     by using the postfix notation (eg 'ncfx' or 'dukascopy').
 
@@ -1747,6 +1860,7 @@ class DatabaseSourceArctic(DatabaseSourceTickData):
         arctic_lib_type : str
             'TICK_STORE' : append only style database store specifically for tick data
             'VERSION_STORE' : more flexible data store
+            'CHUNK_STORE' : to store in chunks, can be useful if we typically get date by eg. days/months etc.
 
         """
         super(DatabaseSourceArctic, self).__init__(postfix=postfix)
@@ -1789,7 +1903,7 @@ class DatabaseSourceArctic(DatabaseSourceTickData):
         """
         logger = LoggerManager.getLogger(__name__)
 
-        logger.info('Attempting to load Arctic/MongoDB library: ' + table_name)
+        logger.info('Attempting to load Arctic/MongoDB library: ' + table_name + ' ' + self._arctic_lib_type)
 
         # with DatabaseSourceArctic._arctic_lock:
         engine = self._engine
@@ -1807,9 +1921,9 @@ class DatabaseSourceArctic(DatabaseSourceTickData):
             store.initialize_library(table_name, audit=False, lib_type=self._get_arctic_lib_type(
                 self._arctic_lib_type))  # , lib_type=arctic.TICK_STORE)
 
-            logger.info("Created Arctic/MongoDB library: " + table_name)
+            logger.info("Created Arctic/MongoDB library: " + table_name + ' ' + self._arctic_lib_type)
         else:
-            logger.info("Got Arctic/MongoDB library: " + table_name)
+            logger.info("Got Arctic/MongoDB library: " + table_name + ' ' + self._arctic_lib_type)
 
         return engine, store
 
@@ -1820,6 +1934,8 @@ class DatabaseSourceArctic(DatabaseSourceTickData):
 
         if arctic_lib_type == 'VERSION_STORE':
             return arctic.VERSION_STORE
+        elif arctic_lib_type == 'CHUNK_STORE':
+            return arctic.CHUNK_STORE
         elif arctic_lib_type == 'TICK_STORE':
             return arctic.TICK_STORE
 
@@ -1845,6 +1961,8 @@ class DatabaseSourceArctic(DatabaseSourceTickData):
 
         if self._arctic_lib_type == 'VERSION_STORE':
             start_date, finish_date = self._parse_start_finish_dates(start_date, finish_date)
+        elif self._arctic_lib_type == 'CHUNK_STORE':
+            start_date, finish_date = self._parse_start_finish_dates(start_date, finish_date)
         elif self._arctic_lib_type == 'TICK_STORE':
             start_date, finish_date = self._parse_start_finish_dates(start_date, finish_date, utc=True)
 
@@ -1858,7 +1976,10 @@ class DatabaseSourceArctic(DatabaseSourceTickData):
         library = store[table_name]
 
         # Strip away timezones for daterange (always assume we are using UTC data)
-        item = library.read(ticker, date_range=DateRange(start_date, finish_date))
+        if self._arctic_lib_type == 'CHUNK_STORE':
+            item = library.read(ticker, chunk_range=DateRange(start_date, finish_date), filter_data=True)
+        else:
+            item = library.read(ticker, date_range=DateRange(start_date, finish_date))
 
         logger.debug("Extracted Arctic/MongoDB library: " + str(table_name) + " for ticker " + str(ticker) +
                      " between " + str(start_date) + " - " + str(finish_date) + " from " + self._arctic_lib_type)
@@ -1868,6 +1989,13 @@ class DatabaseSourceArctic(DatabaseSourceTickData):
         else:
             df = item.data
 
+        try:
+            df.index.name = 'Date'
+        except:
+            pass
+
+        # print("--------------------------------------------------------------------")
+        # print(df)
         # TICK_STORE may return data in local timezone so should be converted
         # VERSION_STORE will return times without timezone
 
@@ -2027,19 +2155,28 @@ class DatabaseSourceArctic(DatabaseSourceTickData):
                 df = df.tz_localize(None)
 
                 # Append data or overwrite the whole ticker
+                # Note: if appending data need to make sure the fields are the same!
                 if if_exists_ticker == 'append':
 
                     # If we're appending check we have no overlapping data and make sure we are writing at the end!
                     # only allow people to append to the end (unless they set the ignore_existing_datacheck parameter)
 
+                    # For CHUNK_STORE, it is possible to update on disk
                     if existing_datacheck == 'ignore':
                         item = None
-                    else:
+                    elif existing_datacheck == 'yes':
                         if self._arctic_lib_type == 'VERSION_STORE':
                             try:
                                 item = library.read(ticker, date_range=DateRange(
                                     (df.index[0] + pd.Timedelta(np.timedelta64(1, 'ms'))).replace(tzinfo=None),
                                     pd.Timestamp(datetime.datetime.utcnow()).replace(tzinfo=None)))
+                            except NoDataFoundException:
+                                item = None
+                        elif self._arctic_lib_type == 'CHUNK_STORE':
+                            try:
+                                item = library.read(ticker, chunk_range=DateRange(
+                                    (df.index[0] + pd.Timedelta(np.timedelta64(1, 'ms'))).replace(tzinfo=None),
+                                    pd.Timestamp(datetime.datetime.utcnow()).replace(tzinfo=None)), filter_data=True)
                             except NoDataFoundException:
                                 item = None
                         elif self._arctic_lib_type == 'TICK_STORE':
@@ -2074,8 +2211,10 @@ class DatabaseSourceArctic(DatabaseSourceTickData):
                                 raise ErrorWritingOverlapDataException(err_msg)
 
                     if self._arctic_lib_type == 'VERSION_STORE':
-
                         library.append(ticker, df)
+                    elif self._arctic_lib_type == 'CHUNK_STORE':
+                        df.index.name = 'date'
+                        library.update(ticker, df)
                     elif self._arctic_lib_type == 'TICK_STORE':
 
                         # For tick store need a timezone (causes problems with version_store)
@@ -2085,13 +2224,21 @@ class DatabaseSourceArctic(DatabaseSourceTickData):
                         library.write(ticker, df)
 
                 elif if_exists_ticker == 'replace':
-                    library.delete(ticker)
+
+                    try:
+                        library.delete(ticker)
+                    except:
+                        logger.warn("Tried to delete " + ticker + " but couldn't.. did not exist?")
 
                     # For tick store need a timezone (causes problems with version_store)
                     if self._arctic_lib_type == 'TICK_STORE':
                         df = df.tz_localize(pytz.utc)
 
-                    library.write(ticker, df)
+                    if self._arctic_lib_type == 'CHUNK_STORE':
+                        df.index.name = 'date'
+                        library.write(ticker, df, chunk_size=constants.arctic_chunk_store_freq)
+                    else:
+                        library.write(ticker, df)
                 else:
                     logger.info('Nothing written in ' + self._arctic_lib_type)
 
@@ -2192,15 +2339,17 @@ class DatabaseSourceArctic(DatabaseSourceTickData):
         self.append_market_data(market_df, ticker, table_name=table_name, if_exists_table='append',
                                 if_exists_ticker='replace', remove_duplicates=False)
 
-    def insert_market_data(self, market_df, ticker, table_name=None, remove_duplicates=True):
+    def insert_market_data(self, market_df, ticker, table_name=None, remove_duplicates=False):
 
         # Can't manipulate Arctic time series on disk, so we need to load it all up into memory first, edit in pandas
         # and then write back down on to disk once finished (with the insertion)
+
+        # TODO rewrite a version for CHUNK_STORE, where we can update directly on disk, so don't need to load into memory
         market_old_df = self.fetch_market_data(ticker=ticker, start_date='01 Jan 1999',
                                                finish_date=pd.Timestamp(datetime.datetime.utcnow()),
                                                table_name=table_name)
 
-        # make start/finish dates into timestamp (UTC) - all data on disk stored in UTC
+        # Make start/finish dates into timestamp (UTC) - all data on disk stored in UTC
         start_date = pd.Timestamp(market_df.index[0], tzinfo=pytz.utc)
         finish_date = pd.Timestamp(market_df.index[-1], tzinfo=pytz.utc)
 
@@ -2212,11 +2361,404 @@ class DatabaseSourceArctic(DatabaseSourceTickData):
         self.append_market_data(market_df, ticker, table_name=table_name, if_exists_table='append',
                                 if_exists_ticker='replace', remove_duplicates=remove_duplicates)
 
-
 ########################################################################################################################
 
-from influxdb import DataFrameClient
+class DatabaseSourcePyStore(DatabaseSourceTickData):
+    """Implements DatabaseSource for PyStore for market data, which is an Arctic-like library which stores data in Parquet
+    flat files on disk. It also allows us to store market data from multiple sources, by using the postfix notation
+    (eg 'ncfx' or 'dukascopy').
 
+    """
+
+    def __init__(self, postfix=None, pystore_database=constants.pystore_data_store, pystore_path=constants.pystore_path):
+        """Initialise the PyStore object
+
+        Parameters
+        ----------
+        postfix : str
+            Postfix can be used to identify different market data sources (eg. 'ncfx' or 'dukascopy'), if we only use
+            one market data source, this is not necessary
+
+        data_store : str
+            Underlying data store for PyStore
+
+        path : str
+            Path of PyStore on disk
+
+        """
+        super(DatabaseSourcePyStore, self).__init__(postfix=postfix)
+
+        pystore.set_path(pystore_path)
+
+        self._engine = pystore.store(pystore_database)
+
+    def _get_database_engine(self, table_name=None):
+        """Gets the database engine for PyStore
+
+        Parameters
+        ----------
+        table_name : str
+            Table name
+
+        Returns
+        -------
+        PyStore store, None
+        """
+        logger = LoggerManager.getLogger(__name__)
+
+        logger.info('Attempting to load PyStore table/collection: ' + table_name)
+
+        engine = self._engine
+
+        # Create table (collection) if it doesn't exist
+        engine.collection(table_name)
+
+        return engine, None
+
+    def fetch_market_data(self, start_date=None, finish_date=None, ticker=None, table_name=None):
+        """Fetches market data for a particular ticker
+
+        Parameters
+        ----------
+        start_date : str
+            Start date
+
+        finish_date : str
+            Finish date
+
+        ticker : str
+            Ticker to be downloaded
+
+        Returns
+        -------
+        DataFrame
+        """
+        logger = LoggerManager.getLogger(__name__)
+
+        ticker = ticker + self.postfix
+
+        if table_name is None:
+            table_name = constants.pystore_market_data_database_table
+
+        engine, _ = self._get_database_engine(table_name=table_name)
+
+        # Convert dates into datetime64 stripped of timezone
+        start_date, finish_date = self._parse_start_finish_dates(start_date, finish_date, utc=True)
+
+        # Fetch table/collection
+        collection = engine.collection(table_name)
+
+        # Filter down on Dask DataFrame
+        item = collection.item(ticker)
+        item.data = item.data[start_date.replace(tzinfo=None):finish_date.replace(tzinfo=None)]
+
+        logger.debug("Extracted PyStore collection: " + str(table_name) + " for ticker " + str(ticker) +
+                     " between " + str(start_date) + " - " + str(finish_date))
+
+        df = item.to_pandas()
+
+        # Downsample floats to reduce memory footprint
+        return self._downsample_localize_utc(df, convert=True)
+
+    def fetch_trade_order_data(self, start_date=None, finish_date=None, ticker=None, table_name=None):
+        """Fetches trade/order data for a particular ticker from Arctic/MongoDB database. We assume that trades/orders
+        are stored in different tables.
+
+        Parameters
+        ----------
+        start_date : str
+            Start date
+
+        finish_date : str
+            Finish date
+
+        ticker : str
+            Ticker
+
+        table_name : str
+            Table name which contains trade/order data
+
+        Returns
+        -------
+        DataFrame
+        """
+        logger = LoggerManager.getLogger(__name__)
+
+        logger.error("PyStore is not tested for storing trade data")
+
+        return
+
+    def convert_csv_to_table(self, csv_file, ticker, table_name, database_name=None, if_exists_table='replace',
+                             if_exists_ticker='replace', market_trade_data='market', date_format=None,
+                             read_in_reverse=False,
+                             csv_read_chunksize=constants.csv_read_chunksize, remove_duplicates=True):
+        """Reads CSV from disk (or potentionally a list of CSVs for a list of different tickers) into a pandas DataFrame
+        which is then dumped in Arctic/MongoDB.
+
+        Parameters
+        ----------
+        csv_file : str (list)
+            Path of CSV file - can also include wildcard characters (assume that files are ordered in time, eg. if
+            we specify EURUSD*.csv, then EURUSD1.csv would be before EURUSD2.csv etc.
+
+        ticker : str
+            Ticker for the dataset (for market data eg. EURUSD, for trade data eg. trade_df
+
+        table_name : str
+            Table/collection to store data in
+
+        database_name : str
+            Database name
+
+        if_exists_table : str (default: 'replace')
+            What to do if the database table already exists
+            * 'replace' - replaces the database table (default)
+            * 'append' - appends to the database table
+
+        if_exists_ticker : str (default: 'replace')
+            What to do if the ticker already exists in a table
+            * 'replace' - replaces the ticker data already there (default)
+            * 'append' - appends to the existing ticker data
+
+        market_trade_date : str (default: 'market')
+            'market' for market data
+            'trade' for trade data
+
+        date_format : str (default: None)
+            Specify the format of the dates stored in CSV, specifying this speeds up CSV parsing considerably and
+            is recommended
+
+        csv_read_chunksize : int (default: in constants file)
+            Specifies the chunksize to read CSVs. If we are reading very large CSVs this helps us to reduce risk of running
+            out of memory
+
+        remove_duplicates : bool (default: True)
+            Should we remove consecutive duplicated market values (eg. if EURUSD is at 1.1652 and 20ms later it is also
+            recorded at 1.1652, should we ignore the second point), which will make our calculations a lot faster
+            - whilst in many TCA cases, we can ignore duplicated
+            points, we cannot do this for situations where we might wish to use for example volume, to calculate VWAP
+
+        Returns
+        -------
+
+        """
+        logger = LoggerManager.getLogger(__name__)
+
+        if market_trade_data == 'trade':
+            logger.error("PyStore is not tested for storing trade data")
+
+            return
+
+        engine, _ = self._get_database_engine(table_name=table_name)
+
+        # Delete, then create table/collection (if needs to replace)
+        if if_exists_table == 'replace':
+            try:
+                engine.delete_collection(table_name)
+            except:
+                pass
+
+            try:
+                engine.collection(table_name)
+            except:
+                pass
+
+        # Read CSV files (possibly in chunks) and then dump to tick database
+        self._stream_chunks(engine, _, csv_file, ticker, table_name,
+                            if_exists_ticker=if_exists_ticker, market_trade_data=market_trade_data,
+                            date_format=date_format,
+                            read_in_reverse=read_in_reverse,
+                            csv_read_chunksize=csv_read_chunksize, remove_duplicates=remove_duplicates)
+
+    def _write_to_db(self, df, engine, _, table_name, ticker, if_exists_ticker, existing_datacheck='ignore'):
+        logger = LoggerManager.getLogger(__name__)
+
+        # Get handle for the table library to write to
+        collection = engine.collection(table_name)
+
+        if df is not None:
+            if not(df.empty):
+                # Assume that we are using writing to Dask/PyStore in a non-timezone aware way
+                df = df.tz_localize(None)
+
+                # Append data or overwrite the whole ticker
+                if if_exists_ticker == 'append':
+
+                    # If we're appending check we have no overlapping data and make sure we are writing at the end!
+                    # only allow people to append to the end (unless they set the ignore_existing_datacheck parameter)
+                    if existing_datacheck == 'ignore':
+                        item = None
+                    else:
+                            try:
+                                item = collection.item(ticker)
+
+                                start = (df.index[0] + pd.Timedelta(np.timedelta64(1, 'ms'))).replace(tzinfo=None)
+                                finish = pd.Timestamp(datetime.datetime.utcnow()).replace(tzinfo=None)
+                                item.data = item.data[start:finish]
+
+                                #, date_range=DateRange(
+                                #    (df.index[0] + pd.Timedelta(np.timedelta64(1, 'ms'))).replace(tzinfo=None),
+                                #    pd.Timestamp(datetime.datetime.utcnow()).replace(tzinfo=None)))
+                            except NoDataFoundException:
+                                item = None
+
+                    if item is not None:
+                        npartitions = item.data.npartitions
+
+                        if not(isinstance(item, pd.DataFrame)):
+                            item = item.to_pandas()
+
+                        temp_df = self._downsample_localize_utc(item, convert=True)
+
+                        if temp_df is not None:
+                            if not (temp_df.empty):
+
+                                err_msg = "PyStore can't append overlapping data for " + ticker + \
+                                          " in " + table_name + ". Has data between " + str(
+                                    df.index[0]) + ' - ' + str(df.index[-1])
+
+                                logger.error(err_msg)
+
+                                raise ErrorWritingOverlapDataException(err_msg)
+
+                        # Hack for npartitions! https://github.com/ranaroussi/pystore/issues/31
+                        # collection.append(ticker, df, npartitions=npartitions)
+
+                        # TODO: use the append function from PyStore once fixed
+                        # a bit of hack which isn't optimal but currently having issues with PyStore append
+                        df = self._time_series_ops.localize_as_UTC(df, convert=True)
+                        self.insert_market_data(df, ticker.replace(self.postfix, ''), table_name=table_name)
+                    else:
+                        # TODO: use the append function from PyStore once fixed
+                        # a bit of hack which isn't optimal but currently having issues with PyStore append
+                        df = self._time_series_ops.localize_as_UTC(df, convert=True)
+                        self.insert_market_data(df, ticker.replace(self.postfix, ''), table_name=table_name)
+                        # collection.append(ticker, df, npartitions=1)
+
+                elif if_exists_ticker == 'replace':
+                    try:
+                        collection.delete_item(ticker)
+                    except:
+                        pass
+
+                    collection.write(ticker, df)
+                else:
+                    logger.info('Nothing written in PyStore')
+
+    def append_market_data(self, market_df, ticker, table_name=constants.pystore_market_data_database_table,
+                           if_exists_table='append', if_exists_ticker='append', remove_duplicates=True,
+                           existing_datacheck='yes'):
+        """Append market data to PyStore. It is expected that market data has an index of DateTimeIndex, and fields
+        such as "mid", "bid", "ask" etc. Do not write data which overlaps, otherwise it messes up the internal store.
+
+        Parameters
+        ----------
+        market_df : DataFrame
+            Market data to dumped
+
+        ticker : str
+            Ticker for the dataset (for market data eg. EURUSD, for trade data eg. trade_df
+
+        table_name : str
+            Table/collection to store data in
+
+        if_exists_table : str
+            What to do if the database table/collection already exists
+            * 'replace' - replaces the database table (default)
+            * 'append' - appends to the database table
+
+        if_exists_ticker : str
+            What to do if the ticker already exists in a table
+            * 'replace' - replaces the ticker data already there (default)
+            * 'append' - appends to the existing ticker data
+
+        remove_duplicates : bool
+            Should we remove consecutive duplicates in market data, mainly to reduce file size on disk
+            * True (default) - removes duplicates (ie. every bit of market data other than time the same)
+            * False - leave data as it is
+
+        existing_datacheck : str (default: 'yes')
+            If set to 'ignore', we shall throw an error if there's data already on the disk for this period
+
+        Returns
+        -------
+
+        """
+        logger = LoggerManager.getLogger(__name__)
+
+        old_ticker = ticker
+        ticker = ticker + self.postfix
+
+        engine, _ = self._get_database_engine(table_name=table_name)
+
+        if if_exists_table == 'replace':
+            try:
+                engine.delete_collection(table_name)
+            except:
+                pass
+
+        # If neccessary initialise table/collection
+        try:
+            engine.collection(table_name)
+        except:
+            pass
+
+        try:
+            # Assume market data is stored in UTC (as with ALL data for tcapy)
+            market_df.index = market_df.index.tz_localize(pytz.utc)
+        except:
+            pass
+
+        logger.info("Now doing PyStore database dump for ticker " + ticker + " in table " + table_name)
+
+        market_df = self._tidy_market_data(market_df, old_ticker, 'dataframe', 'market',
+                                           remove_duplicates=remove_duplicates)
+
+        self._write_to_db(market_df, engine, _, table_name, ticker, if_exists_ticker,
+                          existing_datacheck=existing_datacheck)
+
+    def delete_market_data(self, ticker, start_date=None, finish_date=None, table_name=None):
+
+        # Can't manipulate PyStore time series on disk, so we need to load it all up into memory first, edit in pandas
+        # and then write back down on to disk once finished
+
+        # Note: likely we can improve this by doing a Dask implmentation
+        market_df = self.fetch_market_data(ticker=ticker, start_date='01 Jan 1999',
+                                           finish_date=pd.Timestamp(datetime.datetime.utcnow()), table_name=table_name)
+
+        # Make start/finish dates into timestamp (UTC) - all data on disk stored in UTC
+        start_date = pd.Timestamp(start_date, tzinfo=pytz.utc)
+        finish_date = pd.Timestamp(finish_date, tzinfo=pytz.utc)
+
+        market_df = self._time_series_ops.remove_between_dates(market_df, start_date, finish_date)
+
+        # Write back into the database
+        self.append_market_data(market_df, ticker, table_name=table_name, if_exists_table='append',
+                                if_exists_ticker='replace', remove_duplicates=False)
+
+    def insert_market_data(self, market_df, ticker, table_name=None, remove_duplicates=False):
+
+        # Can't manipulate PyStore time series on disk, so we need to load it all up into memory first, edit in pandas
+        # and then write back down on to disk once finished (with the insertion)
+
+        # Note: likely we can improve this by doing a Dask implmentation
+        market_old_df = self.fetch_market_data(ticker=ticker, start_date='01 Jan 1999',
+                                               finish_date=pd.Timestamp(datetime.datetime.utcnow()),
+                                               table_name=table_name)
+
+        # Make start/finish dates into timestamp (UTC) - all data on disk stored in UTC
+        start_date = pd.Timestamp(market_df.index[0])#, tzinfo=pytz.utc)
+        finish_date = pd.Timestamp(market_df.index[-1])#, tzinfo=pytz.utc)
+
+        market_old_df = self._time_series_ops.remove_between_dates(market_old_df, start_date, finish_date)
+
+        market_df = market_old_df.append(market_df).sort_index()
+
+        # Write back into the database
+        self.append_market_data(market_df, ticker, table_name=table_name, if_exists_table='append',
+                                if_exists_ticker='replace', remove_duplicates=remove_duplicates)
+
+########################################################################################################################
 
 class DatabaseSourceInfluxDB(DatabaseSourceTickData):
     """Wrapper for InfluxDB to access market data for tcapy
@@ -2363,9 +2905,8 @@ class DatabaseSourceInfluxDB(DatabaseSourceTickData):
 
                         if temp_df is not None:
                             if not (temp_df.empty):
-                                err_msg = "tcapy doesn't allow influxdb to append overlapping data for " + ticker + " in " + table_name + ". " \
-                                                                                                                                          "Has data between " + str(
-                                    df.index[0]) + ' - ' + str(df.index[-1])
+                                err_msg = "tcapy doesn't allow influxdb to append overlapping data for " + ticker + " in " \
+                                          + table_name + ". " "Has data between " + str(df.index[0]) + ' - ' + str(df.index[-1])
 
                                 logger.error(err_msg)
 
@@ -2529,11 +3070,6 @@ class DatabaseSourceInfluxDB(DatabaseSourceTickData):
 
 
 ########################################################################################################################
-
-import qpython.qconnection as qconnection
-from qpython import MetaData as MetaDataQ
-from qpython.qtype import QKEYED_TABLE, QDATETIME_LIST
-
 
 class DatabaseSourceKDB(DatabaseSourceTickData):
     """Wrapper for KDB access for tick data. Note, that minimal computations are done inside KDB, this mostly reads/writes
@@ -2966,21 +3502,7 @@ class DatabaseSourceDataFrame(DatabaseSource):
 # External data sources
 ########################################################################################################################
 
-from datetime import timedelta
-import time
 
-import pytz
-import requests
-
-try:
-    import urllib2 as urllib_gen
-except:
-    import urllib.request as urllib_gen
-
-try:
-    from StringIO import StringIO
-except ImportError:
-    from io import StringIO
 
 class DatabaseSourceNCFX(DatabaseSource):
     """Implements DatabaseSource for calling New Change FX's external server, via their Rest/API. It is recommended to use
@@ -3134,7 +3656,7 @@ class DatabaseSourceNCFX(DatabaseSource):
 
 ########################################################################################################################
 
-from findatapy.market import Market, MarketDataGenerator, MarketDataRequest
+
 
 class DatabaseSourceExternalDownloader(DatabaseSource):
     """Implements DatabaseSource for calling an external source. It is recommended to use this to download data from external source
@@ -3166,6 +3688,10 @@ class DatabaseSourceExternalDownloader(DatabaseSource):
         df = self._download(start_date, finish_date, ticker)
 
         if df is None:
+
+            start_date = pd.Timestamp(start_date)
+            finish_date = pd.Timestamp(finish_date)
+
             if start_date.dayofweek != 5 and finish_date.dayofweek != 6:
                 logger.warn("Failed to download from " + self._data_provider() + " for " + ticker + " from " + str(start_date) + " - " +
                             str(finish_date) + ". Check if network problem?")
@@ -3213,20 +3739,27 @@ class DatabaseSourceDukascopy(DatabaseSourceExternalDownloader):
     def __init__(self):
         super(DatabaseSourceDukascopy, self).__init__()
 
+        self._market = Market(market_data_generator=MarketDataGenerator())
+        self._md_request = MarketDataRequest(freq='tick', data_source=self._data_provider(),
+                                             fields=['bid', 'ask'], vendor_fields=['bid', 'ask'], push_to_cache=False)
+
     def _data_provider(self):
         return 'dukascopy'
 
     def _download(self, start_date, finish_date, ticker):
         # Use findatapy to download (supports several providers including Dukascopy)
-        market = Market(market_data_generator=MarketDataGenerator())
+        # md_request = MarketDataRequest(start_date=start_date, finish_date=finish_date, data_source=self._data_provider(),
+        #                                freq='tick',
+        #                                tickers=ticker, vendor_tickers=constants.dukascopy_tickers[ticker],
+        #                                fields=['bid', 'ask'], vendor_fields=['bid', 'ask'], push_to_cache=False)
 
-        md_request = MarketDataRequest(start_date=start_date, finish_date=finish_date, data_source=self._data_provider(),
-                                       category='fx',
-                                       freq='tick',
-                                       tickers=ticker, vendor_tickers=constants.dukascopy_tickers[ticker],
-                                       fields=['bid', 'ask'], vendor_fields=['bid', 'ask'])
+        self._md_request.start_date=start_date
+        self._md_request.finish_date=finish_date
+        self._md_request.data_source = self._data_provider()
+        self._md_request.tickers = ticker
+        self._md_request.vendor_tickers = constants.dukascopy_tickers[ticker]
 
-        df = market.fetch_market(md_request)
+        df = self._market.fetch_market(self._md_request)
 
         if df is not None:
             # tcapy has different column format

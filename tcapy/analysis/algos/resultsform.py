@@ -15,8 +15,8 @@ from tcapy.analysis.algos.resultssummary import ResultsSummary
 
 from tcapy.conf.constants import Constants
 from tcapy.analysis.tradeorderfilter import TradeOrderFilterTag
-from tcapy.util.utilfunc import UtilFunc
-from tcapy.util.timeseries import TimeSeriesOps
+from tcapy.util.mediator import Mediator
+from tcapy.util.loggermanager import LoggerManager
 
 constants = Constants()
 
@@ -31,6 +31,9 @@ class ResultsForm(ABC):
     """
     def __init__(self, trade_order_list=None, metric_name=None, aggregate_by_field=None, aggregation_metric='mean',
                  tag_value_combinations={}):
+        if not(isinstance(trade_order_list, list)) and trade_order_list is not None:
+            trade_order_list = [trade_order_list]
+
         self._trade_order_list = trade_order_list
         self._metric_name = metric_name
         self._aggregate_by_field = aggregate_by_field
@@ -39,8 +42,8 @@ class ResultsForm(ABC):
 
         self._tag_value_combinations = tag_value_combinations
         self._trade_order_filter_tag = TradeOrderFilterTag()
-        self._util_func = UtilFunc()
-        self._time_series_ops = TimeSeriesOps()
+        self._util_func = Mediator.get_util_func()
+        self._time_series_ops = Mediator.get_time_series_ops()
 
     def _check_calculate_results(self, trade_order_name):
         if trade_order_name is not None and self._trade_order_list is not None:
@@ -62,9 +65,10 @@ class TableResultsForm(ResultsForm):
     def __init__(self, trade_order_list=None, metric_name=None, filter_by=['all'], tag_value_combinations={},
                  keep_fields=['executed_notional', 'side'], replace_text={}, round_figures_by=1, scalar=1.0,
                  weighting_field=constants.table_weighting_field, exclude_fields_from_avg=[], remove_index=False):
-        self._trade_order_list = trade_order_list
-        self._metric_name = metric_name
-        self._results_summary = ResultsSummary()
+
+        super(TableResultsForm, self).__init__(trade_order_list=trade_order_list, metric_name=metric_name,
+                                              tag_value_combinations=tag_value_combinations)
+
         self._keep_fields = keep_fields
         self._filter_by = filter_by
         self._replace_text = replace_text
@@ -74,11 +78,8 @@ class TableResultsForm(ResultsForm):
         self._exclude_fields_from_avg = exclude_fields_from_avg
         self._remove_index = remove_index
 
-        self._tag_value_combinations = tag_value_combinations
-        self._trade_order_filter_tag = TradeOrderFilterTag()
         self._results_form_tag = 'table'
-        self._util_func = UtilFunc()
-        self._time_series_ops = TimeSeriesOps()
+
 
     def aggregate_results(self, trade_order_df=None, market_df=None, filter_by=[], trade_order_name=None,
                           metric_name=None, ticker=None,
@@ -165,25 +166,23 @@ class ScatterResultsForm(ResultsForm):
     """
     def __init__(self, trade_order_list=None, filter_by=['all'], tag_value_combinations={},
                  scatter_fields=['executed_notional', 'slippage'], replace_text={}, round_figures_by=1, scalar=1.0):
-        self._trade_order_list = trade_order_list
-        self._results_summary = ResultsSummary()
+
+        super(ScatterResultsForm, self).__init__(trade_order_list=trade_order_list,
+                                              tag_value_combinations=tag_value_combinations)
+
         self._scatter_fields = scatter_fields
         self._filter_by = filter_by
         self._replace_text = replace_text
         self._round_figures_by = round_figures_by
         self._scalar = scalar
 
-        self._tag_value_combinations = tag_value_combinations
-        self._trade_order_filter_tag = TradeOrderFilterTag()
         self._results_form_tag = 'scatter'
-        self._util_func = UtilFunc()
-        self._time_series_ops = TimeSeriesOps()
 
     def aggregate_results(self, trade_order_df=None, market_df=None, trade_order_name=None,
                           scatter_fields=None,
                           tag_value_combinations={}, replace_text={},
                           round_figures_by=None, scalar=None):
-        if not (self._check_calculate_results(trade_order_name)): return [None, None]
+        if not(self._check_calculate_results(trade_order_name)): return [None, None]
 
         if scatter_fields is None: scatter_fields = self._scatter_fields
         if round_figures_by is None: round_figures_by = self._round_figures_by
@@ -223,6 +222,7 @@ class DistResultsForm(ResultsForm):
 
     def __init__(self, trade_order_list=None, metric_name=None, aggregate_by_field=None, aggregation_metric='mean',
                  tag_value_combinations={}, weighting_field=constants.pdf_weighting_field, scalar=1.0):
+
         super(DistResultsForm, self).__init__(trade_order_list=trade_order_list, metric_name=metric_name,
                                               aggregate_by_field=aggregate_by_field,
                                               aggregation_metric=aggregation_metric,
@@ -230,6 +230,8 @@ class DistResultsForm(ResultsForm):
 
         self._weighting_field = weighting_field
         self._scalar = scalar
+
+        self._results_form_tag = 'dist'
 
     def aggregate_results(self, trade_order_df=None, market_df=None, trade_order_name=None, metric_name=None,
                           ticker=None, aggregate_by_field=None,
@@ -240,6 +242,7 @@ class DistResultsForm(ResultsForm):
         if aggregate_by_field is None: aggregate_by_field = self._aggregate_by_field
         if weighting_field is None: weighting_field = self._weighting_field
         if scalar is None: scalar = self._scalar
+        if tag_value_combinations == {}: tag_value_combinations = self._tag_value_combinations
 
         trade_order_df = self._trade_order_filter_tag.filter_trade_order(trade_order_df,
                                                                          tag_value_combinations=tag_value_combinations)
@@ -268,7 +271,7 @@ class DistResultsForm(ResultsForm):
 
                 if agg is None: agg = 'all'
 
-                results.append((results_df, 'dist_' + trade_order_name + '_' + met + '_by_' + str(agg)))
+                results.append((results_df, 'dist_' + trade_order_name + '_' + met + '_by/pdf/' + str(agg)))
 
         return results
 
@@ -296,7 +299,7 @@ class BarResultsForm(ResultsForm):
                           ticker=None, aggregate_by_field=None,
                           weighting_field=None, tag_value_combinations={}, filter_nan=True, scalar=None,
                           round_figures_by=None, aggregation_metric=None):
-        if not (self._check_calculate_results(trade_order_name)): return [None, None]
+        if not(self._check_calculate_results(trade_order_name)): return [None, None]
 
         if metric_name is None: metric_name = self._metric_name
         if aggregate_by_field is None: aggregate_by_field = self._aggregate_by_field
@@ -304,6 +307,7 @@ class BarResultsForm(ResultsForm):
         if round_figures_by is None: round_figures_by = self._round_figures_by
         if weighting_field is None: weighting_field = self._weighting_field
         if aggregation_metric is None: aggregation_metric = self._aggregation_metric
+        if tag_value_combinations == {}: tag_value_combinations = self._tag_value_combinations
 
         trade_order_df = self._trade_order_filter_tag.filter_trade_order(trade_order_df,
                                                                          tag_value_combinations=tag_value_combinations)
@@ -335,8 +339,14 @@ class BarResultsForm(ResultsForm):
 
                 results_df  = self._rename_columns(results_df, met)
 
-                results.append(
-                    (results_df, self._results_form_tag + '_' + trade_order_name + '_' + met + '_by_' + str(agg)))
+                if self._by_date is None:
+                    results.append(
+                        (results_df, self._results_form_tag + '_' + trade_order_name + '_' + met + '_by/'
+                         + aggregation_metric + '/' + str(agg)))
+                else:
+                    results.append(
+                        (results_df, self._results_form_tag + '_' + trade_order_name + '_' + met + '_by/'
+                         + aggregation_metric + '_' + self._by_date + '/' + str(agg)))
 
         return results
 
@@ -352,7 +362,7 @@ class TimelineResultsForm(BarResultsForm):
     """
     def __init__(self, trade_order_list=None, metric_name=None, aggregate_by_field=None, aggregation_metric='mean',
                  tag_value_combinations={}, by_date='date', round_figures_by=None,
-                 weighting_field=constants.pdf_weighting_field, scalar=10000.0):
+                 weighting_field=constants.pdf_weighting_field, scalar=1.0):
         super(TimelineResultsForm, self).__init__(trade_order_list=trade_order_list, metric_name=metric_name,
                                                   aggregate_by_field=aggregate_by_field,
                                                   aggregation_metric=aggregation_metric,
@@ -381,10 +391,12 @@ class JoinTables(object):
         self._scalar = scalar
         self._round_figures_by = round_figures_by
 
-        self._time_series_ops = TimeSeriesOps()
-        self._util_func = UtilFunc()
+        self._time_series_ops = Mediator.get_time_series_ops()
+        self._util_func = Mediator.get_util_func()
 
     def aggregate_tables(self, df_dict={}, tables_dict={}, round_figures_by=None, scalar=None):
+        logger = LoggerManager.getLogger(__name__)
+
         if tables_dict == {}: tables_dict = self._tables_dict
         if round_figures_by is None: round_figures_by = self._round_figures_by
         if scalar is None: scalar = self._scalar
@@ -420,6 +432,8 @@ class JoinTables(object):
                     df = self._time_series_ops.round_dataframe(df, round_figures_by)
 
                     agg_results.append(df)
+            else:
+                logger.warning(table + ' not in TCA output, are you use the dictionary entry is correct?')
 
         if agg_results != []:
             if len(agg_results) > 1:

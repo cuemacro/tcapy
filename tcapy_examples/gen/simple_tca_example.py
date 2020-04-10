@@ -28,11 +28,11 @@ from tcapy.vis.tcaresults import TCAResults
 from chartpy import Chart, Style
 
 ticker = 'EURUSD'
-mult_ticker = ['USDJPY', 'USDCAD']
+mult_ticker = ['USDJPY', 'EURUSD']
 start_date = '01 May 2017'; finish_date = '31 May 2017'
 
 # 'dukascopy' or 'ncfx'
-data_source = 'ncfx'
+data_source = 'dukascopy'
 
 # Change the market and trade data store as necessary
 market_data_store = 'arctic-' + data_source
@@ -64,7 +64,7 @@ def single_ticker_tca_example():
     # Note: running Orca might not work in WSL, also when generating Plotly charts, might get an error with WSL, if
     # it doesn't have silent_display=True, as it will try to open a web page in a browser (which isn't supported in WSL1
     # but is in WSL2)
-    PLOT = True
+    PLOT = False
 
     # clear entire cache
     # Mediator.get_volatile_cache().clear_cache()
@@ -120,7 +120,7 @@ def single_ticker_tca_example():
 
                                               # At the spread at the time of every trade/order
                                               BenchmarkSpreadToMid()],
-                             trade_order_mapping=trade_order_list, use_multithreading=False)
+                             trade_order_mapping=trade_order_list, use_multithreading=True)
 
     # Dictionary of dataframes as output from TCA calculation
     dict_of_df = tca_engine.calculate_tca(tca_request)
@@ -129,9 +129,15 @@ def single_ticker_tca_example():
 
     print(dict_of_df.keys())
 
-    timeline_slippage_df = dict_of_df['timeline_' + trade_order_type + '_slippage_by_all']
-    timeline_executed_notional_df = dict_of_df['timeline_' + trade_order_type + '_executed_notional_in_reporting_currency_by_all'] # average slippage per day
-    metric_df = dict_of_df[trade_order_type]['permanent_market_impact']  # permanent market impact for every trade
+    # Average slippage per date/hour
+    timeline_slippage_df = dict_of_df['timeline_' + trade_order_type + '_slippage_by/mean_datehour/all']
+
+    # Total executed notional per date/hour
+    timeline_executed_notional_df = dict_of_df['timeline_' + trade_order_type
+                                               + '_executed_notional_in_reporting_currency_by/sum_datehour/all']
+
+    # Permanent market impact for every trade
+    metric_df = dict_of_df[trade_order_type]['permanent_market_impact']
 
     print(metric_df.head(500))
 
@@ -297,6 +303,31 @@ def compare_multithreading_type():
             print('Multithreading example: calculated ' + str(round(finish - start, 3)) + "s for, use_multithreading = "
                   + str(use_multithreading) + ' multithreading_params = ' + str(multithreading_params))
 
+def multiple_ticker_tca_aggregated_with_results_example():
+    """Example of how to do TCa analysis on multiple tickers with TCAResults
+    """
+
+    tca_engine = TCAEngineImpl(version=tca_version)
+
+    # Run a TCA computation for multiple tickers, calculating slippage
+    tca_request = TCARequest(start_date=start_date, finish_date=finish_date, ticker=mult_ticker, tca_type='aggregated',
+                             trade_data_store=trade_data_store, market_data_store=market_data_store,
+                             results_form=[TimelineResultsForm(metric_name='slippage', by_date='datehour', scalar=10000.0)],
+                             metric_calcs=MetricSlippage(), reporting_currency='EUR', summary_display='candlestick')
+
+    dict_of_df = tca_engine.calculate_tca(tca_request)
+
+    # Show the output of objects
+    print(dict_of_df.keys())
+
+    ### Generate TCA report using high level object
+    # Use higher level TCAResults object to encapsulate results (easier to deal with than a dictionary of DataFrames)
+    tca_results = TCAResults(dict_of_df, tca_request)
+    tca_results.render_computation_charts()
+
+    print(tca_results.sparse_market_charts.keys())
+    print(tca_results.sparse_market.keys())
+
 
 if __name__ == '__main__':
     start = time.time()
@@ -308,6 +339,7 @@ if __name__ == '__main__':
     multiple_ticker_tca_aggregated_example()
     venue_tca_aggregated_example()
     compare_multithreading_type()
+    multiple_ticker_tca_aggregated_with_results_example()
 
     finish = time.time()
     print('Status: calculated ' + str(round(finish - start, 3)) + "s")

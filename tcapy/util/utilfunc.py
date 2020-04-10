@@ -258,7 +258,7 @@ class UtilFunc(object):
 
                     return data_frame
 
-                return pd.read_parquet(fname + '.parquet')
+                return pd.read_parquet(fname)
             except Exception as e:
                 logger.error("No valid data for " + fname + ': ' + str(e))
 
@@ -319,7 +319,7 @@ class UtilFunc(object):
 
             if data_frame is not None:
                 if not (data_frame.empty):
-                    data_frame.to_feather(fname + '.parquet', compression=constants.parquet_compression)
+                    data_frame.to_parquet(fname, compression=constants.parquet_compression)
 
         elif format == 'hdf5':
             # delete the old copy
@@ -470,12 +470,17 @@ class UtilFunc(object):
         return date
 
     def period_bounds(self, date, period='month'):
-        """Gets the very first and very last ticks of the monthweek period for a particular date
+        """Gets the very first and very last ticks of the month/week/day period for a particular date
 
         Parameters
         ----------
         date : pd.Timestamp
             Date to be used
+
+        period : str
+            'month' (default)
+            'week'
+            'day'
 
         Returns
         -------
@@ -495,6 +500,11 @@ class UtilFunc(object):
         date : pd.Timestamp
             Date to be used
 
+        period : str
+            'month' (default)
+            'week'
+            'day'
+
         Returns
         -------
         datetime
@@ -507,6 +517,9 @@ class UtilFunc(object):
         elif period == 'week':
             date = copy.deepcopy(date)
             date = date - relativedelta(days=date.dayofweek)
+
+        elif period == 'day':
+            date = copy.deepcopy(date)
 
         date = date.replace(hour=0)
         date = date.replace(minute=0)
@@ -527,6 +540,7 @@ class UtilFunc(object):
             Period defined
             "month" - define monthly period
             "week" - define weekly period
+            "day" - define daily period
 
         Returns
         -------
@@ -552,10 +566,12 @@ class UtilFunc(object):
         if period == 'month':
             date = date.replace(day=1)
             date = date + relativedelta(months=1)
-
         elif period == 'week':
             date = date - relativedelta(days=date.dayofweek)
             date = date + relativedelta(weeks=1)
+        elif period == 'day':
+            date = date + relativedelta(days=1)
+
         else:
             Exception("Invalid period selected")
 

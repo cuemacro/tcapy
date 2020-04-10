@@ -31,7 +31,7 @@ from tcapy.analysis.tcarequest import TCARequest, MarketRequest
 from tcapy.analysis.algos.benchmark import *
 from tcapy.analysis.algos.metric import MetricSlippage, MetricTransientMarketImpact
 from tcapy.analysis.algos.resultsform import *
-from tcapy.analysis.tradeorderfilter import TradeOrderFilterTag
+from tcapy.analysis.tradeorderfilter import *
 from tcapy.vis.tcaresults import TCAResults
 from tcapy.vis.report.tcareport import TCAReport
 
@@ -51,6 +51,10 @@ logger.info('Make sure you have created folder ' + constants.csv_folder + ' & ' 
 # YOU MAY NEED TO CHANGE TESTING PARAMETERS IF YOUR DATABASE DOESN'T COVER THESE DATES
 start_date = '01 May 2017'
 finish_date = '30 May 2017'
+
+filter_date = '03 May 2017'
+start_filter_date = '00:00:00 03 May 2017'
+finish_filter_date = '23:59:59 03 May 2017'
 
 # Current data vendors are 'ncfx' or 'dukascopy'
 data_source = 'ncfx'
@@ -364,6 +368,35 @@ def test_tag_filter_calculation():
             # check the filtering has been correctly, so we only have trades by broker1 and venue1
             assert match_brokers > 0 and non_brokers == 0 and match_venue > 0 and non_match_venue == 0
 
+def test_time_of_day_filter_calculation():
+    """Test we can filter by time of day/date
+    """
+
+    trade_order_filter = TradeOrderFilterTimeOfDayWeekMonth(specific_dates=filter_date)
+
+    tca_request = TCARequest(start_date=start_date, finish_date=finish_date, ticker=ticker,
+                             trade_data_store=trade_data_store,
+                             reporting_currency=reporting_currency,
+                             market_data_store=market_data_store,
+                             trade_order_mapping=trade_order_mapping,
+                             tca_type=tca_type,
+                             trade_order_filter=trade_order_filter)
+
+    tca_engine = TCAEngineImpl(version=tcapy_version)
+
+    trade_order_results_df_dict = tca_engine.calculate_tca(tca_request)
+
+    trade_df = trade_order_results_df_dict[trade_df_name]
+
+    if trade_df is not None:
+        if not(trade_df.empty):
+
+            match_filtered_date = len(trade_df[start_filter_date:finish_filter_date])
+            non_filtered_date = len(trade_df[(trade_df.index > finish_filter_date) & (trade_df.index < start_filter_date)])
+
+            # check the filtering has been correctly, so we only have trades by broker1 and venue1
+            assert match_filtered_date > 0 and non_filtered_date == 0
+
 def test_executed_price_notional_calculation():
     """Test that the executed average price calculation from trades is correctly reflected in the order level
     """
@@ -532,6 +565,8 @@ if __name__ == '__main__':
     test_benchmark_calculation()
 
     test_tag_filter_calculation()
+    test_time_of_day_filter_calculation()
+
     test_executed_price_notional_calculation()
     test_data_offset()
     test_market_data_convention()

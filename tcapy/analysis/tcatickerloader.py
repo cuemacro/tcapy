@@ -29,6 +29,8 @@ from tcapy.analysis.dataframeholder import DataFrameHolder
 
 from tcapy.analysis.tcarequest import TCARequest, MarketRequest, TradeRequest
 
+from tcapy.data.databasesource import DatabaseSource
+
 constants = Constants()
 
 # compatible with Python 2 *and* 3:
@@ -88,7 +90,10 @@ class TCATickerLoader(ABC):
 
         # available_tickers = []
 
-        if 'csv' in market_request.data_store or 'h5' in market_request.data_store or 'gzip' in market_request.data_store or \
+        if isinstance(market_request.data_store, DatabaseSource):
+            # TODO improve ticker check here!
+            available_tickers = [ticker]
+        elif 'csv' in market_request.data_store or 'h5' in market_request.data_store or 'gzip' in market_request.data_store or \
                 isinstance(market_request.data_store, pd.DataFrame) :
             # For CSV (or H5) we don't have much choice, and could differ between CSV files (if CSV has 'ticker' field, will
             # match on that)
@@ -157,30 +162,44 @@ class TCATickerLoader(ABC):
                     market_base_df = self.get_market_data(market_request_base)
                     market_terms_df = self.get_market_data(market_request_terms)
 
+                    market_has_data = False
+
+                    if market_base_df is not None and market_terms_df is not None:
+                        if not(market_base_df.empty) and not(market_terms_df.empty):
+                            market_has_data = True
+
+                    # If there's no data in either DataFrame, don't attempt to calculate anything
+                    if not(market_has_data):
+                        return pd.DataFrame()
+
                     fields = []
 
                     for f in fields_try:
                         if f in market_base_df.columns and f in market_terms_df.columns:
                             fields.append(f)
 
-                    # Remove any other columns (eg. with ticker name etc.)
-                    market_base_df = market_base_df[fields]
-                    market_terms_df = market_terms_df[fields]
+                    # Only attempt to calculate if the fields exist
+                    if len(fields) > 0:
+                        # Remove any other columns (eg. with ticker name etc.)
+                        market_base_df = market_base_df[fields]
+                        market_terms_df = market_terms_df[fields]
 
-                    # Need to align series to multiply (and then fill down points which don't match)
-                    # can't use interpolation, given that would use FUTURE data
-                    market_base_df, market_terms_df = market_base_df.align(market_terms_df, join="outer")
-                    market_base_df = market_base_df.fillna(method='ffill')
-                    market_terms_df = market_terms_df.fillna(method='ffill')
+                        # Need to align series to multiply (and then fill down points which don't match)
+                        # can't use interpolation, given that would use FUTURE data
+                        market_base_df, market_terms_df = market_base_df.align(market_terms_df, join="outer")
+                        market_base_df = market_base_df.fillna(method='ffill')
+                        market_terms_df = market_terms_df.fillna(method='ffill')
 
-                    market_df = pd.DataFrame(data=market_base_df.values * market_terms_df.values, columns=fields,
-                                             index=market_base_df.index)
+                        market_df = pd.DataFrame(data=market_base_df.values * market_terms_df.values, columns=fields,
+                                                 index=market_base_df.index)
 
-                    # Values at the start of the series MIGHT be nan, so need to ignore those
-                    market_df = market_df.dropna(subset=['mid'])
+                        # Values at the start of the series MIGHT be nan, so need to ignore those
+                        market_df = market_df.dropna(subset=['mid'])
 
-                    if 'ticker' in market_df.columns:
-                        market_df['ticker'] = old_ticker
+                        if 'ticker' in market_df.columns:
+                            market_df['ticker'] = old_ticker
+                    else:
+                        return None
 
                 else:
                     # Otherwise couldn't compute either from the USD legs or EUR legs
@@ -427,7 +446,7 @@ class TCATickerLoader(ABC):
         valid_market = False
 
         if market_df is not None:
-            if not (market_df.empty):
+            if not(market_df.empty):
                 valid_market = True
 
         if len(trade_order_df_dict.keys()) > 0 and valid_market:
@@ -684,7 +703,9 @@ class TCATickerLoader(ABC):
         ## TODO drop stale quotes for market data and add last update time?
 
         # Calculate mid market rate, if it doesn't exist
-        _, market_df = self._benchmark_mid.calculate_benchmark(market_df=market_df)
+        if market_df is not None:
+            if not(market_df.empty):
+                _, market_df = self._benchmark_mid.calculate_benchmark(market_df=market_df)
 
         return market_df
 
@@ -748,7 +769,9 @@ class TCATickerLoader(ABC):
 
         valid_trade_order_data = trade_order_holder.check_empty_combined_dataframe_dict(trade_order_df_dict)
 
-        if (not (valid_trade_order_data)):
+        # Note, can sometimes get empty results when doing in parallel (eg. split up into days, and don't
+        # get for a particular day, so don't raise an exception)
+        if not(valid_trade_order_data):
             err_msg = "No trade/order data between selected dates for " + ticker + " between " + str(start_date) + " - " \
                       + str(finish_date)
 
@@ -823,12 +846,12 @@ class TCATickerLoader(ABC):
 
         if start_date != tca_request.start_date:
             if data_frame is not None:
-                if not (data_frame.empty):
+                if not(data_frame.empty):
                     data_frame = data_frame.loc[data_frame.index >= tca_request.start_date]
 
         if finish_date != tca_request.finish_date:
             if data_frame is not None:
-                if not (data_frame.empty):
+                if not(data_frame.empty):
                     data_frame = data_frame.loc[data_frame.index <= tca_request.finish_date]
 
         return data_frame

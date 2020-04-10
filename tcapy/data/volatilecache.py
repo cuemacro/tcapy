@@ -387,7 +387,7 @@ class VolatileAdvCache(VolatileCache):
 
                 df_new = {}
 
-                # get each key from the cache
+                # Get each key from the cache
                 for k in df.keys():
                     df_new[k] = self.get(df[k], burn_after_reading=burn_after_reading)
 
@@ -441,7 +441,7 @@ class VolatileAdvCache(VolatileCache):
 
         logger.debug("Now pushing " + str(key) + " to cache")
 
-        try:
+        if True:
             filter_keep = []
 
             if (not(convert_cache_handle)):
@@ -458,8 +458,8 @@ class VolatileAdvCache(VolatileCache):
 
             self._put(key, obj)
             logger.debug("Pushed " + str(key) + " to cache")
-        except Exception as e:
-            logger.warning("Couldn't push " + str(key) + " to cache: " + str(e))
+        #except Exception as e:
+        #    logger.warning("Couldn't push " + str(key) + " to cache: " + str(e))
 
     def get(self, key, burn_after_reading=False):
         """Gets the object(s) associated with the key(s) or CacheHandle(s)
@@ -492,6 +492,9 @@ class VolatileAdvCache(VolatileCache):
 
         obj = self._get(key, burn_after_reading=burn_after_reading)
 
+        if ('market_df' in key):
+            print("market_df")
+
         if single:
             return obj[0]
 
@@ -509,7 +512,7 @@ class VolatileAdvCache(VolatileCache):
         """
 
         return json.dumps({'data': json.loads(json.dumps(fig.data, cls=PlotlyJSONEncoder)),
-                           'layout': json.loads(json.dumps(fig.layout, cls=PlotlyJSONEncoder))})
+                          'layout': json.loads(json.dumps(fig.layout, cls=PlotlyJSONEncoder))})
 
     def _plotly_from_json(self, fig):
         """Render a plotly figure from a json file"""
@@ -596,7 +599,7 @@ class VolatileAdvCache(VolatileCache):
             # print(obj)
             obj_list = [self._plotly_fig_2_json(obj)]
         elif isinstance(obj, CacheHandle) and convert_cache_handle:
-            obj_list = self._convert_python_to_binary(self.get_dataframe_handle(obj, burn_after_reading=True), key)
+            obj_list, key = self._convert_python_to_binary(self.get_dataframe_handle(obj, burn_after_reading=True), key)
         else:
             obj_list = [obj]
 
@@ -658,7 +661,7 @@ class VolatileAdvCache(VolatileCache):
 
         elif '_fig' in key:
             # print("--------- " + len(obj) + " ---------")
-            obj = self._plotly_from_json(obj[0])
+            obj = self._plotly_from_json(obj[0].decode("utf-8"))
 
         return obj
 
@@ -767,7 +770,10 @@ class VolatileRedis(VolatileAdvCache):
                 if "_expiry_" in k:
                     pipeline.expire(k, constants.volatile_cache_expiry_seconds)
 
-        pipeline.execute()
+        try:
+            pipeline.execute()
+        except Exception as err:
+            print(str(err))
 
     #def _get(self, key):
     #    return self._db.lrange(key, 0, -1)

@@ -21,10 +21,16 @@ from tcapy.vis.app_imports import *
 # sharing=True,
 server=Flask(__name__)
 
+# url_prefix = '' # for debugging when starting server directly
+debug_start_flask_server_directly = constants.debug_start_flask_server_directly
+
 # add a static image/css route that serves images from desktop
 # be *very* careful here - you don't want to serve arbitrary files
 # from your computer or server
-url_prefix = constants.url_prefix # eg. if hosted on "http://localhost/tcapy" (can also be empty)
+if debug_start_flask_server_directly:
+    url_prefix = ''
+else:
+    url_prefix = constants.url_prefix # eg. if hosted on "http://localhost/tcapy" (can also be empty)
 
 stylesheets = ['tcapy.css']
 
@@ -41,9 +47,6 @@ for css in stylesheets:
 app = dash.Dash(name='tcapy', server=server, suppress_callback_exceptions=True, serve_locally=True, external_stylesheets=stylesheets_path)
 app.title = 'tcapy'
 app.server.secret_key = constants.secret_key
-
-# url_prefix = '' # for debugging when starting server directly
-debug_start_flask_server_directly = False
 
 cur_directory = app.server.root_path
 

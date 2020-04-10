@@ -14,6 +14,7 @@
 # - install nginx web server (which is the recommended server for tcapy's web app)
 # - install tcapy on nginx, so the tcapy web app is accessable
 # - install MongoDB to store market tick data (optional KDB/InfluxDB/CSV/DataFrame)
+# - increase file open limits (without this MongoDB tends to be very unstable)
 # - install MySQL to store trade/order data (optional Microsoft SQL Server/PostgreSQL/MySQL/CSV)
 # - install Memcached as a results backend for Celery
 # - install tcapy on Apache, which is deprecated
@@ -50,6 +51,9 @@ source install_tcapy_on_nginx_gunicorn.sh
 # Install database for tick data (MongoDB)
 # note that we can run MongoDB, MySQL and Redis on different computers
 source install_mongo.sh
+
+# Increases the number of open files for root user (for MongoDB)
+source increase_file_limits.sh
 
 # Install database for trade/order data (MySQL) - PostgreSQL also supported
 source install_mysql.sh

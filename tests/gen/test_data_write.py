@@ -29,7 +29,8 @@ from tcapy.analysis.tcarequest import MarketRequest
 
 from tcapy.data.databasesource import DatabaseSourceCSVBinary as DatabaseSourceCSV
 from tcapy.data.databasesource import \
-    DatabaseSourceArctic, DatabaseSourceMSSQLServer, DatabaseSourceKDB, DatabaseSourceInfluxDB
+    DatabaseSourceMSSQLServer, DatabaseSourceMySQL, DatabaseSourceSQLite, \
+    DatabaseSourceArctic, DatabaseSourceKDB, DatabaseSourceInfluxDB, DatabaseSourcePyStore
 
 import datetime
 
@@ -57,10 +58,9 @@ start_date = '26 Apr 2017'
 finish_date = '05 Jun 2017'
 ticker = 'EURUSD'
 
+# Market data parameters for tables/databases
 test_harness_arctic_market_data_table = 'market_data_table_test_harness'
 test_harness_arctic_market_data_store = 'arctic-testharness'
-
-test_harness_sql_server_trade_data_database_name = 'trade_database_test_harness'
 
 test_harness_kdb_market_data_table = 'market_data_table_test_harness'
 test_harness_kdb_data_store = 'kdb-testharness'
@@ -68,33 +68,56 @@ test_harness_kdb_data_store = 'kdb-testharness'
 test_harness_influxdb_market_data_table = 'market_data_table_test_harness' # InfluxDB database
 test_harness_influxdb_data_store = 'influxdb-testharness' # InfluxDB measurement
 
-arctic_lib_type = ['TICK_STORE', 'VERSION_STORE']
+test_harness_pystore_market_data_table = 'market_data_table_test_harness' # InfluxDB database
+test_harness_pystore_data_store = 'pystore-testharness' # InfluxDB measurement
+
+arctic_lib_type = ['CHUNK_STORE', 'TICK_STORE', 'VERSION_STORE']
+
+# Trade data for tables/databases
+# Note: make sure you have already created the test_harness databases beforehand
+test_harness_ms_sql_trade_data_database = 'trade_database_test_harness'
+test_harness_ms_sql_data_store = 'ms_sql_server'
+
+test_harness_mysql_trade_data_database = 'trade_database_test_harness'
+test_harness_mysql_data_store = 'mysql'
+
+test_harness_sqlite_trade_data_database = '/home/tcapyuser/db/trade_database_test_harness.db'
+test_harness_sqlite_data_store = 'sqlite'
 
 # mainly just to speed up tests - note: you will need to generate the HDF5 files using convert_csv_to_h5.py from the CSVs
-use_hdf5_market_files = True
+use_parquet_market_files = True
 
 run_arctic_tests = True
+run_pystore_tests = True
 run_influx_db_tests = False
 run_kdb_tests = False
+
 run_ms_sql_server_tests = True
+run_mysql_server_tests = True
+run_sqlite_server_tests = True
 
 ########################################################################################################################
 folder = Constants().test_data_harness_folder
 
 trade_order_list = ['trade_df', 'order_df']
 
-sql_trade_order_mapping = OrderedDict(
-    [('trade_df', '[dbo].[trade]'),  # name of table which has broker messages to client
-     ('order_df', '[dbo].[order]')])  # name of table which has orders from client
+sql_trade_order_mapping = {
+    'ms_sql_server' :   {'trade_df' : '[dbo].[trade]',      # Name of table which has broker messages to client
+                         'order_df' : '[dbo].[order]'},             # Name of table which has orders from client
+    'mysql':            {'trade_df': 'trade_database_test_harness.trade',   # Name of table which has broker messages to client
+                         'order_df': 'trade_database_test_harness.order'},  # Name of table which has orders from client
+    'sqlite':           {'trade_df': 'trade_table',  # Name of table which has broker messages to client
+                         'order_df': 'order_table'}  # Name of table which has orders from client
+}
 
 eps = 10 ** -5
 
 invalid_start_date = '01 Jan 1999'
 invalid_finish_date = '01 Feb 1999'
 
-if use_hdf5_market_files:
-    csv_market_data_store = os.path.join(folder, 'small_test_market_df.h5')
-    csv_reverse_market_data_store = os.path.join(folder, 'small_test_market_df_reverse.h5')
+if use_parquet_market_files:
+    csv_market_data_store = os.path.join(folder, 'small_test_market_df.parquet')
+    csv_reverse_market_data_store = os.path.join(folder, 'small_test_market_df_reverse.parquet')
 else:
     csv_market_data_store = os.path.join(folder, 'small_test_market_df.csv.gz')
     csv_reverse_market_data_store = os.path.join(folder, 'small_test_market_df_reverse.csv.gz')
@@ -118,33 +141,35 @@ def test_write_market_data_arctic():
 
     replace_append = ['replace', 'append']
 
-    # check first when replacing full table and then appending
+    # Check first when replacing full table and then appending
     for a in arctic_lib_type:
         for i in replace_append:
-                database_source = DatabaseSourceArctic(postfix='testharness', arctic_lib_type=a)
+            database_source = DatabaseSourceArctic(postfix='testharness', arctic_lib_type=a)
 
-                # write CSV to Arctic
-                database_source.convert_csv_to_table(csv_market_data_store, ticker,
-                                                     test_harness_arctic_market_data_table,
-                                                     if_exists_table=i,
-                                                     if_exists_ticker='replace', market_trade_data='market',
-                                                     remove_duplicates=False)
+            # Write CSV to Arctic
+            database_source.convert_csv_to_table(csv_market_data_store, ticker,
+                                                 test_harness_arctic_market_data_table,
+                                                 if_exists_table=i,
+                                                 if_exists_ticker='replace', market_trade_data='market',
+                                                 remove_duplicates=False)
 
-                # fetch data directly from CSV
-                database_source_csv = DatabaseSourceCSV(market_data_database_csv=csv_market_data_store)
+            # Fetch data directly from CSV
+            database_source_csv = DatabaseSourceCSV(market_data_database_csv=csv_market_data_store)
 
-                market_df_csv = database_source_csv.fetch_market_data(
-                    start_date=db_start_date, finish_date=db_finish_date, ticker=ticker)
+            market_df_csv = database_source_csv.fetch_market_data(
+                start_date=db_start_date, finish_date=db_finish_date, ticker=ticker)
 
-                # read back data from Arctic and compare with CSV
-                market_request = MarketRequest(start_date=db_start_date, finish_date=db_finish_date, ticker=ticker,
-                    data_store=test_harness_arctic_market_data_store, market_data_database_table=test_harness_arctic_market_data_table)
+            # Read back data from Arctic and compare with CSV
+            market_request = MarketRequest(start_date=db_start_date, finish_date=db_finish_date, ticker=ticker,
+                                           data_store=database_source, # test_harness_arctic_market_data_store,
+                                           market_data_database_table=test_harness_arctic_market_data_table)
 
-                market_df_load = market_loader.get_market_data(market_request=market_request)
+            market_df_load = market_loader.get_market_data(market_request=market_request)
 
-                diff_df = market_df_csv['mid'] - market_df_load['mid']
+            diff_df = market_df_csv['mid'] - market_df_load['mid']
 
-                assert all(diff_df < eps)
+            diff_df.to_csv('test' + i + '.csv')
+            assert all(diff_df < eps)
 
 def test_append_market_data_arctic():
     """Tests we can append market data to arctic (we will have already written data to the test harness database)
@@ -156,12 +181,7 @@ def test_append_market_data_arctic():
     ### Test we can append (non-overlapping) data to Arctic
     arctic_start_date = '01 Jan 2016'; arctic_finish_date = pd.Timestamp(datetime.datetime.utcnow())
 
-    # use this market request later when reading back from Arctic
-    market_request = MarketRequest(start_date=arctic_start_date, finish_date=arctic_finish_date, ticker=ticker,
-                                   data_store=test_harness_arctic_market_data_store,
-                                   market_data_database_table=test_harness_arctic_market_data_table)
-
-    # load data from CSV for comparison later
+    # Load data from CSV for comparison later
     database_source_csv = DatabaseSourceCSV(market_data_database_csv=csv_market_data_store)
 
     market_df_csv = database_source_csv.fetch_market_data(
@@ -195,9 +215,18 @@ def test_append_market_data_arctic():
         database_source.append_market_data(market_df_higher, ticker, table_name=test_harness_arctic_market_data_table,
                                            if_exists_table='append', if_exists_ticker='append', remove_duplicates=False)
 
+        # Use this market request later when reading back from Arctic
+        market_request = MarketRequest(start_date=arctic_start_date, finish_date=arctic_finish_date, ticker=ticker,
+                                       data_store=database_source,
+                                       market_data_database_table=test_harness_arctic_market_data_table)
+
         market_df_all_read_back = market_loader.get_market_data(market_request=market_request)
 
-        assert all(market_df_all_read_back['mid'] - market_df_csv['mid'] < eps)
+        diff_df = abs(market_df_all_read_back['mid'] - market_df_csv['mid'])
+
+        outside_bounds = diff_df[diff_df >= eps]
+
+        assert len(outside_bounds) == 0
 
 
 def test_delete_market_data_arctic():
@@ -212,7 +241,7 @@ def test_delete_market_data_arctic():
         db_start_date = '01 Jan 2016';
         db_finish_date = pd.Timestamp(datetime.datetime.utcnow())
 
-        # write test market data CSV to arctic first
+        # Write test market data CSV to arctic first
         database_source.convert_csv_to_table(csv_market_data_store, ticker,
                                              test_harness_arctic_market_data_table,
                                              if_exists_table='replace',
@@ -228,13 +257,14 @@ def test_delete_market_data_arctic():
         market_df_old = market_df_old.loc[
             (market_df_old.index <= db_start_cut_off) | (market_df_old.index >= db_finish_cut_off)]
 
-        # do it with Arctic (note: underneath this will just use pandas, as can't do on database deletion with Arctic)
+        # Do it with Arctic (note: underneath this will just use pandas, as can't do on database deletion with Arctic)
         database_source.delete_market_data(ticker, start_date=db_start_cut_off, finish_date=db_finish_cut_off,
                                            table_name=test_harness_arctic_market_data_table)
 
         # read back data from database (will exclude the deleted records)
         market_df_new = database_source.fetch_market_data(start_date=db_start_date, finish_date=db_finish_date,
-                                                          ticker=ticker, table_name=test_harness_arctic_market_data_table)
+                                                          ticker=ticker,
+                                                          table_name=test_harness_arctic_market_data_table)
 
         # sort columns so they are same order
         market_df_old = market_df_old.sort_index(axis=1)
@@ -255,7 +285,7 @@ def test_write_chunked_market_data_arctic():
 
     arctic_start_date = '01 Jan 2016'; arctic_finish_date = pd.Timestamp(datetime.datetime.utcnow())
 
-    # load data from CSVs directly (for comparison later)
+    # Load data from CSVs directly (for comparison later)
     market_df_csv_desc = DatabaseSourceCSV(market_data_database_csv=csv_reverse_market_data_store).fetch_market_data(
         start_date=arctic_start_date, finish_date=arctic_finish_date, ticker=ticker)
 
@@ -265,7 +295,7 @@ def test_write_chunked_market_data_arctic():
     for a in arctic_lib_type:
         database_source = DatabaseSourceArctic(postfix='testharness', arctic_lib_type=a)
 
-        ### write CSV data to Arctic which is sorted ascending (default!)
+        ### Write CSV data to Arctic which is sorted ascending (default!)
         database_source.convert_csv_to_table(csv_market_data_store, ticker,
                                              test_harness_arctic_market_data_table,
                                              if_exists_table='replace',
@@ -273,15 +303,15 @@ def test_write_chunked_market_data_arctic():
                                              csv_read_chunksize=100000, remove_duplicates=False)
 
         market_request = MarketRequest(start_date=arctic_start_date, finish_date=arctic_finish_date, ticker=ticker,
-                                       data_store=test_harness_arctic_market_data_store,
+                                       data_store=database_source,
                                        market_data_database_table=test_harness_arctic_market_data_table)
 
         market_df_load = market_loader.get_market_data(market_request=market_request)
 
-        # compare reading directly from the CSV vs. reading back from arctic
+        # Compare reading directly from the CSV vs. reading back from arctic
         assert all(market_df_csv_asc['mid'] - market_df_load['mid'] < eps)
 
-        ### write CSV data to Arctic which is sorted descending
+        ### Write CSV data to Arctic which is sorted descending
         database_source.convert_csv_to_table(csv_reverse_market_data_store, ticker,
                                              test_harness_arctic_market_data_table,
                                              if_exists_table='append',
@@ -289,12 +319,12 @@ def test_write_chunked_market_data_arctic():
                                              csv_read_chunksize=100000, read_in_reverse=True, remove_duplicates=False)
 
         market_request = MarketRequest(start_date=arctic_start_date, finish_date=arctic_finish_date, ticker=ticker,
-                                       data_store=test_harness_arctic_market_data_store,
+                                       data_store=database_source,
                                        market_data_database_table=test_harness_arctic_market_data_table)
 
         market_df_load = market_loader.get_market_data(market_request=market_request)
 
-        # compare reading directly from the CSV vs. reading back from arctic
+        # Compare reading directly from the CSV vs. reading back from arctic
         assert all(market_df_csv_desc['mid'] - market_df_load['mid'] < eps)
 
 def test_write_multiple_wildcard_market_data_csvs_arctic():
@@ -311,7 +341,7 @@ def test_write_multiple_wildcard_market_data_csvs_arctic():
     for a in arctic_lib_type:
         database_source = DatabaseSourceArctic(postfix='testharness', arctic_lib_type=a)
 
-        ### read CSV data which is sorted ascending (default!)
+        ### Read CSV data which is sorted ascending (default!)
         database_source.convert_csv_to_table(csv_market_data_store, ticker,
                                              test_harness_arctic_market_data_table,
                                              if_exists_table='replace',
@@ -323,27 +353,28 @@ def test_write_multiple_wildcard_market_data_csvs_arctic():
         market_df_csv = database_source_csv.fetch_market_data(
             start_date=arctic_start_date, finish_date=arctic_finish_date, ticker=ticker)
 
-        # prepare the CSV folder first
+        # Prepare the CSV folder first
         csv_folder = os.path.join(constants.test_data_harness_folder, 'csv_arctic_mult')
 
-        # empty the CSV test harness folder, where we shall dump the mini CSVs
+        # Empty the CSV test harness folder, where we shall dump the mini CSVs
         UtilFunc().forcibly_create_empty_folder(csv_folder)
 
-        # split the CSV file into several mini CSV files (and also HDF5 files)
+        # Split the CSV file into several mini CSV files (and also HDF5 files)
         market_df_list = TimeSeriesOps().split_array_chunks(market_df_csv, chunks=3)
 
         chunk_no = 0
 
         for m in market_df_list:
             m.to_csv(os.path.join(csv_folder, "EURUSD" + str(chunk_no) + '.csv'))
-            UtilFunc().write_dataframe_to_binary(m, os.path.join(csv_folder, "EURUSD" + str(chunk_no) + '.h5'))
+            UtilFunc().write_dataframe_to_binary(m, os.path.join(csv_folder, "EURUSD" + str(chunk_no) + '.parquet'),
+                                                 format='parquet')
 
             chunk_no = chunk_no + 1
 
-        file_ext = ['csv', 'h5']
+        file_ext = ['csv', 'parquet']
 
         for f in file_ext:
-            ### read CSV data from the mini CSVs (using wildcard char) and dump to Arctic
+            ### Read CSV data from the mini CSVs (using wildcard char) and dump to Arctic
             database_source.convert_csv_to_table(os.path.join(csv_folder, "EURUSD*." + f), ticker,
                                                  test_harness_arctic_market_data_table,
                                                  if_exists_table='append',
@@ -351,56 +382,90 @@ def test_write_multiple_wildcard_market_data_csvs_arctic():
                                                  csv_read_chunksize=10 ** 6, remove_duplicates=False)
 
             market_request = MarketRequest(start_date=arctic_start_date, finish_date=arctic_finish_date, ticker=ticker,
-                                           data_store=test_harness_arctic_market_data_store,
+                                           data_store=database_source,
                                            market_data_database_table=test_harness_arctic_market_data_table)
 
-            # read back from Arctic
+            # Read back from Arctic
             market_df_load = market_loader.get_market_data(market_request=market_request)
 
-            # compare reading directly from the original large CSV vs. reading back from arctic (which was dumped from split CSVs)
-            assert all(market_df_csv['mid'] - market_df_load['mid'] < eps)
+            # Compare reading directly from the original large CSV vs. reading back from arctic (which was dumped from split CSVs)
+            diff_df = abs(market_df_load['mid'] - market_df_csv['mid'])
 
-### MSSQL ##############################################################################################################
+            outside_bounds = diff_df[diff_df >= eps]
 
-def test_write_trade_data_ms_sql_server():
-    """Tests that trade data can be read from CSV and dumped to MS SQL server
+            assert len(outside_bounds) == 0
+            # assert all(market_df_csv['mid'] - market_df_load['mid'] < eps)
+
+### SQL dialects #######################################################################################################
+
+def _get_db_trade_database_source():
+    database_source_list = [];
+    test_harness_trade_database_list = [];
+    test_harness_data_store_list = []
+
+    if run_ms_sql_server_tests:
+        database_source_list.append(DatabaseSourceMSSQLServer())
+        test_harness_trade_database_list.append(test_harness_ms_sql_trade_data_database)
+        test_harness_data_store_list.append(test_harness_ms_sql_data_store)
+
+    if run_mysql_server_tests:
+        database_source_list.append(DatabaseSourceMySQL())
+        test_harness_trade_database_list.append(test_harness_mysql_trade_data_database)
+        test_harness_data_store_list.append(test_harness_mysql_data_store)
+
+    if run_sqlite_server_tests:
+        database_source_list.append(DatabaseSourceSQLite())
+        test_harness_trade_database_list.append(test_harness_sqlite_trade_data_database)
+        test_harness_data_store_list.append(test_harness_sqlite_data_store)
+
+    return database_source_list, test_harness_trade_database_list, test_harness_data_store_list
+
+def test_write_trade_data_sql():
+    """Tests that trade data can be read from CSV and dumped to various SQL dialect
     """
 
-    if not (run_ms_sql_server_tests): return
+    database_source_list, test_harness_trade_database_list, test_harness_data_store_list = _get_db_trade_database_source()
 
-    database_source = DatabaseSourceMSSQLServer()
+    for i in range(0, len(database_source_list)):
 
-    for t in trade_order_list:
-        # dump trade_df to SQL test harness database and overwrite
-        database_source.convert_csv_to_table(csv_trade_order_mapping[t], None, sql_trade_order_mapping[t],
-                                             database_name=test_harness_sql_server_trade_data_database_name,
-                                             if_exists_table='replace', market_trade_data='trade')
+        database_source = database_source_list[i]
 
-        trade_order_df_sql = database_source.fetch_trade_order_data(
-            start_date=start_date, finish_date=finish_date, ticker=ticker, table_name=sql_trade_order_mapping[t],
-            database_name=test_harness_sql_server_trade_data_database_name)
+        test_harness_trade_database = test_harness_trade_database_list[i]
+        test_harness_data_store = test_harness_data_store_list[i]
 
-        database_source_csv = DatabaseSourceCSV()
+        for t in trade_order_list:
+            # Dump trade_df to SQL test harness database and overwrite
+            database_source.convert_csv_to_table(csv_trade_order_mapping[t], None,
+                                                 (sql_trade_order_mapping[test_harness_data_store])[t],
+                                                 test_harness_trade_database,
+                                                 if_exists_table='replace', market_trade_data='trade')
 
-        trade_order_df_csv = database_source_csv.fetch_trade_order_data(
-            start_date=start_date, finish_date=finish_date, ticker=ticker, table_name=csv_trade_order_mapping[t])
+            trade_order_df_sql = database_source.fetch_trade_order_data(
+                start_date=start_date, finish_date=finish_date, ticker=ticker,
+                table_name=sql_trade_order_mapping[test_harness_data_store][t],
+                database_name=test_harness_trade_database)
 
-        comp_fields = ['executed_price', 'notional', 'side']
+            database_source_csv = DatabaseSourceCSV()
 
-        # check that the data read back from MS SQL Server matches that from the original CSV
-        for c in comp_fields:
-            if c in trade_order_df_sql.columns and c in trade_order_df_csv.columns:
-                exec_sql = trade_order_df_sql[c]#.dropna()
-                exec_csv = trade_order_df_csv[c]#.dropna()
+            trade_order_df_csv = database_source_csv.fetch_trade_order_data(
+                start_date=start_date, finish_date=finish_date, ticker=ticker, table_name=csv_trade_order_mapping[t])
 
-                exec_diff = exec_sql - exec_csv
+            comp_fields = ['executed_price', 'notional', 'side']
 
-                assert all(exec_diff < eps)
+            # Check that the data read back from SQL database matches that from the original CSV
+            for c in comp_fields:
+                if c in trade_order_df_sql.columns and c in trade_order_df_csv.columns:
+                    exec_sql = trade_order_df_sql[c]#.dropna()
+                    exec_csv = trade_order_df_csv[c]#.dropna()
+
+                    exec_diff = exec_sql - exec_csv
+
+                    assert all(exec_diff < eps)
 
 
 ### KDB/InfluxDB #######################################################################################################
 
-def _get_db_database_source():
+def _get_db_market_database_source():
     database_source_list = [];
     test_harness_market_data_table_list = [];
     test_harness_data_store_list = []
@@ -415,13 +480,18 @@ def _get_db_database_source():
         test_harness_market_data_table_list.append(test_harness_influxdb_market_data_table)
         test_harness_data_store_list.append(test_harness_influxdb_data_store)
 
+    if run_pystore_tests:
+        database_source_list.append(DatabaseSourcePyStore(postfix='testharness'))
+        test_harness_market_data_table_list.append(test_harness_pystore_market_data_table)
+        test_harness_data_store_list.append(test_harness_pystore_data_store)
+
     return database_source_list, test_harness_market_data_table_list, test_harness_data_store_list
 
 def test_write_market_data_db():
-    """Tests we can write market data to influxdb
+    """Tests we can write market data to KDB/Influxdb/PyStore
     """
 
-    database_source_list, test_harness_market_data_table_list, test_harness_data_store_list = _get_db_database_source()
+    database_source_list, test_harness_market_data_table_list, test_harness_data_store_list = _get_db_market_database_source()
 
     market_loader = Mediator.get_tca_market_trade_loader(version=tcapy_version)
 
@@ -441,7 +511,7 @@ def test_write_market_data_db():
         market_df_csv = database_source_csv.fetch_market_data(
              start_date=db_start_date, finish_date=db_finish_date, ticker=ticker)
 
-        # check first when replacing full table and then appending (will still replace ticker though)
+        # Check first when replacing full table and then appending (will still replace ticker though)
         for i in replace_append:
 
             database_source.convert_csv_to_table(csv_market_data_store, ticker,
@@ -459,9 +529,9 @@ def test_write_market_data_db():
             assert all(diff_df < eps)
 
 def test_append_market_data_db():
-    """Tests we can append market data to KDB/InfluxDB.
+    """Tests we can append market data to KDB/InfluxDB/PyStore.
     """
-    database_source_list, test_harness_market_data_table_list, test_harness_data_store_list = _get_db_database_source()
+    database_source_list, test_harness_market_data_table_list, test_harness_data_store_list = _get_db_market_database_source()
 
     market_loader = Mediator.get_tca_market_trade_loader(version=tcapy_version)
 
@@ -490,7 +560,7 @@ def test_append_market_data_db():
 
         overlap_error = False
 
-        ## try to append overlapping data (this will fail!)
+        ## Try to append overlapping data (this will fail!)
         try:
             database_source.append_market_data(market_df_lower, ticker,
                                                table_name=test_harness_market_data_table,
@@ -500,8 +570,8 @@ def test_append_market_data_db():
 
         assert overlap_error
 
-        # append non-overlapping data which follows (writing overlapping data can end up with duplicated values - although
-        # KDB/InfluxDB will allow this)
+        # Append non-overlapping data which follows (writing overlapping data can end up with duplicated values - although
+        # KDB/InfluxDB/PyStore will allow this)
         database_source.append_market_data(market_df_higher, ticker, table_name=test_harness_market_data_table,
                                            if_exists_table='append', if_exists_ticker='append', remove_duplicates=False)
 
@@ -510,10 +580,10 @@ def test_append_market_data_db():
         assert all(market_df_all_read_back['mid'] - market_df_load['mid'] < eps)
 
 def test_delete_market_data_db():
-    """Tests that we can delete a section of a ticker by start/finish date in KDB/InfluxDB
+    """Tests that we can delete a section of a ticker by start/finish date in KDB/InfluxDB/PyStore
     """
 
-    database_source_list, test_harness_market_data_table_list, _ = _get_db_database_source()
+    database_source_list, test_harness_market_data_table_list, _ = _get_db_market_database_source()
 
     # market_loader = Mediator.get_tca_market_trade_loader(version=tcapy_version)
 
@@ -526,7 +596,7 @@ def test_delete_market_data_db():
         db_start_date = '01 Jan 2016';
         db_finish_date = pd.Timestamp(datetime.datetime.utcnow())
 
-        # write test market CSV to KDB first replacing any other test data (ie. deleting full folder)
+        # Write test market CSV to KDB first replacing any other test data (ie. deleting full folder)
         database_source.convert_csv_to_table(csv_market_data_store, ticker,
                                                  test_harness_market_data_table,
                                                  if_exists_table='replace',
@@ -535,21 +605,21 @@ def test_delete_market_data_db():
 
         db_start_cut_off = '26 Apr 2017 00:00'; db_finish_cut_off = '27 Apr 2017 00:50'
 
-        # read back from KDB test database
+        # Read back from KDB test database
         market_df_old = database_source.fetch_market_data(
              start_date=db_start_date, finish_date=db_finish_date, ticker=ticker, table_name=test_harness_market_data_table)
 
-        # now cutaway the bit to delete using pandas
+        # Now cutaway the bit to delete using pandas
         market_df_old = market_df_old.loc[(market_df_old.index <= db_start_cut_off) | (market_df_old.index >= db_finish_cut_off)]
 
-        # use our delete method in KDB/InfluxDB and later check if it matches
+        # Use our delete method in KDB/InfluxDB and later check if it matches
         database_source.delete_market_data(ticker, start_date=db_start_cut_off, finish_date=db_finish_cut_off,
                                            table_name=test_harness_market_data_table)
 
         market_df_new = database_source.fetch_market_data(start_date=db_start_date, finish_date=db_finish_date, ticker=ticker,
                                                           table_name=test_harness_market_data_table)
 
-        # both pandas and KDB/InfluxDB implementation should be the same
+        # Both pandas and KDB/InfluxDB implementation should be the same
         assert_frame_equal(market_df_old, market_df_new)
 
 ###
@@ -562,10 +632,10 @@ if __name__ == '__main__':
     test_write_chunked_market_data_arctic()
     test_write_multiple_wildcard_market_data_csvs_arctic()
 
-    # MS SQL Server
-    test_write_trade_data_ms_sql_server()
+    # SQL dialects
+    test_write_trade_data_sql()
 
-    # for KDB/InfluxDB
+    # for PyStore/KDB/InfluxDB
     test_write_market_data_db()
     test_append_market_data_db()
     test_delete_market_data_db()

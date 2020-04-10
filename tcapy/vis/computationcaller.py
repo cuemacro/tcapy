@@ -286,17 +286,17 @@ class ComputationCaller(ABC):
                 key = [key]
 
             for k in key:
-                # has one of the dataframes we want, just been calculated, if so return it!
+                # Has one of the dataframes we want, just been calculated, if so return it!
                 if k in dict_of_df.keys():
                     cached_list.append(dict_of_df[k])
 
-                # otherwise look in Redis for the table for the user
+                # Otherwise look in Redis for the table for the user
                 else:
                     # as last resort get from our global, this key is unique to each user
                     cached_list.append(self._glob_volatile_cache.get(session_id_computation + k))
 
         # return as tuples
-        tup = tuple(cached_list)
+        tup = list(cached_list)
 
         if len(tup) == 1:
             return tup[0]

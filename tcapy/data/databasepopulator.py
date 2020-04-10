@@ -31,8 +31,13 @@ constants = Constants()
 # Compatible with Python 2 *and* 3:
 ABC = abc.ABCMeta('ABC', (object,), {'__slots__': ()})
 
-fileformat = 'h5' # 'h5' or 'gzip'
+
 binary_format=constants.binary_default_dump_format # 'hdf5' or 'parquet'
+
+if binary_format == 'hdf5':
+    fileformat = 'h5' # 'h5' or 'gzip'
+elif binary_format == 'parquet':
+    fileformat = 'parquet'
 
 class DatabasePopulator(ABC):
     """DatabasePopulator connects from one data source (typically an external one via a DatabaseSource eg. DatabaseNCFX)
@@ -678,6 +683,9 @@ class DatabasePopulator(ABC):
         else:
             logger.warn("Couldn't write dataframe for " + ticker + " to database, appears it is empty!")
 
+    def _remove_saturday(self):
+        return True
+
 from tcapy.util.mediator import Mediator
 from tcapy.analysis.tcarequest import MarketRequest
 
@@ -731,12 +739,15 @@ class DatabasePopulatorNCFX(DatabasePopulator):
         start_time_stamp = pd.Timestamp(start)
         finish_time_stamp = pd.Timestamp(finish)
 
-        if self._remove_weekend_points():
-            weekend_data = "Weekend? " + key
+        if self._remove_saturday():
+            weekend_data = "Saturday? " + key
 
-            # Ignore weekends/create a cutoff at Sunday open/Friday close
+            # Ignore Saturday, and don't attempt to download
             if start_time_stamp.dayofweek == 5 or finish_time_stamp.dayofweek == 5:
                 return None, weekend_data
+
+        if self._remove_weekend_points():
+            weekend_data = "Weekend? " + key
 
             if start_time_stamp.dayofweek == 6 and start_time_stamp.hour < 20:
                 return None, weekend_data

@@ -2,7 +2,7 @@
 <html>
 <head><meta charset="utf-8" />
 
-<title>compliance_tca_calculations</title>
+<title>populating_databases_for_tcapy</title>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.1.10/require.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
@@ -13078,7 +13078,7 @@ div#notebook {
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <p><img src="data:image/png;base64,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" alt="cuemacro_logo.png"></p>
-<h1 id="Compliance-and-other-more-involved-TCA-calculations">Compliance and other more involved TCA calculations<a class="anchor-link" href="#Compliance-and-other-more-involved-TCA-calculations">&#182;</a></h1><p><strong>Saeed Amen / Founder of Cuemacro</strong></p>
+<h1 id="Populate-databases-for-tcapy">Populate databases for tcapy<a class="anchor-link" href="#Populate-databases-for-tcapy">&#182;</a></h1><p><strong>Saeed Amen / Founder of Cuemacro</strong></p>
 <p><a href="https://www.cuemacro.com">https://www.cuemacro.com</a> / saeed@cuemacro.com / @saeedamenfx / All material is copyright Cuemacro / 2020</p>
 
 </div>
@@ -13087,48 +13087,16 @@ div#notebook {
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>tcapy is a transaction cost analysis library in Python and one of the first open source TCA library. Typically, internal solutions can cost hundreds of thousands of dollars to develop and maintain. Using external services to do TCA also often have a licence cost.</p>
-<p>This notebook assumes that you have already</p>
+<h2 id="Introduction">Introduction<a class="anchor-link" href="#Introduction">&#182;</a></h2><p>In order for tcapy to work best it needs databases to ingest trade data and high frequency market data. Here we illustrate how to download market data from external sources, and how to populate your market tick database with it. We also show how to populate your trade database with your own trade/order data from CSV files. We also show how you can dump trade/order data from your database too via tcapy.</p>
+<p>This tutorial assumes that users are using databases for MySQL to store their trade/order data and MongoDB for their market data and also using Ubuntu/WSL, on <code>localhost</code>. You can setup both MySQL and MongoDB on Windows if you prefer.</p>
+<p>Whilst our focus here is on MySQL and MongoDB, note that tcapy supports several databases, via adapters:</p>
 <ul>
-<li>installed it by following the instructions <a href="https://github.com/cuemacro/tcapy/blob/master/INSTALL.md">here</a>) </li>
-<li>read the introductory tcapy notebook <a href="https://github.com/cuemacro/tcapy/blob/master/tcapy_notebooks/introducing_tcapy.ipynb">here</a></li>
+<li>trade/order data - Microsoft SQL Server, MySQL, SQLite</li>
+<li>market data - Arctic/MongoDB, PyStore, InfluxDB and KDB</li>
 </ul>
-<p>In this notebook, we show how we can do more involved TCA calculations with tcapy. We will show users how to construct Python based queries to:</p>
-<ul>
-<li>Calculate notionals executed with each LP (liquidity provider)</li>
-<li>Flag trades which have outlying slippage</li>
-</ul>
-<p>We shall also show you how to do to use some of the lower level parts of tcapy.</p>
-
-</div>
-</div>
-</div>
-<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
-</div><div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="Benchmark-machines">Benchmark machines<a class="anchor-link" href="#Benchmark-machines">&#182;</a></h2><p>For reference, the benchmark times quoted in the text are for the following hardware setup, which is designed to replicate a typical environment, where databases are running on a different system. In our case, we are running on Windows and WSL/Ubuntu on our primary machine. This setup is the best of both worlds, allowing us to use features like Celery and Dash/web GUI undex Linux, but still using Windows, so we could also interact with applications like Excel easily. Note, that the times we quote are from running once (in practice, we should take an average over many runs).</p>
-<p>tcapy is running on</p>
-<ul>
-<li>Processor: Intel(R) Core(TM) i9-7940X CPU @ 3.10GHz, 14 Core(s)</li>
-<li>Memory: 64 GB RAM</li>
-<li>Hard disk: NVMe m.2 SSD</li>
-<li>OS: Windows Version 10.0.18362 and WSL/Windows Subsystem for Linux (Ubuntu 18.04) running Celery/Redis/Memcached backend</li>
-</ul>
-<p>Databases are running on (Arctic/MongoDB 3.6.5 for market tick data and Microsoft SQL Server 14.0.2027)</p>
-<ul>
-<li>Intel(R) Xeon(R) CPU E3-1505M v6 @ 3.00GHz, 4 Core(s)</li>
-<li>Memory: 32 GB RAM and </li>
-<li>Hard disk: NVMe m.2 SSD</li>
-<li>OS: Windows Version 10.0.17763</li>
-</ul>
-
-</div>
-</div>
-</div>
-<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
-</div><div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
-<p>Our first step is to add the tcapy library to our <code>PYTHONPATH</code>. You may need to change these lines. Note, that in our setup, we are running the Jupyter notebook on Windows, and the backend Celery workers on Linux. If you are running everything in the same environment, the paths are likely to be same.</p>
+<p>You can also read trade/order and market data from flat files (CSV, Parquet or H5) or direct from external sources. However, we would strongly recommend, in particular for your market data, to download from your external source and then dump in your database. For trade/order data, it is also more convenient to use a database, rather than using CSVs.</p>
+<p>If running locally, we are assuming that users have already installed MySQL/MongoDB on their Linux box, using <code>install_mysql.sh</code> and <code>install_mongodb.sh</code>, which is also triggered by <code>install_all_tcapy.sh</code>. You also need to make sure the databases have been started locally, using <code>restart_db.py</code>.</p>
+<p>You can of course use databases which are not installed locally, in which case you won't need to install locally, but you will still need the IP, usernames and passwords to access them. To begin with, as with the other notebooks, let's set our paths. We are assuming that we are running the front end on Windows and the backend on WSL/Ubuntu.</p>
 
 </div>
 </div>
@@ -13141,13 +13109,29 @@ div#notebook {
 <div class=" highlight hl-ipython3"><pre><span></span><span class="kn">import</span> <span class="nn">sys</span>
 <span class="kn">import</span> <span class="nn">os</span>
 
-<span class="n">windows_tcapy_path</span> <span class="o">=</span> <span class="s1">&#39;e:/Remote/tcapy&#39;</span> <span class="c1"># Windows platform</span>
+<span class="n">windows_tcapy_path</span> <span class="o">=</span> <span class="s1">&#39;e:/Remote/tcapy/&#39;</span> <span class="c1"># Windows platform</span>
 <span class="n">linux_tcapy_path</span> <span class="o">=</span> <span class="s1">&#39;/home/tcapyuser/cuemacro/tcapy&#39;</span> <span class="c1"># Linux platform</span>
-<span class="n">local_test_data_path</span> <span class="o">=</span> <span class="s1">&#39;e:/Remote/tcapy/tests_harness_data/&#39;</span> <span class="c1"># Windows platform</span>
+<span class="n">local_test_data_path</span> <span class="o">=</span> <span class="s2">&quot;e:/Remote/tcapy/tests_harness_data/&quot;</span> <span class="c1"># Windows platform</span>
 <span class="n">remote_test_data_path</span> <span class="o">=</span> <span class="s1">&#39;/home/tcapyuser/cuemacro/tcapy/tests_harness_data/&#39;</span> <span class="c1"># WSL drive</span>
 
-<span class="c1"># Assuming the front end is on Linux</span>
+<span class="c1"># For dumping market data files</span>
+<span class="c1"># Assuming Windows platform (you might have to change these paths)</span>
+<span class="c1"># wsl$ gives us access to the WSL/Ubuntu drive on Windows</span>
+<span class="c1"># Make sure whatever paths you add exist!</span>
+<span class="n">csv_folder</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="se">\\\\</span><span class="s1">wsl$</span><span class="se">\\</span><span class="s1">Ubuntu</span><span class="se">\\</span><span class="s1">home</span><span class="se">\\</span><span class="s1">tcapyuser</span><span class="se">\\</span><span class="s1">csv_dump</span><span class="se">\\</span><span class="s1">&#39;</span>
+<span class="n">temp_data_folder</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\\\\</span><span class="s2">wsl$</span><span class="se">\\</span><span class="s2">Ubuntu</span><span class="se">\\</span><span class="s2">home</span><span class="se">\\</span><span class="s2">tcapyuser</span><span class="se">\\</span><span class="s2">csv_dump</span><span class="se">\\</span><span class="s2">temp</span><span class="se">\\</span><span class="s2">&quot;</span>
+<span class="n">temp_large_data_folder</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\\\\</span><span class="s2">wsl$</span><span class="se">\\</span><span class="s2">Ubuntu/home</span><span class="se">\\</span><span class="s2">tcapyuser</span><span class="se">\\</span><span class="s2">csv_dump</span><span class="se">\\</span><span class="s2">large</span><span class="se">\\</span><span class="s2">&quot;</span>
+
+<span class="c1"># Assuming the front end is on Windows</span>
 <span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">windows_tcapy_path</span><span class="p">)</span>
+
+<span class="kn">from</span> <span class="nn">tcapy.conf.constants</span> <span class="kn">import</span> <span class="n">Constants</span>
+
+<span class="n">constants</span> <span class="o">=</span> <span class="n">Constants</span><span class="p">()</span>
+
+<span class="c1"># Should we download the tick data or upload to Arctic? (this will take ages!)</span>
+<span class="n">download_tick_data</span> <span class="o">=</span> <span class="kc">False</span>
+<span class="n">upload_tick_data</span> <span class="o">=</span> <span class="kc">False</span>
 </pre></div>
 
     </div>
@@ -13158,7 +13142,7 @@ div#notebook {
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>If the Python path now includes tcapy, we can do all the imports from it, that we'll need later. We'll also import all the other Python libraries we'll use.</p>
+<p>Let's also define the data vendor we are using (by default <code>dukascopy</code>) and also which database we shall use for trade/order data <code>mysql</code>. We'll also define our market database as <code>arctic</code> but you can also select <code>pystore</code> too. In both cases, we ensure that we are reading/writing to the test harness database/tables, rather than the main tables. Obviously, for production purposes, you would not use the databases or tables with <code>test_harness</code>, however, for tutorials etc, it is better to write in separate tables. We also even advise setting up a totally different database for testing purposes, rather than using a production database.</p>
 
 </div>
 </div>
@@ -13168,66 +13152,46 @@ div#notebook {
 <div class="prompt input_prompt">In&nbsp;[2]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">OrderedDict</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">data_vendor</span> <span class="o">=</span> <span class="s1">&#39;dukascopy&#39;</span> <span class="c1"># &#39;ncfx&#39; or &#39;dukascopy&#39;</span>
 
-<span class="c1"># This is the entry point for our TCA analysis</span>
-<span class="kn">from</span> <span class="nn">tcapy.analysis.tcaengine</span> <span class="kn">import</span> <span class="n">TCAEngineImpl</span>
+<span class="c1"># &#39;ms_sql_server&#39; or &#39;mysql&#39; or &#39;sqlite&#39;</span>
+<span class="n">sql_database</span> <span class="o">=</span> <span class="s1">&#39;mysql&#39;</span>
+<span class="n">trade_data_database_name</span> <span class="o">=</span> <span class="s1">&#39;trade_database_test_harness&#39;</span>
 
-<span class="c1"># To construct the parameters for our TCA calculation</span>
-<span class="kn">from</span> <span class="nn">tcapy.analysis.tcarequest</span> <span class="kn">import</span> <span class="n">TCARequest</span>
+<span class="c1"># &#39;arctic&#39; or &#39;pystore&#39;</span>
+<span class="n">market_database</span> <span class="o">=</span> <span class="s1">&#39;arctic&#39;</span>
+<span class="n">market_data_database_name</span> <span class="o">=</span> <span class="s1">&#39;market_data_table_test_harness&#39;</span>
+<span class="n">data_vendor_test_harness</span> <span class="o">=</span> <span class="s1">&#39;testharness&#39;</span>
 
-<span class="c1"># To access trade and market data</span>
-<span class="kn">from</span> <span class="nn">tcapy.data.databasesource</span> <span class="kn">import</span> <span class="n">DatabaseSourceCSVBinary</span><span class="p">,</span> \
-    <span class="n">DatabaseSourceDataFrame</span><span class="p">,</span> <span class="n">DatabaseSourceDukascopy</span>
+<span class="c1"># Change paths as appropriate</span>
+<span class="n">pystore_path</span> <span class="o">=</span> <span class="s1">&#39;/home/tcapyuser/pystore&#39;</span> <span class="c1"># Linux</span>
+<span class="n">pystore_path</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="se">\\\\</span><span class="s1">wsl$</span><span class="se">\\</span><span class="s1">Ubuntu</span><span class="se">\\</span><span class="s1">home</span><span class="se">\\</span><span class="s1">tcapyuser</span><span class="se">\\</span><span class="s1">pystore&#39;</span> <span class="c1"># Windows</span>
 
-<span class="c1"># Import all the metrics and benchmarks we&#39;ll use</span>
-<span class="kn">from</span> <span class="nn">tcapy.analysis.algos.benchmark</span> <span class="kn">import</span> <span class="n">BenchmarkArrival</span><span class="p">,</span> <span class="n">BenchmarkSpreadToMid</span>
-<span class="kn">from</span> <span class="nn">tcapy.analysis.algos.metric</span> <span class="kn">import</span> <span class="n">MetricSlippage</span><span class="p">,</span> <span class="n">MetricTransientMarketImpact</span>
+<span class="kn">from</span> <span class="nn">tcapy.data.databasesource</span> <span class="kn">import</span> <span class="n">DatabaseSourceArctic</span><span class="p">,</span> <span class="n">DatabaseSourcePyStore</span>
 
-<span class="c1"># To aggregate the TCA results</span>
-<span class="kn">from</span> <span class="nn">tcapy.analysis.algos.resultsform</span> <span class="kn">import</span> <span class="n">TimelineResultsForm</span><span class="p">,</span> <span class="n">DistResultsForm</span><span class="p">,</span> \
-    <span class="n">BarResultsForm</span><span class="p">,</span> <span class="n">TableResultsForm</span><span class="p">,</span> <span class="n">JoinTables</span>
+<span class="k">if</span> <span class="n">data_vendor</span> <span class="o">==</span> <span class="s1">&#39;ncfx&#39;</span><span class="p">:</span>
+    <span class="kn">from</span> <span class="nn">tcapy.data.databasepopulator</span> <span class="kn">import</span> <span class="n">DatabasePopulatorNCFX</span> <span class="k">as</span> <span class="n">DatabasePopulator</span>
 
-<span class="c1"># To help display the output of a TCA calculation</span>
-<span class="kn">from</span> <span class="nn">tcapy.vis.tcaresults</span> <span class="kn">import</span> <span class="n">TCAResults</span>
-<span class="kn">from</span> <span class="nn">tcapy.vis.report.tcareport</span> <span class="kn">import</span> <span class="n">TCAReport</span>
-<span class="kn">from</span> <span class="nn">tcapy.vis.displaylisteners</span> <span class="kn">import</span> <span class="n">PlotRender</span>
+    <span class="n">tickers</span> <span class="o">=</span> <span class="n">constants</span><span class="o">.</span><span class="n">ncfx_tickers</span>
+<span class="k">elif</span> <span class="n">data_vendor</span> <span class="o">==</span> <span class="s1">&#39;dukascopy&#39;</span><span class="p">:</span>
+    <span class="kn">from</span> <span class="nn">tcapy.data.databasepopulator</span> <span class="kn">import</span> <span class="n">DatabasePopulatorDukascopy</span> <span class="k">as</span> <span class="n">DatabasePopulator</span>
+    
+    <span class="n">tickers</span> <span class="o">=</span> <span class="n">constants</span><span class="o">.</span><span class="n">dukascopy_tickers</span>
 
-<span class="c1"># General classes</span>
-<span class="kn">from</span> <span class="nn">tcapy.conf.constants</span> <span class="kn">import</span> <span class="n">Constants</span>
-<span class="kn">from</span> <span class="nn">tcapy.util.mediator</span> <span class="kn">import</span> <span class="n">Mediator</span>
-
-<span class="c1"># Prevent requests from displaying debug messages for certain libraries</span>
-<span class="kn">import</span> <span class="nn">logging</span>
-
-<span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s2">&quot;findatapy&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">WARNING</span><span class="p">)</span>
-<span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s2">&quot;requests&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">WARNING</span><span class="p">)</span>
-<span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s2">&quot;urllib3&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">WARNING</span><span class="p">)</span>
-
-<span class="c1"># For plotting later</span>
-<span class="kn">import</span> <span class="nn">plotly.io</span> <span class="k">as</span> <span class="nn">pio</span>
-
-<span class="c1"># For interactive plots (but these disappear when we reopen Jupyter)</span>
-<span class="n">pio</span><span class="o">.</span><span class="n">renderers</span><span class="o">.</span><span class="n">default</span> <span class="o">=</span> <span class="s2">&quot;notebook&quot;</span> 
-
-<span class="c1"># For static plots, need Orca (but might not work properly on WSL)</span>
-<span class="c1"># pio.renderers.default = &quot;svg&quot;</span>
-<span class="n">pio</span><span class="o">.</span><span class="n">renderers</span><span class="o">.</span><span class="n">default</span> <span class="o">=</span> <span class="s2">&quot;png&quot;</span>
-
-<span class="kn">import</span> <span class="nn">plotly</span>
-
-<span class="c1"># plotly.io.orca.config.executable = &#39;/home/tcapyuser/anaconda3/envs/py36tca/lib/orca_app/orca&#39; # You might need to change this</span>
-<span class="c1"># plotly.io.orca.config.save()</span>
-
-<span class="kn">from</span> <span class="nn">chartpy</span> <span class="kn">import</span> <span class="n">Chart</span><span class="p">,</span> <span class="n">Style</span>
-
-<span class="c1"># default size for Plotly charts we use</span>
-<span class="n">chart_width</span> <span class="o">=</span> <span class="mi">800</span>
-<span class="n">chart_height</span> <span class="o">=</span> <span class="mi">500</span>
-
-<span class="n">chart</span> <span class="o">=</span> <span class="n">Chart</span><span class="p">()</span>
-<span class="n">constants</span> <span class="o">=</span> <span class="n">Constants</span><span class="p">()</span>
-<span class="n">style</span> <span class="o">=</span> <span class="n">Style</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="n">chart_width</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="n">chart_height</span><span class="p">,</span> <span class="n">scale_factor</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">silent_display</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="k">if</span> <span class="n">sql_database</span> <span class="o">==</span> <span class="s1">&#39;ms_sql_server&#39;</span><span class="p">:</span>
+    <span class="kn">from</span> <span class="nn">tcapy.data.databasesource</span> <span class="kn">import</span> <span class="n">DatabaseSourceMSSQLServer</span> <span class="k">as</span> <span class="n">DatabaseSource</span>
+<span class="k">elif</span> <span class="n">sql_database</span> <span class="o">==</span> <span class="s1">&#39;mysql&#39;</span><span class="p">:</span>
+    <span class="kn">from</span> <span class="nn">tcapy.data.databasesource</span> <span class="kn">import</span> <span class="n">DatabaseSourceMySQL</span> <span class="k">as</span> <span class="n">DatabaseSource</span>
+<span class="k">elif</span> <span class="n">sql_database</span> <span class="o">==</span> <span class="s1">&#39;sqlite&#39;</span><span class="p">:</span>
+    <span class="kn">from</span> <span class="nn">tcapy.data.databasesource</span> <span class="kn">import</span> <span class="n">DatabaseSourceSQLite</span> <span class="k">as</span> <span class="n">DatabaseSource</span>
+    
+<span class="k">if</span> <span class="n">market_database</span> <span class="o">==</span> <span class="s1">&#39;arctic&#39;</span><span class="p">:</span>
+    <span class="n">market_data_database_table</span> <span class="o">=</span> <span class="s1">&#39;market_database_test_harness&#39;</span>
+    <span class="n">database_source_market</span> <span class="o">=</span> <span class="n">DatabaseSourceArctic</span><span class="p">(</span><span class="n">postfix</span><span class="o">=</span><span class="n">data_vendor_test_harness</span><span class="p">)</span>
+    
+<span class="k">elif</span> <span class="n">market_database</span> <span class="o">==</span> <span class="s1">&#39;pystore&#39;</span><span class="p">:</span>
+    <span class="n">market_data_database_table</span> <span class="o">=</span> <span class="s1">&#39;market_database_test_harness&#39;</span>
+    <span class="n">database_source_market</span> <span class="o">=</span> <span class="n">DatabaseSourcePyStore</span><span class="p">(</span><span class="n">postfix</span><span class="o">=</span><span class="n">data_vendor_test_harness</span><span class="p">)</span>
 </pre></div>
 
     </div>
@@ -13238,7 +13202,7 @@ div#notebook {
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>Let's specify the paths of the trade/order data CSVs in the test folder of tcapy, which are included in the package.</p>
+<p>Let's also define the trade key mappings to underlying SQL database tables too.</p>
 
 </div>
 </div>
@@ -13248,16 +13212,14 @@ div#notebook {
 <div class="prompt input_prompt">In&nbsp;[3]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">csv_trade_order_mapping</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;trade_df&#39;</span> <span class="p">:</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">local_test_data_path</span><span class="p">,</span> <span class="s1">&#39;small_test_trade_df.csv&#39;</span><span class="p">),</span>
-                           <span class="s1">&#39;order_df&#39;</span> <span class="p">:</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">local_test_data_path</span><span class="p">,</span> <span class="s1">&#39;small_test_order_df.csv&#39;</span><span class="p">)}</span>
-
-<span class="c1"># The test trade/order data is populated between 25 Apr 2017-05 Jun 2017</span>
-<span class="c1"># with trades/orders for &#39;EURUSD&#39;, &#39;USDJPY&#39; and &#39;EURJPY&#39;</span>
-<span class="n">local_csv_trade_order_mapping</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">([(</span><span class="s1">&#39;trade_df&#39;</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">local_test_data_path</span><span class="p">,</span> <span class="s1">&#39;small_test_trade_df.csv&#39;</span><span class="p">)),</span>
-                                             <span class="p">(</span><span class="s1">&#39;order_df&#39;</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">local_test_data_path</span><span class="p">,</span> <span class="s1">&#39;small_test_order_df.csv&#39;</span><span class="p">))])</span>
-
-<span class="n">remote_csv_trade_order_mapping</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">([(</span><span class="s1">&#39;trade_df&#39;</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">remote_test_data_path</span><span class="p">,</span> <span class="s1">&#39;small_test_trade_df.csv&#39;</span><span class="p">)),</span>
-                                              <span class="p">(</span><span class="s1">&#39;order_df&#39;</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">remote_test_data_path</span><span class="p">,</span> <span class="s1">&#39;small_test_order_df.csv&#39;</span><span class="p">))])</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">sql_trade_order_mapping</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s1">&#39;ms_sql_server&#39;</span> <span class="p">:</span>   <span class="p">{</span><span class="s1">&#39;trade_df&#39;</span> <span class="p">:</span> <span class="s1">&#39;[dbo].[trade]&#39;</span><span class="p">,</span>      <span class="c1"># Name of table which has broker messages to client</span>
+                         <span class="s1">&#39;order_df&#39;</span> <span class="p">:</span> <span class="s1">&#39;[dbo].[order]&#39;</span><span class="p">},</span>             <span class="c1"># Name of table which has orders from client</span>
+    <span class="s1">&#39;mysql&#39;</span><span class="p">:</span>            <span class="p">{</span><span class="s1">&#39;trade_df&#39;</span><span class="p">:</span> <span class="s1">&#39;trade_database_test_harness.trade&#39;</span><span class="p">,</span>   <span class="c1"># Name of table which has broker messages to client</span>
+                         <span class="s1">&#39;order_df&#39;</span><span class="p">:</span> <span class="s1">&#39;trade_database_test_harness.order&#39;</span><span class="p">},</span>  <span class="c1"># Name of table which has orders from client</span>
+    <span class="s1">&#39;sqlite&#39;</span><span class="p">:</span>           <span class="p">{</span><span class="s1">&#39;trade_df&#39;</span><span class="p">:</span> <span class="s1">&#39;trade_table&#39;</span><span class="p">,</span>  <span class="c1"># Name of table which has broker messages to client</span>
+                         <span class="s1">&#39;order_df&#39;</span><span class="p">:</span> <span class="s1">&#39;order_table&#39;</span><span class="p">}</span>  <span class="c1"># Name of table which has orders from client</span>
+<span class="p">}</span>
 </pre></div>
 
     </div>
@@ -13268,7 +13230,225 @@ div#notebook {
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>We need to create the <code>TCAEngineImpl</code> object, which is the entry point for dealing with TCA calculations.</p>
+<h1 id="Format-of-input-data-for-tcapy">Format of input data for tcapy<a class="anchor-link" href="#Format-of-input-data-for-tcapy">&#182;</a></h1><p>tcapy expects data to be a certain format when input. If it isn't quite the right format, you can change it beforehand, or use <code>DataNorm</code> to change on the fly. We strongly recommend looking at sample CSV files in the <code>tests_harness_data</code> folder which have trade data (<code>small_test_trade_df.csv</code>) and order data (<code>small_test_order_df.csv</code>).</p>
+<p>Note, that the more fields we have recorded, the more scope it gives us for doing TCA. For example, the <code>venue</code> field is optional but if it is there, we can also slice and dice trade data by venue, to understand if some venues are more costly than others.</p>
+<p>If we have very limited data, we have less scope in what we do for TCA. Also the granularity and quality of the data is important. For example, having very inaccurate timestamps can make TCA, means that any benchmark we find will also be subject to an inaccurate timestamp. This can happen when trades are booked manually after a trade has taken place.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Trade-data-format">Trade data format<a class="anchor-link" href="#Trade-data-format">&#182;</a></h2><p>We assume that trade messages are points in time, which are returned by our liquidity provider. These can a range of messages, usually <code>trade</code> fills, but they can also be cancel messages (in which case we would not for example have a populated <code>executed_price</code> field etc.). We give some of the fields here, note that we can have many more than this, and use those to filter trades.</p>
+<p>Note that tcapy will add many calculated fields to this, such as converting to the notional to the reporting currency (typically USD), benchmarks (such as mid price), metrics (such as slippage) etc.</p>
+<ul>
+<li><code>Date</code> - index - date/time of the message</li>
+<li><code>id</code> - event identifier</li>
+<li><code>ticker</code> - asset</li>
+<li><code>side</code> - side of the trade (eg. +1 for buy and -1 for sell)</li>
+<li><code>executed_notional</code> - amount actually executed</li>
+<li><code>executed_price</code> - price at which trade has been dealt</li>
+<li><code>notional_currency</code> - currency in which notional is expressed</li>
+<li><code>event_type</code> - trade, cancel, cancel/replace or placement</li>
+<li>optional fields<ul>
+<li><code>ancestor_pointer_id</code> - pointing to the order which this trade is part (if orders exist in the dataset)</li>
+<li><code>broker_id</code> - name of the liquidity provider</li>
+<li><code>venue</code> - venue where trade was executed</li>
+<li><code>algo_id</code> - name of the algo used (eg. <code>manual</code> or <code>TWAP</code> etc.)</li>
+<li><code>trader_id</code> - which trader executed trade</li>
+<li><code>portfolio_id</code> - which internal portfolio is the trade for</li>
+<li><code>portfolio_manager_id</code> - which portfolio manager is this for</li>
+</ul>
+</li>
+</ul>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Order-data-format">Order data format<a class="anchor-link" href="#Order-data-format">&#182;</a></h2><p>You can also use order data in tcapy. Orders are sent by the client to their liquidity provider. They have start and end times and can include multiple trade events. Here we discuss some of the fields specific to orders. As with trades, tcapy will add additional calculated fields, such as <code>executed_notional</code> based upon the underlying trade fills in an order, and also <code>executed_price</code> calculated as the average execution price of the trade fills.</p>
+<ul>
+<li><code>benchmark_date_start</code> - start time of order</li>
+<li><code>benchmark_date_end</code> - end time of order</li>
+<li>optional fields<ul>
+<li><code>order_notional</code> - total amount of notional from the order</li>
+</ul>
+</li>
+</ul>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Market-data-format">Market data format<a class="anchor-link" href="#Market-data-format">&#182;</a></h2><p>High frequency market data is used as our benchmark in tcapy. Typically, this is going to be quote data. We clearly can't use our own trade data as a benchmark, as this is going to result in circular analysis. However, if we have access to a large database of trade data from many different counterparties, we could construct a benchmark out of that.</p>
+<p>Below, we give some of the fields which you can have in your market data for use in tcapy. At the very least we need to have a <code>mid</code> market quote and this is typically what we'd use as a benchmark</p>
+<ul>
+<li><code>Date</code> - date/time of the tick</li>
+<li><code>mid</code> - mid market quote, which can be our proxy for the reference price</li>
+<li><code>bid</code> - bid quote</li>
+<li><code>ask</code> - ask quote</li>
+</ul>
+<p>tcapy can use bid/ask quotes as benchmark for selling/buying trades respectively, although, by default it will select the <code>mid</code> field. For orders, tcapy can construct benchmarks like TWAP on the fly, or VWAP, if you also have volume data (using <code>BenchmarkTWAP</code> and <code>BenchmarkVWAP</code> classes).</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h1 id="MySQL-for-trade/order-data">MySQL for trade/order data<a class="anchor-link" href="#MySQL-for-trade/order-data">&#182;</a></h1><p>Here we discuss how to add users to the MySQL database and also how to upload/dump data from your SQL database.</p>
+<h2 id="Adding-users">Adding users<a class="anchor-link" href="#Adding-users">&#182;</a></h2><p>Once MySQL installed, you are likely to want to create a user to access it. In this case, we assume the user is <code>tcapyuser</code>. In practice, you may wish to limit the precise privilages. The first step is to run the mysql shell, that will allow us to run commands on the database</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+
+<pre><code>sudo mysql</code></pre>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Let's add a user <code>tcapyuser</code> that can access the mysql database. In practice, we may wish to limit their priviliges! In this instance, we will only allow the user to login from the localhost. This <a href="https://medium.com/@harshityadav95/installing-mysql-in-ubuntu-linux-windows-subsystem-for-linux-from-scratch-d5771a4a2496">guide</a> summarises how to install MySQL on Ubuntu/WSL and also the steps you can take to secure it.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+
+<pre><code>CREATE USER 'tcapyuser'@'localhost' IDENTIFIED BY 'password';
+GRANT ALL PRIVILEGES ON * . * TO 'tcapyuser'@'localhost';
+FLUSH PRIVILEGES;</code></pre>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>We can also change the passwords of a user by running the following.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+
+<pre><code>SET PASSWORD FOR 'tcapyuser'@'localhost' = 'password';</code></pre>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>We can also create the <code>trade_database</code> database that we'll use to store trade/order data. You should also create <code>trade_database_test_harness</code> if you want to run any tests or execute the code in this notebook. If you want to setup SQL Server or SQLite, you'll also need to create databases in those, as tcapy doesn't by default attempt to create databases (it will create the appropriate tables though automatically, if necessary).</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+
+<pre><code>CREATE DATABASE trade_database;
+SHOW DATABASES;</code></pre>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>MySQL can have issues with large SQL inserts, increasing the <code>max_allowed_packet</code> parameter can help.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+
+<pre><code>Select @@global.max_allowed_packet;
+SET GLOBAL max_allowed_packet=1073741824</code></pre>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Default location for the data in MySQL is <code>/var/lib/mysql/</code> on Ubuntu. You can configure it for a different location.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Configuring-tcapy-to-interact-with-your-MySQL-database">Configuring tcapy to interact with your MySQL database<a class="anchor-link" href="#Configuring-tcapy-to-interact-with-your-MySQL-database">&#182;</a></h2><p>You will likely need to edit <code>constants.py</code> to make sure it is pointing to the right SQL database. Also make sure you add any credentials to a new file <code>constantscred.py</code>, which should not be added to version control. Below we've shown some of the parameters you may need to change. Microsoft SQL database has similar parameters</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+
+<pre><code>## MySQL
+mysql_host = '127.0.0.1'
+mysql_port = '3306'
+
+mysql_trade_data_database_name = 'trade_database'
+
+mysql_username = 'OVERWRITE_IN_ConstantsCred'
+mysql_password = 'OVERWRITE_IN_ConstantsCred'
+
+mysql_dump_record_chunksize = 10000    # Making the chunk size very big for MySQL can slow down inserts significantly
+
+mysql_trade_order_mapping = OrderedDict(
+    [('trade_df', 'trade_database.trade'),     # Name of the table which holds broker messages to clients
+     ('order_df', 'trade_database.order')])    # Name of the table which has orders from client</code></pre>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h1 id="SQLite-for-trade/order-data">SQLite for trade/order data<a class="anchor-link" href="#SQLite-for-trade/order-data">&#182;</a></h1><p>tcapy also supports SQLite for storing trade/order data. SQLite is basically a flat file database, which is stored in a single file on your computer. If you are the only user, it can be an easy way to setup a database. SQLite is included in Python, so we don't need to install it separately unlike for example MySQL. The first thing you need to do is to activate your <code>py36tca</code> Python environment. We can do this by running <code>source /home/tcapyuser/cuemacro/tcapy/batch_scripts/linux/installation/activate_python_environment.sh</code> on Linux or running <code>activate_python_environment.bat</code> on Windows. Then we create a folder to house our SQL database and then run <code>sqlite3</code> from the Anaconda prompt to create <code>trade_database.db</code>. If you want to run the tcapy tests or execute the code in this notebook, you can also create <code>trade_database_test_harness.db</code>.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+
+<pre><code>mkdir -p /home/tcapyuser/db
+sqlite3 /home/tcapyuser/db/trade_database.db
+&gt;.quit</code></pre>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h1 id="Uploading-trade/order-data-to-SQL-database">Uploading trade/order data to SQL database<a class="anchor-link" href="#Uploading-trade/order-data-to-SQL-database">&#182;</a></h1><p>In this instance we show how to upload trade/order CSV into the database tables (<code>trade</code> and <code>order</code>). Note that the database table names differ from the nicknames <code>trade_df</code> and <code>order_df</code> that we usually use. For simplicity, it is probably easier simply to name everything <code>trade_df</code> and <code>order_df</code>, but if you have an existing database, we recognise you might not be able to change table names easily. Warning this will overwrite your <code>trade</code> and <code>order</code> tables!! This code is generic so will work with all the supported SQL databases used.</p>
 
 </div>
 </div>
@@ -13278,10 +13458,23 @@ div#notebook {
 <div class="prompt input_prompt">In&nbsp;[4]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">tca_version</span>  <span class="o">=</span> <span class="n">constants</span><span class="o">.</span><span class="n">tcapy_version</span>
-<span class="n">tca_engine</span> <span class="o">=</span> <span class="n">TCAEngineImpl</span><span class="p">(</span><span class="n">version</span><span class="o">=</span><span class="n">tca_version</span><span class="p">)</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># Where are the trade/order CSVs stored, and how are they mapped?</span>
+<span class="c1"># This assumes you have already generated these files!</span>
+<span class="n">csv_sql_table_trade_order_mapping</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;trade&#39;</span><span class="p">:</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">local_test_data_path</span><span class="p">,</span> <span class="s1">&#39;small_test_trade_df.csv&#39;</span><span class="p">),</span>
+                                     <span class="s1">&#39;order&#39;</span><span class="p">:</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">local_test_data_path</span><span class="p">,</span> <span class="s1">&#39;small_test_order_df.csv&#39;</span><span class="p">),</span>
+                                    <span class="p">}</span>
 
-<span class="n">volatile_cache</span> <span class="o">=</span> <span class="n">Mediator</span><span class="o">.</span><span class="n">get_volatile_cache</span><span class="p">()</span>
+<span class="c1"># Get the actual table names in the database which may differ from &quot;nicknames&quot;</span>
+<span class="n">trade_order_mapping</span> <span class="o">=</span> <span class="n">constants</span><span class="o">.</span><span class="n">trade_order_mapping</span><span class="p">[</span><span class="n">sql_database</span><span class="p">]</span>
+
+<span class="c1"># To interact with our SQL database</span>
+<span class="n">database_source</span> <span class="o">=</span> <span class="n">DatabaseSource</span><span class="p">(</span><span class="n">trade_data_database_name</span><span class="o">=</span><span class="n">trade_data_database_name</span><span class="p">)</span>
+
+<span class="c1"># Upload each CSV to the associated table (replacing it!)</span>
+<span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">csv_sql_table_trade_order_mapping</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+    <span class="n">database_source</span><span class="o">.</span><span class="n">convert_csv_to_table</span><span class="p">(</span>
+            <span class="n">csv_sql_table_trade_order_mapping</span><span class="p">[</span><span class="n">key</span><span class="p">],</span> <span class="kc">None</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">database_name</span><span class="o">=</span><span class="n">trade_data_database_name</span><span class="p">,</span>
+            <span class="n">if_exists_table</span><span class="o">=</span><span class="s1">&#39;replace&#39;</span><span class="p">)</span>
 </pre></div>
 
     </div>
@@ -13298,7 +13491,30 @@ div#notebook {
 
 
 <div class="output_subarea output_stream output_stderr output_text">
-<pre>2020-04-08 19:01:06,187; INFO:tcapy.analysis.tcaengine: Init TCAEngine version: pro - Env: desktop_laptop_linux (tcaengine.py:53)
+<pre>2020-04-08 19:19:59,961; INFO:tcapy.data.databasesource: Parsing e:/Remote/tcapy/tests_harness_data/small_test_trade_df.csv before database dump for table trade (databasesource.py:1036)
+2020-04-08 19:19:59,987; DEBUG:tcapy.data.databasesource: About to write to mysql database... (databasesource.py:1101)
+2020-04-08 19:20:00,168; DEBUG:tcapy.data.databasesource: No empty strings in column broker_id (databasesource.py:500)
+2020-04-08 19:20:00,169; DEBUG:tcapy.data.databasesource: No empty strings in column venue (databasesource.py:500)
+2020-04-08 19:20:00,171; DEBUG:tcapy.data.databasesource: No empty strings in column algo_id (databasesource.py:500)
+2020-04-08 19:20:00,291; INFO:tcapy.data.databasesource: Parsing e:/Remote/tcapy/tests_harness_data/small_test_order_df.csv before database dump for table order (databasesource.py:1036)
+2020-04-08 19:20:00,300; DEBUG:tcapy.data.databasesource: About to write to mysql database... (databasesource.py:1101)
+2020-04-08 19:20:00,369; WARNING:tcapy.data.databasesource: Primary key already exists... (databasesource.py:1196)
+2020-04-08 19:20:00,371; WARNING:tcapy.data.databasesource: Index already exists... (databasesource.py:1202)
+2020-04-08 19:20:00,372; DEBUG:tcapy.data.databasesource: No empty strings in column broker_id (databasesource.py:500)
+2020-04-08 19:20:00,373; DEBUG:tcapy.data.databasesource: No empty strings in column algo_id (databasesource.py:500)
+</pre>
+</div>
+</div>
+
+<div class="output_area">
+
+    <div class="prompt"></div>
+
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>(mysql.connector.errors.ProgrammingError) 1064 (42000): You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near &#39;order ADD CONSTRAINT order_PK_trade PRIMARY KEY (`date`, id, ticker)&#39; at line 1
+[SQL: ALTER TABLE order ADD CONSTRAINT order_PK_trade PRIMARY KEY (`date`, id, ticker)]
+(Background on this error at: http://sqlalche.me/e/f405)
 </pre>
 </div>
 </div>
@@ -13310,14 +13526,14 @@ div#notebook {
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h1 id="Creating-a-TCA-calculation-to-flag-outlying-slippage-on-trades">Creating a TCA calculation to flag outlying slippage on trades<a class="anchor-link" href="#Creating-a-TCA-calculation-to-flag-outlying-slippage-on-trades">&#182;</a></h1><p>In this section, we show how to do TCA calculations with tcapy to</p>
-<ul>
-<li>flag trades/orders which have a spread which are outliers</li>
-<li>get the total notional executed by each broker</li>
-<li>get the average slippage per broker</li>
-</ul>
-<p>We'll also aggregate some of these results into a single DataFrame.</p>
-<p>As a first step, let's specify our <code>MetricSlippage</code> object. We also create a <code>BenchmarkSpreadToMid</code> object, which will take the market data and the then calculate the spread from the bid/ask to the mid. For those market data sources, without a bid/ask and only mid, we specify 1 bp as our outlier amount (if bid/ask exist, tcapy will ignore this given we've specified <code>overwrite_bid_ask=False</code>.</p>
+<h2 id="Dumping-trade/order-data-to-CSV-and-Parquet">Dumping trade/order data to CSV and Parquet<a class="anchor-link" href="#Dumping-trade/order-data-to-CSV-and-Parquet">&#182;</a></h2>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>We can use the <code>DatabaseSource</code> objects to read back from our SQL database. Note, that the data here, won't have undergone any normalization process, which is typically done during TCA calculations by the <code>DataNorm</code> object.</p>
 
 </div>
 </div>
@@ -13327,11 +13543,42 @@ div#notebook {
 <div class="prompt input_prompt">In&nbsp;[5]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">metric_slippage</span> <span class="o">=</span> <span class="n">MetricSlippage</span><span class="p">()</span>
-<span class="n">benchmark_spread_to_mid</span> <span class="o">=</span> <span class="n">BenchmarkSpreadToMid</span><span class="p">(</span><span class="n">overwrite_bid_ask</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">bid_mid_bp</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">ask_mid_bp</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># Map the &quot;nicknames&quot; to the CSV dumping output</span>
+<span class="n">csv_trade_order_mapping_dump</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;trade_df&#39;</span><span class="p">:</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">local_test_data_path</span><span class="p">,</span> <span class="s1">&#39;small_test_trade_df_dump.csv&#39;</span><span class="p">),</span>
+                                <span class="s1">&#39;order_df&#39;</span><span class="p">:</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">local_test_data_path</span><span class="p">,</span> <span class="s1">&#39;small_test_order_df_dump.csv&#39;</span><span class="p">),</span>
+                                <span class="p">}</span>
+
+<span class="c1"># Get the actual table names in the database which may differ from &quot;nicknames&quot;</span>
+<span class="n">trade_order_mapping</span> <span class="o">=</span> <span class="n">constants</span><span class="o">.</span><span class="n">trade_order_mapping</span><span class="p">[</span><span class="n">sql_database</span><span class="p">]</span>
+
+<span class="n">database_source</span> <span class="o">=</span> <span class="n">DatabaseSource</span><span class="p">(</span><span class="n">trade_data_database_name</span><span class="o">=</span><span class="n">trade_data_database_name</span><span class="p">)</span>
+
+<span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">trade_order_mapping</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+    <span class="n">trade_order_df</span> <span class="o">=</span> <span class="n">database_source</span><span class="o">.</span><span class="n">fetch_trade_order_data</span><span class="p">(</span><span class="n">table_name</span><span class="o">=</span><span class="n">trade_order_mapping</span><span class="p">[</span><span class="n">k</span><span class="p">])</span>
+    <span class="n">trade_order_df</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">csv_trade_order_mapping_dump</span><span class="p">[</span><span class="n">k</span><span class="p">])</span>
+    <span class="n">trade_order_df</span><span class="o">.</span><span class="n">to_parquet</span><span class="p">(</span><span class="n">csv_trade_order_mapping_dump</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;csv&#39;</span><span class="p">,</span> <span class="s1">&#39;parquet&#39;</span><span class="p">))</span>
 </pre></div>
 
     </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    <div class="prompt"></div>
+
+
+<div class="output_subarea output_stream output_stderr output_text">
+<pre>2020-04-08 19:20:00,448; DEBUG:tcapy.data.databasesource: Excecuted mysql query: select *  from trade_database.trade , 660 returned (databasesource.py:959)
+2020-04-08 19:20:00,492; DEBUG:tcapy.data.databasesource: Excecuted mysql query: select *  from trade_database.order , 322 returned (databasesource.py:959)
+</pre>
+</div>
+</div>
+
 </div>
 </div>
 
@@ -13339,7 +13586,191 @@ div#notebook {
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>Let's create a <code>TableResultsForm</code> which will look at the <code>slippage</code> of all the trades and pick out only those which are anomalous. The resulting DataFrame, will be ordered by the worst slippage.</p>
+<h1 id="Arctic/MongoDB-for-market-tick-data">Arctic/MongoDB for market tick data<a class="anchor-link" href="#Arctic/MongoDB-for-market-tick-data">&#182;</a></h1><p>Here we discuss how to add users to the database, how to download data from Dukascopy and also how to upload tick data to Arctic/MongoDB.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Increasing-open-file-limit-on-Linux-for-MongoDB">Increasing open file limit on Linux for MongoDB<a class="anchor-link" href="#Increasing-open-file-limit-on-Linux-for-MongoDB">&#182;</a></h2><p>MongoDB ends up opening many files at the same time. However, on Linux typically the <code>nofile</code> setting is quite low by default. In order to make MongoDB stable, it is recommended to increase the number of open files allowed. By default, during tcapy's installation <code>increase_file_limits.sh</code> is run which copies a modified version of <code>limits.conf</code> to <code>/etc/security/limits.conf</code> which increases the <code>nofile</code> parameters for <code>root</code> user (which is the default one in tcapy for running MongoDB). It also overwrites <code>/etc/pam.d/common-session</code> and <code>/etc/pam.d/common-session-noninteractive</code> to ensure that the <code>limits.conf</code> is observed for the root user.</p>
+<p>Note, that you may wish to use different users such as the <code>mongodb</code> user to run your instance of MongoDB, and also to run MongoDB on Linux a service at startup, as opposed to running it via <code>restart_db.sh</code>. However, this isn't the default usage with tcapy and would require changing the configuration.</p>
+<p>To check the <code>nofile</code> parameter has been currently set for the <code>root</code> user, you can run:</p>
+
+<pre><code>sudo su
+ulimit -n
+
+</code></pre>
+<p>The output should be <code>100000</code> if the above script has been run. Note, that it has only been fully tested on Ubuntu at present.</p>
+<p>If you do not increase the open file limit, you will likely experience a lot of issues, when trying to access MongoDB. This link in the <a href="https://docs.mongodb.com/manual/reference/ulimit/">MongoDB explains more</a> and this article explains how to <a href="https://www.mongodb.com/blog/post/tuning-mongodb--linux-to-allow-for-tens-of-thousands-connections">tune MongoDB for a large number of users</a> including a discussion of the open files point.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Adding-users">Adding users<a class="anchor-link" href="#Adding-users">&#182;</a></h2><p>Once installed, you may wish to create various users for accessing MongoDB, by typing in the following commands into the Mongo shell. We can start the Mongo shell by running.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+
+<pre><code>sudo mongo</code></pre>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>We can add a root user called <code>admin_root</code>. Generally, it is advisable to limit root access to the database.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+
+<pre><code>use admin
+db.createUser(
+  {
+    user: "admin_root",
+    pwd: "password",
+    roles: ["root"]
+  }
+)</code></pre>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Let's create a user <code>tcapyuser</code> who will be the one mainly accessing the MongoDB database via tcapy. Again, as with mysql, we might wish to reduce the privilages of the user.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+
+<pre><code>use admin
+db.createUser(
+      {
+        user: "tcapyuser",
+        pwd: "password",
+        roles: [ { role: "userAdminAnyDatabase", db: "admin" }, 
+             { role: "dbAdminAnyDatabase", db: "admin" }, 
+             { role: "readWriteAnyDatabase", db: "admin" } ]
+      }
+)</code></pre>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>You can also change passwords of user.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+
+<pre><code>use admin
+db.changeUserPassword("admin_root", "password")</code></pre>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Storage-engines-for-Arctic/MongoDB">Storage engines for Arctic/MongoDB<a class="anchor-link" href="#Storage-engines-for-Arctic/MongoDB">&#182;</a></h2><p>tcapy uses <a href="https://github.com/man-group/arctic">Arctic</a> which is Man AHL's open source Python library to intreact with MongoDB. It essentially takes Pandas DataFrame, and then compresses them before dumping them into MongoDB. It is very fast for fetching and dumping large amounts of time series data. The speed is relatively to several points, first because of the compression, it is less impacted by IO limits. Furthermore, because of the compression there is less overhead when accessing MongoDB over a network.</p>
+<p>There are several different storage engines in Arctic:</p>
+<ul>
+<li><code>ChunkStore</code></li>
+<li><code>VersionStore</code></li>
+<li><code>TickStore</code></li>
+</ul>
+<p>Each engine has various different use cases. tcapy supports all three, however, we have opted to make <code>ChunkStore</code> the default engine, which stores the data in user defined chunks.</p>
+<p>In our case, our default chunk size is daily, because typically, when using Celery in parallel to fetch data in daily chunks (and caching these daily chunks in Redis), and it should be very fast to get such chunks. In our experience this seems to be quicker than doing the same thing using <code>VersionStore</code>.</p>
+<p>The precise chunk size you choose, will depend on how you intend to use it. For example, if you wouldn't run tcapy in parallel, then you might consider using larger chunk sizes. In the documentation, the reasons for Arctic speed is discussed in more detail, as well as a <a href="https://arctic.readthedocs.io/en/latest/">summary of the various storage engines</a>.</p>
+<p>Note, that you should not try to keep switching between the various storage engines, while using the same identical collection names eg. <code>market_data_table</code>. If you intend to use them in together (eg. for benchmarking) it would be better to have different collection names for each storage engine to avoid confusion.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Configuring-tcapy-to-interact-with-your-MongoDB-database">Configuring tcapy to interact with your MongoDB database<a class="anchor-link" href="#Configuring-tcapy-to-interact-with-your-MongoDB-database">&#182;</a></h2><p>You will likely need to edit <code>constants.py</code> to make sure it is pointing to you MongoDB instance. Also make sure you add any credentials to a new file <code>constantscred.py</code>, which should not be added to version control. Below we've shown some of the parameters you may need to change.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+
+<pre><code>### Arctic/MongoDB
+arctic_host = database_host
+arctic_port = 27017
+arctic_username = 'OVERWRITE_IN_ConstantsCred'
+arctic_password = 'OVERWRITE_IN_ConstantsCred'
+
+arctic_ssl = False
+arctic_ssl_cert_reqs = ssl.CERT_NONE
+
+# NOTE: database name not currently used in Arctic
+arctic_market_data_database_name = 'fx'
+arctic_trade_data_database_name = 'fx'
+arctic_market_data_database_table = 'market_data_table'  # Name of the table with market tick data
+
+arctic_timeout_ms = 10 * 1000  # How many millisections should we have a timeout for in Arctic/MongoDB
+
+# https://arctic.readthedocs.io/en/latest/ has more discussion on the differences between the
+# various storage engines, and the various pros and cons
+# By default we use 'CHUNK_STORE' with 'D' (daily) bucketing - corresponding to our 'daily' fetching when using
+# with Celery
+arctic_lib_type = 'CHUNK_STORE'  # storage engines: VERSION_STORE or TICK_STORE or CHUNK_STORE (default)
+
+# 'D' is for daily, you can also choose 'M' and other chunk sizes (depends on how you wish to cache data)
+arctic_chunk_store_freq = 'D'
+
+arctic_quota_market_data_GB = 80</code></pre>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h1 id="Experiementing-with-PyStore-for-market-tick-data">Experiementing with PyStore for market tick data<a class="anchor-link" href="#Experiementing-with-PyStore-for-market-tick-data">&#182;</a></h1><p>Another choice for storing your market tick data, is <a href="https://github.com/ranaroussi/pystore">PyStore</a>. It isn't strictly speaking a database. It is modelled on Arctic, but instead of using MongoDB as the backend it is Pandas data store, which uses Parquet files on disk, which have been chunked. If you are the only user for the market tick data, PyStore can be an easy to use option (combined with SQLite for the trade/order data). In order to setup PyStore, you just need to make sure that it has access to a folder <code>/home/tcapyuser/pystore/</code>, which you can create with:</p>
+
+<pre><code>mkdir -p /home/tcapyuser/pystore
+
+</code></pre>
+<p>Note, that with pretty much everything else with tcapy, this is fully configurable. You can change the default PyStore dump location in <code>constants.py</code>. tcapy also has adapters to use InfluxDB and KDB for accessing market tick data.</p>
+<p><em>At present we are still our working on our PyStore, and it is highly experimental, in particular, we are trying to speed up the appending of new data, so you may choose to use Arctic for the moment</em></p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h1 id="Downloading-market-tick-data-from-Dukascopy">Downloading market tick data from Dukascopy<a class="anchor-link" href="#Downloading-market-tick-data-from-Dukascopy">&#182;</a></h1><p>We are going to show how to download large amounts of tick data from Dukascopy to disk as Parquet files. We are later going to upload these files to MongoDB. Note, the syntax is very similar for NCFX, we just need to instantiate <code>DatabasePopulatorNCFX</code> instead of <code>DatabasePopulatorDukacopy</code>.</p>
 
 </div>
 </div>
@@ -13349,21 +13780,10 @@ div#notebook {
 <div class="prompt input_prompt">In&nbsp;[6]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># Display a table of all the anomalous trades by slippage (ie. outside bid/ask)</span>
-<span class="n">table_results_form</span> <span class="o">=</span> <span class="n">TableResultsForm</span><span class="p">(</span><span class="n">trade_order_list</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;trade_df&#39;</span><span class="p">],</span>
-    <span class="n">metric_name</span><span class="o">=</span><span class="s1">&#39;slippage&#39;</span><span class="p">,</span>
-                                      
-    <span class="c1"># Order by the worst slippage</span>
-    <span class="n">filter_by</span><span class="o">=</span><span class="s1">&#39;worst_all&#39;</span><span class="p">,</span>  
-                                      
-    <span class="c1"># Only flag trades outside bid/ask</span>
-    <span class="n">tag_value_combinations</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;slippage_anomalous&#39;</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">},</span>
-                                                  
-    <span class="c1"># Only display a small number of fields</span>
-    <span class="n">keep_fields</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;executed_notional_in_reporting_currency&#39;</span><span class="p">,</span> <span class="s1">&#39;side&#39;</span><span class="p">],</span>
-                                        
-    <span class="c1"># Don&#39;t round any of the figures</span>
-    <span class="n">round_figures_by</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">start_date_csv</span> <span class="o">=</span> <span class="s1">&#39;01 Jan 2016&#39;</span><span class="p">;</span> <span class="n">finish_date_csv</span> <span class="o">=</span> <span class="s1">&#39;03 Apr 2020&#39;</span><span class="p">;</span> <span class="n">split_size</span> <span class="o">=</span> <span class="s1">&#39;monthly&#39;</span> <span class="c1"># &#39;daily&#39; or &#39;monthly&#39;</span>
+
+<span class="n">db_populator</span> <span class="o">=</span> <span class="n">DatabasePopulator</span><span class="p">(</span><span class="n">temp_data_folder</span><span class="o">=</span><span class="n">temp_data_folder</span><span class="p">,</span> <span class="n">temp_large_data_folder</span><span class="o">=</span><span class="n">temp_large_data_folder</span><span class="p">,</span>
+                                 <span class="n">tickers</span><span class="o">=</span><span class="n">tickers</span><span class="p">)</span>
 </pre></div>
 
     </div>
@@ -13374,7 +13794,7 @@ div#notebook {
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>Here we create a <code>BarResultsForm</code> object to aggregate notional executed per broker.</p>
+<p>Now we can kick off the download. This will take a very long time, and hence only do this once! It will dump Parquet files to disk in <code>monthly</code> chunks, and will also create smaller temporary files. Having the temporary files is beneficial, so if the download gets interrupted, tcapy will ingest these, rather than redownloading externally. In this case, we have set <code>write_large_csv</code> to <code>False</code>. Whilst CSV files are universal, they can be very large in file size and slow to parse, compared to Parquet files.</p>
 
 </div>
 </div>
@@ -13384,22 +13804,13 @@ div#notebook {
 <div class="prompt input_prompt">In&nbsp;[7]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span> <span class="c1"># Get the total notional executed by broker (in reporting currency)</span>
-<span class="n">bar_results_form_notional</span> <span class="o">=</span> <span class="n">BarResultsForm</span><span class="p">(</span><span class="n">trade_order_list</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;trade_df&#39;</span><span class="p">],</span>  <span class="c1"># Trade</span>
-    <span class="c1"># Aggregate by broker name</span>
-    <span class="n">aggregate_by_field</span><span class="o">=</span><span class="s1">&#39;broker_id&#39;</span><span class="p">,</span>  
-                                                
-    <span class="c1"># Analyse notional</span>
-    <span class="n">metric_name</span><span class="o">=</span><span class="s1">&#39;executed_notional_in_reporting_currency&#39;</span><span class="p">,</span>
-    
-    <span class="c1"># Sum the notional</span>
-    <span class="n">aggregation_metric</span><span class="o">=</span><span class="s1">&#39;sum&#39;</span><span class="p">,</span>  
-                                           
-    <span class="c1"># No need for a multipler</span>
-    <span class="n">scalar</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>  
-                                           
-    <span class="c1"># Round to nearest unit</span>
-    <span class="n">round_figures_by</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># Writes a CSV/Parquet to disk from data vendor (does not attempt to write anything to the database)</span>
+<span class="c1"># Will also dump temporary HDF5 files to disk (to avoid reloading them)</span>
+
+<span class="k">if</span> <span class="p">(</span><span class="n">download_tick_data</span><span class="p">):</span>
+    <span class="n">msg</span><span class="p">,</span> <span class="n">df_dict</span> <span class="o">=</span> <span class="n">db_populator</span><span class="o">.</span><span class="n">download_to_csv</span><span class="p">(</span><span class="n">start_date_csv</span><span class="p">,</span> <span class="n">finish_date_csv</span><span class="p">,</span> <span class="n">tickers</span><span class="p">,</span> <span class="n">split_size</span><span class="o">=</span><span class="s1">&#39;monthly&#39;</span><span class="p">,</span>
+            <span class="n">csv_folder</span><span class="o">=</span><span class="n">csv_folder</span><span class="p">,</span> <span class="n">return_df</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">remove_duplicates</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">write_large_csv</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="n">write_large_hdf5_parquet</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 </pre></div>
 
     </div>
@@ -13410,7 +13821,33 @@ div#notebook {
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>Now let's create a <code>BarResultsForm</code> to calculate the average slippage per broker (weighted by trade size).</p>
+<p>In practice, we'd recommend kicking off the downloading script <code>dump_data_vendor_to_parquet_csv_hdf5.py</code> separately, rather than running it in a Jupyter notebook, given the amount of time it takes, and also the amount of log output it generates. In our <code>csv_dump</code> folder, we'll end up with a bunch of monthly Parquet files which look like this.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+
+<pre><code>AUDUSD_dukascopy_2016-01-03_22_00_01.868000+00_002016-01-31_23_59_57.193000+00_00.parquet
+AUDUSD_dukascopy_2016-02-01_00_00_00.055000+00_002016-02-29_23_59_56.657000+00_00.parquet
+AUDUSD_dukascopy_2016-03-01_00_00_00.712000+00_002016-03-31_23_59_50.885000+00_00.parquet</code></pre>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Uploading-market-tick-data-to-market-database">Uploading market tick data to market database<a class="anchor-link" href="#Uploading-market-tick-data-to-market-database">&#182;</a></h2>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>We can now upload the tick data in the above Parquet (or CSV/HDF5) files to our market database! First we need to define the data source, the tickers we want to upload, and also the format of the data. To make things quicker, I've just filtered for 2017 (mainly because that cover the period of the pregenerated trade/order CSVs in the <code>tests_harness_data</code> folder that comes with tcapy).</p>
 
 </div>
 </div>
@@ -13420,24 +13857,18 @@ div#notebook {
 <div class="prompt input_prompt">In&nbsp;[8]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># Get average slippage per broker (weighted by notional)</span>
-<span class="n">bar_results_form_slippage</span> <span class="o">=</span> <span class="n">BarResultsForm</span><span class="p">(</span><span class="n">trade_order_list</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;trade_df&#39;</span><span class="p">],</span>
-                                           
-    <span class="c1"># Aggregate the trades by broker_id</span>
-    <span class="n">aggregate_by_field</span><span class="o">=</span><span class="s1">&#39;broker_id&#39;</span><span class="p">,</span>
-                                           
-    <span class="c1"># Do calculations on the slippage field</span>
-    <span class="n">metric_name</span><span class="o">=</span><span class="s1">&#39;slippage&#39;</span><span class="p">,</span>
-    <span class="n">aggregation_metric</span><span class="o">=</span><span class="s1">&#39;mean&#39;</span><span class="p">,</span>
-                                           
-    <span class="c1"># Weight the mean by the amount executed in reported currency (usually USD)</span>
-    <span class="n">weighting_field</span><span class="o">=</span><span class="s1">&#39;executed_notional_in_reporting_currency&#39;</span><span class="p">,</span>
-    
-    <span class="c1"># Multiply the slippage by 10000 (converting to bp)</span>
-    <span class="n">scalar</span><span class="o">=</span><span class="mf">10000.0</span><span class="p">,</span>
-    
-    <span class="c1"># Round all output to 2 decimal places</span>
-    <span class="n">round_figures_by</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">ticker_mkt</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;EURUSD&#39;</span><span class="p">]</span> <span class="c1"># You can add more tickers, but it will take much longer!</span>
+
+<span class="n">file_extension</span> <span class="o">=</span> <span class="s1">&#39;parquet&#39;</span>  <span class="c1"># parquet or csv or h5</span>
+
+<span class="c1"># Files dumped by DatabasePopulator look like this</span>
+<span class="c1"># &#39;EURUSD_dukascopy_2016-01-03_22_00_01.868000+00_002016-01-31_23_59_57.193000+00_00.parquet&#39;</span>
+<span class="c1">#</span>
+<span class="c1"># Assume that ALL TIME IN UTC!</span>
+<span class="n">csv_file</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span> <span class="o">+</span> <span class="s1">&#39;_&#39;</span> <span class="o">+</span> <span class="n">data_vendor</span> <span class="o">+</span> <span class="s1">&#39;_*.&#39;</span> <span class="o">+</span> <span class="n">file_extension</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">ticker_mkt</span><span class="p">]</span>  
+
+<span class="c1"># These are all the files with the market tick data</span>
+<span class="n">csv_market_data</span> <span class="o">=</span> <span class="p">[</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">csv_folder</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">csv_file</span><span class="p">]</span>
 </pre></div>
 
     </div>
@@ -13448,7 +13879,7 @@ div#notebook {
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>Lastly, create a <code>JoinTables</code> object to combine the total notional per broker and the associated slippage for each broker.</p>
+<p>Now read the Parquet files and upload our market databases (this will take a while!). Note it will overwrite any tickers already in the database from the same data vendor. By default we use <code>DatabaseSourceArctic</code> but note we could have changed it to <code>DatabaseSourcePyStore</code> earlier.</p>
 
 </div>
 </div>
@@ -13458,72 +13889,24 @@ div#notebook {
 <div class="prompt input_prompt">In&nbsp;[9]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">join_tables_notional_slippage</span> <span class="o">=</span> <span class="n">JoinTables</span><span class="p">(</span><span class="n">tables_dict</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;table_name&#39;</span><span class="p">:</span> <span class="s1">&#39;jointables_broker_id&#39;</span><span class="p">,</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="k">if</span> <span class="n">upload_tick_data</span><span class="p">:</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">ticker_mkt</span><span class="p">)):</span>
+        <span class="n">ticker</span> <span class="o">=</span> <span class="n">ticker_mkt</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+        <span class="n">csv_file</span> <span class="o">=</span> <span class="n">csv_market_data</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
 
-    <span class="c1"># Fetch the following calculated tables</span>
-    <span class="s1">&#39;table_list&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;bar_trade_df_executed_notional_in_reporting_currency_by/sum/broker_id&#39;</span><span class="p">,</span>
-                   <span class="s1">&#39;bar_trade_df_slippage_by/mean/broker_id&#39;</span><span class="p">],</span>
-
-    <span class="c1"># Append to the columns of each table</span>
-    <span class="s1">&#39;column_list&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;notional (rep cur)&#39;</span><span class="p">,</span> <span class="s1">&#39;slippage (bp)&#39;</span><span class="p">]})</span>
-</pre></div>
-
-    </div>
-</div>
-</div>
-
-</div>
-<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
-</div><div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
-<p>Here we create a detailed <code>TCARequest</code> loading our trade data from CSV files for a single ticker (in this case EURUSD). Given that we are downloading directly from Dukascopy, we shall set <code>use_multithreading=False</code> as the current downloader is not thread safe. If we want to use multithreading/Celery, we can use other data sources, such as a database (eg. Arctic/MongoDB). In general, it is better to use a market data database, which has been prepopulated from an external source, rather than repeatedly calling an external source, which is very slow (in particular when accessing a long history).</p>
-<p>Note, we are using the various <code>Metric</code>, <code>Benchmark</code>, <code>ResultsForm</code> and <code>JoinTables</code> objects which we have already defined earlier.</p>
-
-</div>
-</div>
-</div>
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-<div class="prompt input_prompt">In&nbsp;[10]:</div>
-<div class="inner_cell">
-    <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># We are conducting a TCA computation for trade/order data between 05 May-10 May 2017 for EURUSD</span>
-<span class="c1"># The trade dataset is from CSV and the market data is downloaded from Dukascopy on the fly</span>
-<span class="n">tca_request</span> <span class="o">=</span> <span class="n">TCARequest</span><span class="p">(</span><span class="n">start_date</span><span class="o">=</span><span class="s1">&#39;05 May 2017&#39;</span><span class="p">,</span> <span class="n">finish_date</span><span class="o">=</span><span class="s1">&#39;10 May 2017&#39;</span><span class="p">,</span> <span class="n">ticker</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;EURUSD&#39;</span><span class="p">],</span>
-                         <span class="n">tca_type</span><span class="o">=</span><span class="s1">&#39;detailed&#39;</span><span class="p">,</span>
-                         <span class="n">trade_data_store</span><span class="o">=</span><span class="s1">&#39;csv&#39;</span><span class="p">,</span> <span class="n">market_data_store</span><span class="o">=</span><span class="s1">&#39;dukascopy&#39;</span><span class="p">,</span>
-                         <span class="n">trade_order_mapping</span><span class="o">=</span><span class="n">local_csv_trade_order_mapping</span><span class="p">,</span>
-                         <span class="n">metric_calcs</span><span class="o">=</span><span class="p">[</span><span class="n">metric_slippage</span><span class="p">],</span>
-                         <span class="n">results_form</span><span class="o">=</span><span class="p">[</span><span class="n">table_results_form</span><span class="p">,</span> 
-                                       <span class="n">bar_results_form_notional</span><span class="p">,</span> 
-                                       <span class="n">bar_results_form_slippage</span><span class="p">],</span>
-                         <span class="n">benchmark_calcs</span><span class="o">=</span><span class="p">[</span><span class="n">benchmark_spread_to_mid</span><span class="p">],</span>
-                         <span class="n">join_tables</span><span class="o">=</span><span class="p">[</span><span class="n">join_tables_notional_slippage</span><span class="p">],</span>
-                         <span class="n">use_multithreading</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-</pre></div>
-
-    </div>
-</div>
-</div>
-
-</div>
-<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
-</div><div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
-<p>Let's run the TCA calculation from our <code>TCARequest</code>. The output is a dictionary of DataFrames (and Figures).</p>
-
-</div>
-</div>
-</div>
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-<div class="prompt input_prompt">In&nbsp;[11]:</div>
-<div class="inner_cell">
-    <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">Mediator</span><span class="o">.</span><span class="n">get_volatile_cache</span><span class="p">()</span><span class="o">.</span><span class="n">clear_cache</span><span class="p">()</span>
-
-<span class="c1"># Dictionary of (mostly) dataframes as output from TCA calculation</span>
-<span class="n">dict_of_df</span> <span class="o">=</span> <span class="n">tca_engine</span><span class="o">.</span><span class="n">calculate_tca</span><span class="p">(</span><span class="n">tca_request</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Uploading &#39;</span> <span class="o">+</span> <span class="n">ticker</span><span class="p">)</span>
+        
+        <span class="c1"># Very first time, replace whole table, then append</span>
+        <span class="c1"># Otherwise will overwrite every ticker continuously!</span>
+        <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">if_exists_table</span> <span class="o">=</span> <span class="s1">&#39;replace&#39;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">if_exists_table</span> <span class="o">=</span> <span class="s1">&#39;append&#39;</span>
+        
+        <span class="n">database_source_market</span><span class="o">.</span><span class="n">convert_csv_to_table</span><span class="p">(</span><span class="n">csv_file</span><span class="p">,</span> <span class="n">ticker</span><span class="p">,</span> <span class="n">market_data_database_table</span><span class="p">,</span>
+                                            <span class="n">if_exists_table</span><span class="o">=</span><span class="n">if_exists_table</span><span class="p">,</span> <span class="n">remove_duplicates</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                                            <span class="n">if_exists_ticker</span><span class="o">=</span><span class="s1">&#39;replace&#39;</span><span class="p">,</span> <span class="n">date_format</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                                            <span class="n">read_in_reverse</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 </pre></div>
 
     </div>
@@ -13540,87 +13923,88 @@ div#notebook {
 
 
 <div class="output_subarea output_stream output_stderr output_text">
-<pre>2020-04-08 19:01:06,259; DEBUG:tcapy.analysis.tcamarkettradeloader: Start loading trade/data/computation (tcamarkettradeloader.py:240)
-2020-04-08 19:01:06,263; DEBUG:tcapy.analysis.tcatickerloaderimpl: Get market and trade/order data for EURUSD from 2017-05-05 00:00:00+00:00 - 2017-05-10 00:00:00+00:00 (tcatickerloaderimpl.py:80)
-2020-04-08 19:01:06,264; DEBUG:tcapy.data.volatilecache: Attempting to get list from cache: [&#39;dukascopy_EURUSD_2017-05-05 00:00:00+00:00_2017-05-10 00:00:00+00:00_market_df_None_comp&#39;] (volatilecache.py:697)
-2020-04-08 19:01:06,266; DEBUG:tcapy.data.volatilecache: Attempting to get list from cache: [&#39;dukascopy_EURUSD_2017-05-05 00:00:00+00:00_2017-05-10 00:00:00+00:00_market_df_None_comp&#39;] (volatilecache.py:697)
-2020-04-08 19:01:06,427; DEBUG:tcapy.data.databasesource: Downloading 2017-05-05 00:00:00 - 2017-05-10 00:00:00 for EURUSD (databasesource.py:3679)
-2020-04-08 19:01:14,882; WARNING:tcapy.analysis.algos.benchmark: mid not in market data (benchmark.py:107)
-2020-04-08 19:01:14,883; DEBUG:tcapy.data.volatilecache: Attempting to push [&#39;dukascopy_EURUSD_2017-05-05 00:00:00+00:00_2017-05-10 00:00:00+00:00_market_df_None_comp&#39;] to cache (volatilecache.py:429)
-2020-04-08 19:01:14,985; DEBUG:tcapy.data.volatilecache: Pandas dataframe of size: ----------- 17.08 MB ----------- in 1 chunk(s) (volatilecache.py:541)
-2020-04-08 19:01:15,037; DEBUG:tcapy.data.volatilecache: Now pushing [&#39;dukascopy_EURUSD_2017-05-05 00:00:00+00:00_2017-05-10 00:00:00+00:00_market_df_None_comp&#39;] to cache (volatilecache.py:442)
-2020-04-08 19:01:15,047; DEBUG:tcapy.data.volatilecache: Pushed [&#39;dukascopy_EURUSD_2017-05-05 00:00:00+00:00_2017-05-10 00:00:00+00:00_market_df_None_comp&#39;] to cache (volatilecache.py:460)
-2020-04-08 19:01:15,048; DEBUG:tcapy.data.volatilecache: Attempting to push [&#39;dukascopy_EURUSD_2017-05-05 00:00:00+00:00_2017-05-10 00:00:00+00:00_market_df_None_comp&#39;] to cache (volatilecache.py:429)
-2020-04-08 19:01:15,148; DEBUG:tcapy.data.volatilecache: Pandas dataframe of size: ----------- 17.08 MB ----------- in 1 chunk(s) (volatilecache.py:541)
-2020-04-08 19:01:15,194; DEBUG:tcapy.data.volatilecache: Now pushing [&#39;dukascopy_EURUSD_2017-05-05 00:00:00+00:00_2017-05-10 00:00:00+00:00_market_df_None_comp&#39;] to cache (volatilecache.py:442)
-2020-04-08 19:01:15,207; DEBUG:tcapy.data.volatilecache: Pushed [&#39;dukascopy_EURUSD_2017-05-05 00:00:00+00:00_2017-05-10 00:00:00+00:00_market_df_None_comp&#39;] to cache (volatilecache.py:460)
-2020-04-08 19:01:15,209; DEBUG:tcapy.data.volatilecache: Attempting to push [&#39;2020-04-08 18:01:15.209526__df_comp_6609_expiry_&#39;] to cache (volatilecache.py:429)
-2020-04-08 19:01:15,307; DEBUG:tcapy.data.volatilecache: Pandas dataframe of size: ----------- 17.08 MB ----------- in 1 chunk(s) (volatilecache.py:541)
-2020-04-08 19:01:15,353; DEBUG:tcapy.data.volatilecache: Now pushing [&#39;2020-04-08 18:01:15.209526__df_comp_6609_expiry_&#39;] to cache (volatilecache.py:442)
-2020-04-08 19:01:15,367; DEBUG:tcapy.data.volatilecache: Pushed [&#39;2020-04-08 18:01:15.209526__df_comp_6609_expiry_&#39;] to cache (volatilecache.py:460)
-2020-04-08 19:01:15,369; DEBUG:tcapy.analysis.tcatickerloader: Get trade order holder for EURUSD from 2017-05-05 00:00:00+00:00 - 2017-05-10 00:00:00+00:00 (tcatickerloader.py:365)
-2020-04-08 19:01:15,411; WARNING:tcapy.data.datafactory: Dataframe empty for ticker USDEUR (datafactory.py:95)
-2020-04-08 19:01:15,412; DEBUG:tcapy.data.volatilecache: Attempting to get list from cache: [&#39;dukascopy_EURUSD_2017-05-05 00:00:00+00:00_2017-05-10 00:00:00+00:00_market_df_None_comp&#39;] (volatilecache.py:697)
-2020-04-08 19:01:15,476; DEBUG:tcapy.data.volatilecache: Attempting to push [&#39;2020-04-08 18:01:15.476854__df_comp_14427_expiry_&#39;] to cache (volatilecache.py:429)
-2020-04-08 19:01:15,482; DEBUG:tcapy.data.volatilecache: Pandas dataframe of size: ----------- 0.02 MB ----------- in 1 chunk(s) (volatilecache.py:541)
-2020-04-08 19:01:15,484; DEBUG:tcapy.data.volatilecache: Now pushing [&#39;2020-04-08 18:01:15.476854__df_comp_14427_expiry_&#39;] to cache (volatilecache.py:442)
-2020-04-08 19:01:15,486; DEBUG:tcapy.data.volatilecache: Pushed [&#39;2020-04-08 18:01:15.476854__df_comp_14427_expiry_&#39;] to cache (volatilecache.py:460)
-2020-04-08 19:01:15,519; WARNING:tcapy.data.datafactory: Dataframe empty for ticker USDEUR (datafactory.py:95)
-2020-04-08 19:01:15,520; DEBUG:tcapy.data.volatilecache: Attempting to get list from cache: [&#39;dukascopy_EURUSD_2017-05-05 00:00:00+00:00_2017-05-10 00:00:00+00:00_market_df_None_comp&#39;] (volatilecache.py:697)
-2020-04-08 19:01:15,582; DEBUG:tcapy.data.volatilecache: Attempting to push [&#39;2020-04-08 18:01:15.582498__df_comp_41674_expiry_&#39;] to cache (volatilecache.py:429)
-2020-04-08 19:01:15,586; DEBUG:tcapy.data.volatilecache: Pandas dataframe of size: ----------- 0.008 MB ----------- in 1 chunk(s) (volatilecache.py:541)
-2020-04-08 19:01:15,588; DEBUG:tcapy.data.volatilecache: Now pushing [&#39;2020-04-08 18:01:15.582498__df_comp_41674_expiry_&#39;] to cache (volatilecache.py:442)
-2020-04-08 19:01:15,589; DEBUG:tcapy.data.volatilecache: Pushed [&#39;2020-04-08 18:01:15.582498__df_comp_41674_expiry_&#39;] to cache (volatilecache.py:460)
-2020-04-08 19:01:15,590; DEBUG:tcapy.data.volatilecache: Attempting to get list from cache: [&#39;2020-04-08 18:01:15.209526__df_comp_6609_expiry_&#39;] (volatilecache.py:697)
-2020-04-08 19:01:15,611; DEBUG:tcapy.data.volatilecache: Deleted 1 keys (volatilecache.py:733)
-2020-04-08 19:01:15,647; DEBUG:tcapy.analysis.tcatickerloader: Filter the market date by start/finish date (tcatickerloader.py:724)
-2020-04-08 19:01:15,656; DEBUG:tcapy.analysis.tcatickerloader: Combine trade/order data (tcatickerloader.py:745)
-2020-04-08 19:01:15,658; DEBUG:tcapy.data.volatilecache: Attempting to get list from cache: [&#39;2020-04-08 18:01:15.476854__df_comp_14427_expiry_&#39;] (volatilecache.py:697)
-2020-04-08 19:01:15,659; DEBUG:tcapy.data.volatilecache: Deleted 1 keys (volatilecache.py:733)
-2020-04-08 19:01:15,662; DEBUG:tcapy.data.volatilecache: Attempting to get list from cache: [&#39;2020-04-08 18:01:15.582498__df_comp_41674_expiry_&#39;] (volatilecache.py:697)
-2020-04-08 19:01:15,664; DEBUG:tcapy.data.volatilecache: Deleted 1 keys (volatilecache.py:733)
-2020-04-08 19:01:15,789; DEBUG:tcapy.analysis.tcatickerloader: Filter trades by venue (tcatickerloader.py:441)
-2020-04-08 19:01:15,791; DEBUG:tcapy.analysis.tcatickerloader: Calculating derived fields and benchmarks (tcatickerloader.py:491)
-2020-04-08 19:01:15,791; DEBUG:tcapy.analysis.tcatickerloader: Calculating execution fields (tcatickerloader.py:493)
-2020-04-08 19:01:15,801; DEBUG:tcapy.analysis.tcatickerloader: Calculating benchmarks (tcatickerloader.py:519)
-2020-04-08 19:01:15,802; DEBUG:tcapy.analysis.tcatickerloader: Calculating BenchmarkSpreadToMid for market data (tcatickerloader.py:527)
-2020-04-08 19:01:15,826; DEBUG:tcapy.analysis.tcatickerloader: Calculating metrics (tcatickerloader.py:544)
-2020-04-08 19:01:15,827; DEBUG:tcapy.analysis.tcatickerloader: Calculating MetricSlippage for trade_df (tcatickerloader.py:550)
-2020-04-08 19:01:15,846; DEBUG:tcapy.analysis.tcatickerloader: Calculating MetricSlippage for order_df (tcatickerloader.py:550)
-2020-04-08 19:01:15,866; DEBUG:tcapy.analysis.tcatickerloader: Completed derived field calculations for EURUSD (tcatickerloader.py:558)
-2020-04-08 19:01:15,867; DEBUG:tcapy.analysis.tcatickerloaderimpl: Generating downsampled market data for potentional display (tcatickerloaderimpl.py:270)
-2020-04-08 19:01:15,894; DEBUG:tcapy.analysis.tcatickerloaderimpl: About to join (tcatickerloaderimpl.py:332)
-2020-04-08 19:01:15,898; DEBUG:tcapy.analysis.tcatickerloaderimpl: Finished joining (tcatickerloaderimpl.py:348)
-2020-04-08 19:01:15,901; DEBUG:tcapy.analysis.tcatickerloaderimpl: About to join (tcatickerloaderimpl.py:332)
-2020-04-08 19:01:15,905; DEBUG:tcapy.analysis.tcatickerloaderimpl: Finished joining (tcatickerloaderimpl.py:348)
-2020-04-08 19:01:16,500; DEBUG:tcapy.data.volatilecache: Attempting to push [&#39;2020-04-08 18:01:16.500264__df_comp_78040_expiry_&#39;] to cache (volatilecache.py:429)
-2020-04-08 19:01:16,601; DEBUG:tcapy.data.volatilecache: Pandas dataframe of size: ----------- 18.727 MB ----------- in 1 chunk(s) (volatilecache.py:541)
-2020-04-08 19:01:16,657; DEBUG:tcapy.data.volatilecache: Now pushing [&#39;2020-04-08 18:01:16.500264__df_comp_78040_expiry_&#39;] to cache (volatilecache.py:442)
-2020-04-08 19:01:16,671; DEBUG:tcapy.data.volatilecache: Pushed [&#39;2020-04-08 18:01:16.500264__df_comp_78040_expiry_&#39;] to cache (volatilecache.py:460)
-2020-04-08 19:01:16,673; DEBUG:tcapy.data.volatilecache: Attempting to push [&#39;2020-04-08 18:01:16.673894__df_comp_81360_expiry_&#39;, &#39;2020-04-08 18:01:16.673894__df_comp_34392_expiry_&#39;, &#39;2020-04-08 18:01:16.673894__df_comp_79706_expiry_&#39;, &#39;2020-04-08 18:01:16.673894__df_comp_61666_expiry_&#39;, &#39;2020-04-08 18:01:16.673894__df_comp_9814_expiry_&#39;, &#39;2020-04-08 18:01:16.673894__fig_comp_96356_expiry_&#39;] to cache (volatilecache.py:429)
-2020-04-08 19:01:16,677; DEBUG:tcapy.data.volatilecache: Pandas dataframe of size: ----------- 0.011 MB ----------- in 1 chunk(s) (volatilecache.py:541)
-2020-04-08 19:01:16,682; DEBUG:tcapy.data.volatilecache: Pandas dataframe of size: ----------- 0.008 MB ----------- in 1 chunk(s) (volatilecache.py:541)
-2020-04-08 19:01:16,685; DEBUG:tcapy.data.volatilecache: Pandas dataframe of size: ----------- 0.032 MB ----------- in 1 chunk(s) (volatilecache.py:541)
-2020-04-08 19:01:16,689; DEBUG:tcapy.data.volatilecache: Pandas dataframe of size: ----------- 0.032 MB ----------- in 1 chunk(s) (volatilecache.py:541)
-2020-04-08 19:01:16,693; DEBUG:tcapy.data.volatilecache: Pandas dataframe of size: ----------- 0.025 MB ----------- in 1 chunk(s) (volatilecache.py:541)
-2020-04-08 19:01:16,709; DEBUG:tcapy.data.volatilecache: Now pushing [&#39;2020-04-08 18:01:16.673894__df_comp_81360_expiry_&#39;, &#39;2020-04-08 18:01:16.673894__df_comp_34392_expiry_&#39;, &#39;2020-04-08 18:01:16.673894__df_comp_79706_expiry_&#39;, &#39;2020-04-08 18:01:16.673894__df_comp_61666_expiry_&#39;, &#39;2020-04-08 18:01:16.673894__df_comp_9814_expiry_&#39;, &#39;2020-04-08 18:01:16.673894__fig_comp_96356_expiry_&#39;] to cache (volatilecache.py:442)
-2020-04-08 19:01:16,711; DEBUG:tcapy.data.volatilecache: Pushed [&#39;2020-04-08 18:01:16.673894__df_comp_81360_expiry_&#39;, &#39;2020-04-08 18:01:16.673894__df_comp_34392_expiry_&#39;, &#39;2020-04-08 18:01:16.673894__df_comp_79706_expiry_&#39;, &#39;2020-04-08 18:01:16.673894__df_comp_61666_expiry_&#39;, &#39;2020-04-08 18:01:16.673894__df_comp_9814_expiry_&#39;, &#39;2020-04-08 18:01:16.673894__fig_comp_96356_expiry_&#39;] to cache (volatilecache.py:460)
-2020-04-08 19:01:16,715; DEBUG:tcapy.data.volatilecache: Attempting to get list from cache: [&#39;2020-04-08 18:01:16.673894__df_comp_81360_expiry_&#39;] (volatilecache.py:697)
-2020-04-08 19:01:16,717; DEBUG:tcapy.data.volatilecache: Deleted 1 keys (volatilecache.py:733)
-2020-04-08 19:01:16,721; DEBUG:tcapy.data.volatilecache: Attempting to get list from cache: [&#39;2020-04-08 18:01:16.673894__df_comp_34392_expiry_&#39;] (volatilecache.py:697)
-2020-04-08 19:01:16,723; DEBUG:tcapy.data.volatilecache: Deleted 1 keys (volatilecache.py:733)
-2020-04-08 19:01:16,728; DEBUG:tcapy.data.volatilecache: Attempting to get list from cache: [&#39;2020-04-08 18:01:16.673894__df_comp_79706_expiry_&#39;] (volatilecache.py:697)
-2020-04-08 19:01:16,729; DEBUG:tcapy.data.volatilecache: Deleted 1 keys (volatilecache.py:733)
-2020-04-08 19:01:16,732; DEBUG:tcapy.data.volatilecache: Attempting to get list from cache: [&#39;2020-04-08 18:01:16.673894__df_comp_61666_expiry_&#39;] (volatilecache.py:697)
-2020-04-08 19:01:16,733; DEBUG:tcapy.data.volatilecache: Deleted 1 keys (volatilecache.py:733)
-2020-04-08 19:01:16,736; DEBUG:tcapy.data.volatilecache: Attempting to get list from cache: [&#39;2020-04-08 18:01:16.673894__df_comp_9814_expiry_&#39;] (volatilecache.py:697)
-2020-04-08 19:01:16,737; DEBUG:tcapy.data.volatilecache: Deleted 1 keys (volatilecache.py:733)
-2020-04-08 19:01:16,740; DEBUG:tcapy.data.volatilecache: Attempting to get list from cache: [&#39;2020-04-08 18:01:16.673894__fig_comp_96356_expiry_&#39;] (volatilecache.py:697)
-2020-04-08 19:01:16,742; DEBUG:tcapy.data.volatilecache: Deleted 1 keys (volatilecache.py:733)
-2020-04-08 19:01:16,989; DEBUG:tcapy.analysis.tcamarkettradeloader: Finished loading data and calculating metrics on individual tickers (tcamarkettradeloader.py:247)
-2020-04-08 19:01:16,991; DEBUG:tcapy.analysis.tcamarkettradeloaderimpl: Constructing results form to summarize analysis... (tcamarkettradeloaderimpl.py:69)
-2020-04-08 19:01:17,028; DEBUG:tcapy.analysis.tcamarkettradeloaderimpl: Now join table results... (tcamarkettradeloaderimpl.py:99)
-2020-04-08 19:01:17,034; DEBUG:tcapy.analysis.tcamarkettradeloaderimpl: Finished calculating results form and join table results! (tcamarkettradeloaderimpl.py:112)
+<pre>2020-04-08 19:20:00,542; INFO:tcapy.data.databasesource: Attempting to load Arctic/MongoDB library: market_database_test_harness CHUNK_STORE (databasesource.py:1881)
+2020-04-08 19:20:00,544; INFO:tcapy.data.databasesource: Got Arctic/MongoDB library: market_database_test_harness CHUNK_STORE (databasesource.py:1901)
+</pre>
+</div>
+</div>
+
+<div class="output_area">
+
+    <div class="prompt"></div>
+
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>Uploading EURUSD
+</pre>
+</div>
+</div>
+
+<div class="output_area">
+
+    <div class="prompt"></div>
+
+
+<div class="output_subarea output_stream output_stderr output_text">
+<pre>2020-04-08 19:20:00,547; INFO:arctic.arctic: Dropping collection: market_database_test_harness (arctic.py:326)
+2020-04-08 19:20:00,780; INFO:arctic.arctic: Dropping collection: market_database_test_harness.snapshots (arctic.py:330)
+2020-04-08 19:20:00,793; INFO:arctic.arctic: Dropping collection: market_database_test_harness.versions (arctic.py:330)
+2020-04-08 19:20:00,810; INFO:arctic.arctic: Dropping collection: market_database_test_harness.ARCTIC (arctic.py:330)
+2020-04-08 19:20:00,819; INFO:arctic.arctic: Dropping collection: market_database_test_harness.version_nums (arctic.py:330)
+2020-04-08 19:20:01,208; INFO:arctic.chunkstore.chunkstore: Trying to enable sharding... (chunkstore.py:46)
+2020-04-08 19:20:01,211; WARNING:arctic.chunkstore.chunkstore: Library created, but couldn&#39;t enable sharding: no such command: &#39;enablesharding&#39;. This is OK if you&#39;re not &#39;admin&#39; (chunkstore.py:50)
+2020-04-08 19:20:01,833; INFO:tcapy.data.databasesource: Parsing \\wsl$\Ubuntu\home\tcapyuser\csv_dump\EURUSD_dukascopy_2016-01-03_22_00_01.446000+00_002016-01-31_23_59_59.429000+00_00.parquet before tick database dump for ticker EURUSD-testharness (databasesource.py:1701)
+2020-04-08 19:20:02,218; INFO:arctic.arctic: Mongo Quota: arctic.market_database_test_harness 0.000 / 80 GB used (arctic.py:625)
+2020-04-08 19:20:02,990; INFO:tcapy.data.databasesource: Parsing \\wsl$\Ubuntu\home\tcapyuser\csv_dump\EURUSD_dukascopy_2016-02-01_00_00_00.728000+00_002016-02-29_23_59_58.926000+00_00.parquet before tick database dump for ticker EURUSD-testharness (databasesource.py:1701)
+2020-04-08 19:20:04,481; INFO:tcapy.data.databasesource: Parsing \\wsl$\Ubuntu\home\tcapyuser\csv_dump\EURUSD_dukascopy_2016-03-01_00_00_00.290000+00_002016-03-31_23_59_51.216000+00_00.parquet before tick database dump for ticker EURUSD-testharness (databasesource.py:1701)
+2020-04-08 19:20:05,874; INFO:tcapy.data.databasesource: Parsing \\wsl$\Ubuntu\home\tcapyuser\csv_dump\EURUSD_dukascopy_2016-04-01_00_00_00.220000+00_002016-04-29_20_59_13.205000+00_00.parquet before tick database dump for ticker EURUSD-testharness (databasesource.py:1701)
+2020-04-08 19:20:06,869; INFO:tcapy.data.databasesource: Parsing \\wsl$\Ubuntu\home\tcapyuser\csv_dump\EURUSD_dukascopy_2016-05-01_21_00_11.829000+00_002016-05-31_23_59_59.744000+00_00.parquet before tick database dump for ticker EURUSD-testharness (databasesource.py:1701)
+2020-04-08 19:20:07,815; INFO:tcapy.data.databasesource: Parsing \\wsl$\Ubuntu\home\tcapyuser\csv_dump\EURUSD_dukascopy_2016-06-01_00_00_00.402000+00_002016-06-30_23_59_59.903000+00_00.parquet before tick database dump for ticker EURUSD-testharness (databasesource.py:1701)
+2020-04-08 19:20:08,984; INFO:tcapy.data.databasesource: Parsing \\wsl$\Ubuntu\home\tcapyuser\csv_dump\EURUSD_dukascopy_2016-07-01_00_00_00.259000+00_002016-07-31_23_59_59.851000+00_00.parquet before tick database dump for ticker EURUSD-testharness (databasesource.py:1701)
+2020-04-08 19:20:11,147; INFO:tcapy.data.databasesource: Parsing \\wsl$\Ubuntu\home\tcapyuser\csv_dump\EURUSD_dukascopy_2016-08-01_00_00_00.108000+00_002016-08-31_23_59_58.926000+00_00.parquet before tick database dump for ticker EURUSD-testharness (databasesource.py:1701)
+2020-04-08 19:20:14,639; INFO:tcapy.data.databasesource: Parsing \\wsl$\Ubuntu\home\tcapyuser\csv_dump\EURUSD_dukascopy_2016-09-01_00_00_00.077000+00_002016-09-30_20_59_59.046000+00_00.parquet before tick database dump for ticker EURUSD-testharness (databasesource.py:1701)
+2020-04-08 19:20:18,837; INFO:tcapy.data.databasesource: Parsing \\wsl$\Ubuntu\home\tcapyuser\csv_dump\EURUSD_dukascopy_2016-10-02_21_00_05.470000+00_002016-10-31_23_59_42.479000+00_00.parquet before tick database dump for ticker EURUSD-testharness (databasesource.py:1701)
+2020-04-08 19:20:21,752; INFO:tcapy.data.databasesource: Parsing \\wsl$\Ubuntu\home\tcapyuser\csv_dump\EURUSD_dukascopy_2016-11-01_00_00_00.049000+00_002016-11-30_23_59_58.644000+00_00.parquet before tick database dump for ticker EURUSD-testharness (databasesource.py:1701)
+2020-04-08 19:20:22,924; INFO:tcapy.data.databasesource: Parsing \\wsl$\Ubuntu\home\tcapyuser\csv_dump\EURUSD_dukascopy_2016-12-01_00_00_00.156000+00_002016-12-30_21_59_56.230000+00_00.parquet before tick database dump for ticker EURUSD-testharness (databasesource.py:1701)
+2020-04-08 19:20:23,936; INFO:tcapy.data.databasesource: Parsing \\wsl$\Ubuntu\home\tcapyuser\csv_dump\EURUSD_dukascopy_2017-01-01_22_00_20.786000+00_002017-01-31_23_59_53.808000+00_00.parquet before tick database dump for ticker EURUSD-testharness (databasesource.py:1701)
+2020-04-08 19:20:25,123; INFO:tcapy.data.databasesource: Parsing \\wsl$\Ubuntu\home\tcapyuser\csv_dump\EURUSD_dukascopy_2017-02-01_00_00_00.623000+00_002017-02-28_23_59_55.547000+00_00.parquet before tick database dump for ticker EURUSD-testharness (databasesource.py:1701)
+2020-04-08 19:20:25,996; INFO:tcapy.data.databasesource: Parsing \\wsl$\Ubuntu\home\tcapyuser\csv_dump\EURUSD_dukascopy_2017-03-01_00_00_00.241000+00_002017-03-31_20_59_56.707000+00_00.parquet before tick database dump for ticker EURUSD-testharness (databasesource.py:1701)
+2020-04-08 19:20:26,989; INFO:tcapy.data.databasesource: Parsing \\wsl$\Ubuntu\home\tcapyuser\csv_dump\EURUSD_dukascopy_2017-04-02_21_00_34.289000+00_002017-04-30_23_59_03.898000+00_00.parquet before tick database dump for ticker EURUSD-testharness (databasesource.py:1701)
+2020-04-08 19:20:27,709; INFO:tcapy.data.databasesource: Parsing \\wsl$\Ubuntu\home\tcapyuser\csv_dump\EURUSD_dukascopy_2017-05-01_00_00_02.851000+00_002017-05-31_23_59_59.724000+00_00.parquet before tick database dump for ticker EURUSD-testharness (databasesource.py:1701)
+2020-04-08 19:20:28,581; INFO:tcapy.data.databasesource: Parsing \\wsl$\Ubuntu\home\tcapyuser\csv_dump\EURUSD_dukascopy_2017-06-01_00_00_00.132000+00_002017-06-30_20_59_56.643000+00_00.parquet before tick database dump for ticker EURUSD-testharness (databasesource.py:1701)
+2020-04-08 19:20:29,462; INFO:tcapy.data.databasesource: Parsing \\wsl$\Ubuntu\home\tcapyuser\csv_dump\EURUSD_dukascopy_2017-07-02_21_00_14.575000+00_002017-07-31_23_59_59.959000+00_00.parquet before tick database dump for ticker EURUSD-testharness (databasesource.py:1701)
+2020-04-08 19:20:30,509; INFO:tcapy.data.databasesource: Parsing \\wsl$\Ubuntu\home\tcapyuser\csv_dump\EURUSD_dukascopy_2017-08-01_00_00_00.470000+00_002017-08-31_23_59_59.099000+00_00.parquet before tick database dump for ticker EURUSD-testharness (databasesource.py:1701)
+2020-04-08 19:20:31,597; INFO:tcapy.data.databasesource: Parsing \\wsl$\Ubuntu\home\tcapyuser\csv_dump\EURUSD_dukascopy_2017-09-01_00_00_00.191000+00_002017-09-29_20_59_56.618000+00_00.parquet before tick database dump for ticker EURUSD-testharness (databasesource.py:1701)
+2020-04-08 19:20:32,741; INFO:tcapy.data.databasesource: Parsing \\wsl$\Ubuntu\home\tcapyuser\csv_dump\EURUSD_dukascopy_2017-10-01_21_00_06.101000+00_002017-10-31_23_59_12.569000+00_00.parquet before tick database dump for ticker EURUSD-testharness (databasesource.py:1701)
+2020-04-08 19:20:33,714; INFO:tcapy.data.databasesource: Parsing \\wsl$\Ubuntu\home\tcapyuser\csv_dump\EURUSD_dukascopy_2017-11-01_00_00_00.357000+00_002017-11-30_23_59_55.097000+00_00.parquet before tick database dump for ticker EURUSD-testharness (databasesource.py:1701)
+2020-04-08 19:20:34,612; INFO:tcapy.data.databasesource: Parsing \\wsl$\Ubuntu\home\tcapyuser\csv_dump\EURUSD_dukascopy_2017-12-01_00_00_00.175000+00_002017-12-29_21_59_42.990000+00_00.parquet before tick database dump for ticker EURUSD-testharness (databasesource.py:1701)
+2020-04-08 19:20:35,452; INFO:tcapy.data.databasesource: Parsing \\wsl$\Ubuntu\home\tcapyuser\csv_dump\EURUSD_dukascopy_2018-01-01_22_00_08.661000+00_002018-01-31_23_59_47.019000+00_00.parquet before tick database dump for ticker EURUSD-testharness (databasesource.py:1701)
+2020-04-08 19:20:36,633; INFO:tcapy.data.databasesource: Parsing \\wsl$\Ubuntu\home\tcapyuser\csv_dump\EURUSD_dukascopy_2018-02-01_00_00_00.061000+00_002018-02-28_23_59_58.929000+00_00.parquet before tick database dump for ticker EURUSD-testharness (databasesource.py:1701)
+2020-04-08 19:20:37,825; INFO:tcapy.data.databasesource: Parsing \\wsl$\Ubuntu\home\tcapyuser\csv_dump\EURUSD_dukascopy_2018-03-01_00_00_00.185000+00_002018-03-30_20_59_55.773000+00_00.parquet before tick database dump for ticker EURUSD-testharness (databasesource.py:1701)
+2020-04-08 19:20:38,912; INFO:tcapy.data.databasesource: Parsing \\wsl$\Ubuntu\home\tcapyuser\csv_dump\EURUSD_dukascopy_2018-04-01_21_00_18.456000+00_002018-04-30_23_59_59.599000+00_00.parquet before tick database dump for ticker EURUSD-testharness (databasesource.py:1701)
+2020-04-08 19:20:39,906; INFO:tcapy.data.databasesource: Parsing \\wsl$\Ubuntu\home\tcapyuser\csv_dump\EURUSD_dukascopy_2018-05-01_00_00_00.129000+00_002018-05-31_23_59_59.903000+00_00.parquet before tick database dump for ticker EURUSD-testharness (databasesource.py:1701)
+2020-04-08 19:20:41,160; INFO:tcapy.data.databasesource: Parsing \\wsl$\Ubuntu\home\tcapyuser\csv_dump\EURUSD_dukascopy_2018-06-01_00_00_00.434000+00_002018-06-29_20_59_56.236000+00_00.parquet before tick database dump for ticker EURUSD-testharness (databasesource.py:1701)
+2020-04-08 19:20:42,257; INFO:tcapy.data.databasesource: Parsing \\wsl$\Ubuntu\home\tcapyuser\csv_dump\EURUSD_dukascopy_2018-07-01_21_00_16.014000+00_002018-07-31_23_59_57.465000+00_00.parquet before tick database dump for ticker EURUSD-testharness (databasesource.py:1701)
+2020-04-08 19:20:43,449; INFO:tcapy.data.databasesource: Parsing \\wsl$\Ubuntu\home\tcapyuser\csv_dump\EURUSD_dukascopy_2018-08-01_00_00_00.042000+00_002018-08-31_20_59_57.280000+00_00.parquet before tick database dump for ticker EURUSD-testharness (databasesource.py:1701)
+2020-04-08 19:20:44,574; INFO:tcapy.data.databasesource: Parsing \\wsl$\Ubuntu\home\tcapyuser\csv_dump\EURUSD_dukascopy_2018-09-02_21_00_04.803000+00_002018-09-30_23_59_59.225000+00_00.parquet before tick database dump for ticker EURUSD-testharness (databasesource.py:1701)
+2020-04-08 19:20:45,341; INFO:tcapy.data.databasesource: Parsing \\wsl$\Ubuntu\home\tcapyuser\csv_dump\EURUSD_dukascopy_2018-10-01_00_00_00.205000+00_002018-10-31_23_59_59.448000+00_00.parquet before tick database dump for ticker EURUSD-testharness (databasesource.py:1701)
+2020-04-08 19:20:46,400; INFO:tcapy.data.databasesource: Parsing \\wsl$\Ubuntu\home\tcapyuser\csv_dump\EURUSD_dukascopy_2018-11-01_00_00_00.222000+00_002018-11-29_23_59_59.541000+00_00.parquet before tick database dump for ticker EURUSD-testharness (databasesource.py:1701)
+2020-04-08 19:20:47,332; INFO:tcapy.data.databasesource: Parsing \\wsl$\Ubuntu\home\tcapyuser\csv_dump\EURUSD_dukascopy_2018-12-02_22_00_01.940000+00_002018-12-31_22_00_03.048000+00_00.parquet before tick database dump for ticker EURUSD-testharness (databasesource.py:1701)
+2020-04-08 19:20:48,407; INFO:tcapy.data.databasesource: Parsing \\wsl$\Ubuntu\home\tcapyuser\csv_dump\EURUSD_dukascopy_2019-01-01_22_02_37.254000+00_002019-01-31_23_59_58.297000+00_00.parquet before tick database dump for ticker EURUSD-testharness (databasesource.py:1701)
+2020-04-08 19:20:49,829; INFO:tcapy.data.databasesource: Parsing \\wsl$\Ubuntu\home\tcapyuser\csv_dump\EURUSD_dukascopy_2019-02-03_22_00_03.618000+00_002019-02-28_23_59_59.156000+00_00.parquet before tick database dump for ticker EURUSD-testharness (databasesource.py:1701)
+2020-04-08 19:20:50,915; INFO:tcapy.data.databasesource: Parsing \\wsl$\Ubuntu\home\tcapyuser\csv_dump\EURUSD_dukascopy_2019-03-03_22_00_03.788000+00_002019-03-31_23_59_55.956000+00_00.parquet before tick database dump for ticker EURUSD-testharness (databasesource.py:1701)
+2020-04-08 19:20:51,985; INFO:tcapy.data.databasesource: Parsing \\wsl$\Ubuntu\home\tcapyuser\csv_dump\EURUSD_dukascopy_2019-04-01_00_00_00.064000+00_002019-04-30_23_59_51.619000+00_00.parquet before tick database dump for ticker EURUSD-testharness (databasesource.py:1701)
+2020-04-08 19:20:53,174; INFO:tcapy.data.databasesource: Parsing \\wsl$\Ubuntu\home\tcapyuser\csv_dump\EURUSD_dukascopy_2019-05-01_00_00_00.053000+00_002019-05-30_23_59_59.532000+00_00.parquet before tick database dump for ticker EURUSD-testharness (databasesource.py:1701)
+2020-04-08 19:20:54,221; INFO:tcapy.data.databasesource: Parsing \\wsl$\Ubuntu\home\tcapyuser\csv_dump\EURUSD_dukascopy_2019-06-02_21_01_02.358000+00_002019-06-30_23_59_59.336000+00_00.parquet before tick database dump for ticker EURUSD-testharness (databasesource.py:1701)
+2020-04-08 19:20:55,294; INFO:tcapy.data.databasesource: Parsing \\wsl$\Ubuntu\home\tcapyuser\csv_dump\EURUSD_dukascopy_2019-07-01_00_00_00.173000+00_002019-07-31_23_59_59.914000+00_00.parquet before tick database dump for ticker EURUSD-testharness (databasesource.py:1701)
+2020-04-08 19:20:56,360; INFO:tcapy.data.databasesource: Parsing \\wsl$\Ubuntu\home\tcapyuser\csv_dump\EURUSD_dukascopy_2019-08-01_00_00_00.134000+00_002019-08-29_23_59_57.067000+00_00.parquet before tick database dump for ticker EURUSD-testharness (databasesource.py:1701)
+2020-04-08 19:20:57,532; INFO:tcapy.data.databasesource: Parsing \\wsl$\Ubuntu\home\tcapyuser\csv_dump\EURUSD_dukascopy_2019-09-01_21_04_09.364000+00_002019-09-30_23_59_59.830000+00_00.parquet before tick database dump for ticker EURUSD-testharness (databasesource.py:1701)
+2020-04-08 19:20:58,423; INFO:tcapy.data.databasesource: Parsing \\wsl$\Ubuntu\home\tcapyuser\csv_dump\EURUSD_dukascopy_2019-10-01_00_00_00.002000+00_002019-10-31_23_59_53.804000+00_00.parquet before tick database dump for ticker EURUSD-testharness (databasesource.py:1701)
+2020-04-08 19:20:59,451; INFO:tcapy.data.databasesource: Parsing \\wsl$\Ubuntu\home\tcapyuser\csv_dump\EURUSD_dukascopy_2019-11-03_22_00_04.956000+00_002019-11-28_23_59_46.180000+00_00.parquet before tick database dump for ticker EURUSD-testharness (databasesource.py:1701)
+2020-04-08 19:21:00,116; INFO:tcapy.data.databasesource: Parsing \\wsl$\Ubuntu\home\tcapyuser\csv_dump\EURUSD_dukascopy_2019-12-01_22_00_03.296000+00_002019-12-31_21_59_57.829000+00_00.parquet before tick database dump for ticker EURUSD-testharness (databasesource.py:1701)
+2020-04-08 19:21:00,845; INFO:tcapy.data.databasesource: Parsing \\wsl$\Ubuntu\home\tcapyuser\csv_dump\EURUSD_dukascopy_2020-01-01_22_01_12.821000+00_002020-01-30_23_59_57.058000+00_00.parquet before tick database dump for ticker EURUSD-testharness (databasesource.py:1701)
+2020-04-08 19:21:01,584; INFO:tcapy.data.databasesource: Parsing \\wsl$\Ubuntu\home\tcapyuser\csv_dump\EURUSD_dukascopy_2020-02-02_22_00_14.503000+00_002020-02-27_23_59_58.483000+00_00.parquet before tick database dump for ticker EURUSD-testharness (databasesource.py:1701)
+2020-04-08 19:21:02,268; INFO:tcapy.data.databasesource: Parsing \\wsl$\Ubuntu\home\tcapyuser\csv_dump\EURUSD_dukascopy_2020-03-01_22_00_01.729000+00_002020-03-31_23_59_57.265000+00_00.parquet before tick database dump for ticker EURUSD-testharness (databasesource.py:1701)
 </pre>
 </div>
 </div>
@@ -13632,7 +14016,11 @@ div#notebook {
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>Let's have a look inside the output of our TCA calculation.</p>
+<p>There is a script <code>cache_data_vendor_data.py</code> which illustrates how to directly populate the database for market tick data from an external download.</p>
+<ul>
+<li><code>ONEOFF</code> - one off downloads from external data sources (either Dukascopy or NCFX) and write directly to the database</li>
+<li><code>DAILY_RUN_APPEND</code> - a regular download from external data sources (either Dukascopy or NCFX) and write directly to the database (note, that Dukascopy won't have the last few weeks of data), typically you could run this once every day, or potentionally on an even highly frequency than that.</li>
+</ul>
 
 </div>
 </div>
@@ -13642,71 +14030,22 @@ div#notebook {
 <div class="prompt input_prompt">In&nbsp;[12]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="n">dict_of_df</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
-</pre></div>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="o">%</span><span class="k">matplotlib</span> inline
 
-    </div>
-</div>
-</div>
+<span class="kn">import</span> <span class="nn">datetime</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
 
-<div class="output_wrapper">
-<div class="output">
+<span class="n">df</span> <span class="o">=</span> <span class="n">database_source_market</span><span class="o">.</span><span class="n">fetch_market_data</span><span class="p">(</span><span class="n">start_date</span><span class="o">=</span><span class="s1">&#39;01 Jan 2017&#39;</span><span class="p">,</span> <span class="n">finish_date</span><span class="o">=</span><span class="s1">&#39;01 Feb 2017&#39;</span><span class="p">,</span> <span class="n">ticker</span><span class="o">=</span><span class="s1">&#39;EURUSD&#39;</span><span class="p">,</span> 
+                                             <span class="n">table_name</span><span class="o">=</span><span class="n">market_data_database_table</span><span class="p">)</span>
 
+<span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">resample</span><span class="p">(</span><span class="s1">&#39;B&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">last</span><span class="p">())</span>
 
-<div class="output_area">
+<span class="k">if</span> <span class="s1">&#39;mid&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+    <span class="n">df</span><span class="p">[</span><span class="s1">&#39;mid&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;bid&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;ask&#39;</span><span class="p">])</span> <span class="o">/</span> <span class="mf">2.0</span>
 
-    <div class="prompt"></div>
+<span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;mid&#39;</span><span class="p">])</span>
 
-
-<div class="output_subarea output_stream output_stdout output_text">
-<pre>odict_keys([&#39;trade_df&#39;, &#39;order_df&#39;, &#39;sparse_market_trade_df&#39;, &#39;sparse_market_order_df&#39;, &#39;market_df_downsampled&#39;, &#39;candlestick_fig&#39;, &#39;table_trade_df_slippage_by_worst_all&#39;, &#39;bar_trade_df_executed_notional_in_reporting_currency_by/sum/broker_id&#39;, &#39;bar_trade_df_slippage_by/mean/broker_id&#39;, &#39;jointables_broker_id&#39;, &#39;market_df&#39;])
-</pre>
-</div>
-</div>
-
-</div>
-</div>
-
-</div>
-<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
-</div><div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
-<p>Below we explain what each of the keys in the dictionary output represent.</p>
-<ul>
-<li><code>trade_df</code> - trade data, with additional calculated fields</li>
-<li><code>order_df</code> - order data, with additional calculated fields</li>
-<li><code>sparse_market_trade_df</code> - combined downsampled market data with trade data</li>
-<li><code>sparse_market_order_df</code> - combined downsampled market data with order data</li>
-<li><code>market_df_downsampled</code> - downsampled market data</li>
-<li><code>candlestick_fig</code> - candlesticks of resampled market data as a Plotly Figure</li>
-<li><code>market_df</code> - this empty given default <code>dummy_market=True</code> set</li>
-</ul>
-<p>We also have various keys associated with the <code>ResultForm</code> and <code>JoinTable</code> objects we created.</p>
-<ul>
-<li><code>table_trade_df_slippage_by_worst_all</code> - table with trades which have outlying slippage</li>
-<li><code>bar_trade_df_executed_notional_in_reporting_currency_by/sum/broker_id</code> - total notional by broker</li>
-<li><code>bar_trade_df_slippage_by/mean/broker_id</code> - average slippage by broker</li>
-<li><code>jointables_broker_id</code> - combining the notional and slippage tables</li>
-</ul>
-
-</div>
-</div>
-</div>
-<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
-</div><div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
-<p>Let's use the <code>TCAResults</code> object to simplify the output into an easier form and create Plotly Figure charts/HTML styled tables.</p>
-
-</div>
-</div>
-</div>
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-<div class="prompt input_prompt">In&nbsp;[13]:</div>
-<div class="inner_cell">
-    <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">tca_results</span> <span class="o">=</span> <span class="n">TCAResults</span><span class="p">(</span><span class="n">dict_of_df</span><span class="p">,</span> <span class="n">tca_request</span><span class="p">)</span>
-<span class="n">tca_results</span><span class="o">.</span><span class="n">render_computation_charts</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
 </pre></div>
 
     </div>
@@ -13723,43 +14062,13 @@ div#notebook {
 
 
 <div class="output_subarea output_stream output_stderr output_text">
-<pre>2020-04-08 19:01:17,051; DEBUG:tcapy.vis.displaylisteners: Plotting main timeline 2214 (displaylisteners.py:922)
-2020-04-08 19:01:17,214; DEBUG:tcapy.vis.displaylisteners: Rendered plot 2214 and  (displaylisteners.py:932)
-2020-04-08 19:01:17,217; DEBUG:tcapy.vis.displaylisteners: Plotting main timeline 2208 (displaylisteners.py:922)
-2020-04-08 19:01:17,381; DEBUG:tcapy.vis.displaylisteners: Rendered plot 2208 and  (displaylisteners.py:932)
+<pre>2020-04-08 23:16:19,004; DEBUG:matplotlib.pyplot: Loaded backend module://ipykernel.pylab.backend_inline version unknown. (pyplot.py:225)
+2020-04-08 23:16:19,006; INFO:tcapy.data.databasesource: Attempting to load Arctic/MongoDB library: market_database_test_harness CHUNK_STORE (databasesource.py:1881)
+2020-04-08 23:16:19,007; INFO:tcapy.data.databasesource: Got Arctic/MongoDB library: market_database_test_harness CHUNK_STORE (databasesource.py:1901)
+2020-04-08 23:16:19,316; DEBUG:tcapy.data.databasesource: Extracted Arctic/MongoDB library: market_database_test_harness for ticker EURUSD-testharness between 2017-01-01 00:00:00 - 2017-02-01 00:00:00 from CHUNK_STORE (databasesource.py:1960)
 </pre>
 </div>
 </div>
-
-</div>
-</div>
-
-</div>
-<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
-</div><div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
-<p>We can now access the DataFrames via properties like <code>bar</code>, <code>table</code> and <code>jointables</code>.</p>
-
-</div>
-</div>
-</div>
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-<div class="prompt input_prompt">In&nbsp;[14]:</div>
-<div class="inner_cell">
-    <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="n">tca_results</span><span class="o">.</span><span class="n">bar</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">tca_results</span><span class="o">.</span><span class="n">table</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">tca_results</span><span class="o">.</span><span class="n">join_tables</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
-</pre></div>
-
-    </div>
-</div>
-</div>
-
-<div class="output_wrapper">
-<div class="output">
-
 
 <div class="output_area">
 
@@ -13767,9 +14076,31 @@ div#notebook {
 
 
 <div class="output_subarea output_stream output_stdout output_text">
-<pre>dict_keys([&#39;trade_df_executed_notional_in_reporting_currency_by/sum/broker_id&#39;, &#39;trade_df_slippage_by/mean/broker_id&#39;])
-dict_keys([&#39;trade_df_slippage_by_worst_all&#39;])
-dict_keys([&#39;broker_id&#39;])
+<pre>                                mid
+Date                               
+2016-12-30 00:00:00+00:00  1.052560
+2017-01-02 00:00:00+00:00  1.045770
+2017-01-03 00:00:00+00:00  1.041765
+2017-01-04 00:00:00+00:00  1.049720
+2017-01-05 00:00:00+00:00  1.060400
+2017-01-06 00:00:00+00:00  1.052960
+2017-01-09 00:00:00+00:00  1.058605
+2017-01-10 00:00:00+00:00  1.055230
+2017-01-11 00:00:00+00:00  1.059430
+2017-01-12 00:00:00+00:00  1.061625
+2017-01-13 00:00:00+00:00  1.062750
+2017-01-16 00:00:00+00:00  1.060245
+2017-01-17 00:00:00+00:00  1.069665
+2017-01-18 00:00:00+00:00  1.062825
+2017-01-19 00:00:00+00:00  1.065935
+2017-01-20 00:00:00+00:00  1.071275
+2017-01-23 00:00:00+00:00  1.075930
+2017-01-24 00:00:00+00:00  1.072835
+2017-01-25 00:00:00+00:00  1.075270
+2017-01-26 00:00:00+00:00  1.068355
+2017-01-27 00:00:00+00:00  1.071720
+2017-01-30 00:00:00+00:00  1.070770
+2017-01-31 00:00:00+00:00  1.080100
 </pre>
 </div>
 </div>
@@ -13781,377 +14112,9 @@ dict_keys([&#39;broker_id&#39;])
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>Let's view the data related to the <code>BarResultsForm</code> for the executed notional for each broker, firstly as a DataFrame and secondly as a bar chart by accessing the <code>bar_charts</code> property of the <code>TCAResults</code> object.</p>
-
-</div>
-</div>
-</div>
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-<div class="prompt input_prompt">In&nbsp;[15]:</div>
-<div class="inner_cell">
-    <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">tca_results</span><span class="o">.</span><span class="n">bar</span><span class="p">[</span><span class="s1">&#39;trade_df_executed_notional_in_reporting_currency_by/sum/broker_id&#39;</span><span class="p">]</span>
-</pre></div>
-
-    </div>
-</div>
-</div>
-
-<div class="output_wrapper">
-<div class="output">
-
-
-<div class="output_area">
-
-    <div class="prompt output_prompt">Out[15]:</div>
-
-
-
-<div class="output_html rendered_html output_subarea output_execute_result">
-<div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>broker_id</th>
-    </tr>
-    <tr>
-      <th>broker_id_index</th>
-      <th></th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>broker2</th>
-      <td>19743083.0</td>
-    </tr>
-    <tr>
-      <th>broker3</th>
-      <td>21398742.0</td>
-    </tr>
-    <tr>
-      <th>broker4</th>
-      <td>3586887.0</td>
-    </tr>
-    <tr>
-      <th>broker5</th>
-      <td>8986275.0</td>
-    </tr>
-    <tr>
-      <th>broker6</th>
-      <td>27237125.0</td>
-    </tr>
-  </tbody>
-</table>
-</div>
-</div>
-
-</div>
-
-</div>
-</div>
-
-</div>
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-<div class="prompt input_prompt">In&nbsp;[16]:</div>
-<div class="inner_cell">
-    <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">tca_results</span><span class="o">.</span><span class="n">bar_charts</span><span class="p">[</span><span class="s1">&#39;trade_df_executed_notional_in_reporting_currency_by/sum/broker_id&#39;</span><span class="p">]</span>
-</pre></div>
-
-    </div>
-</div>
-</div>
-
-<div class="output_wrapper">
-<div class="output">
-
-
-<div class="output_area">
-
-    <div class="prompt"></div>
-
-
-
-
-<div class="output_png output_subarea ">
-<img src="data:image/png;base64,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"
->
-</div>
-
-</div>
-
-</div>
-</div>
-
-</div>
-<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
-</div><div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
-<p>We can also show the DataFrame with the outlier trades, which are outside the bid/ask from Dukascopy data.</p>
-
-</div>
-</div>
-</div>
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-<div class="prompt input_prompt">In&nbsp;[17]:</div>
-<div class="inner_cell">
-    <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">tca_results</span><span class="o">.</span><span class="n">table</span><span class="p">[</span><span class="s1">&#39;trade_df_slippage_by_worst_all&#39;</span><span class="p">]</span>
-</pre></div>
-
-    </div>
-</div>
-</div>
-
-<div class="output_wrapper">
-<div class="output">
-
-
-<div class="output_area">
-
-    <div class="prompt output_prompt">Out[17]:</div>
-
-
-
-<div class="output_html rendered_html output_subarea output_execute_result">
-<div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>executed_notional_in_reporting_currency</th>
-      <th>side</th>
-      <th>slippage_benchmark</th>
-      <th>slippage</th>
-      <th>slippage_anomalous</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>2017-05-08 10:31:33.011000+00:00</th>
-      <td>3.586887e+06</td>
-      <td>1</td>
-      <td>1.094680</td>
-      <td>-0.000021</td>
-      <td>1.0</td>
-    </tr>
-    <tr>
-      <th>2017-05-05 14:56:49.373000+00:00</th>
-      <td>6.811655e+06</td>
-      <td>1</td>
-      <td>1.098875</td>
-      <td>-0.000016</td>
-      <td>1.0</td>
-    </tr>
-    <tr>
-      <th>2017-05-08 14:37:25.382000+00:00</th>
-      <td>1.551467e+07</td>
-      <td>1</td>
-      <td>1.093750</td>
-      <td>-0.000015</td>
-      <td>1.0</td>
-    </tr>
-    <tr>
-      <th>2017-05-05 06:27:26.514000+00:00</th>
-      <td>1.976319e+07</td>
-      <td>-1</td>
-      <td>1.097445</td>
-      <td>-0.000013</td>
-      <td>1.0</td>
-    </tr>
-    <tr>
-      <th>2017-05-09 11:18:39.206000+00:00</th>
-      <td>1.293143e+07</td>
-      <td>-1</td>
-      <td>1.089700</td>
-      <td>-0.000013</td>
-      <td>1.0</td>
-    </tr>
-    <tr>
-      <th>Avg</th>
-      <td>1.463584e+07</td>
-      <td>0</td>
-      <td>1.094755</td>
-      <td>-0.000014</td>
-      <td>1.0</td>
-    </tr>
-  </tbody>
-</table>
-</div>
-</div>
-
-</div>
-
-</div>
-</div>
-
-</div>
-<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
-</div><div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
-<p>We can view the DataFrame for the combination of total amount executed per broker and the slippage (weighted by notional).</p>
-
-</div>
-</div>
-</div>
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-<div class="prompt input_prompt">In&nbsp;[18]:</div>
-<div class="inner_cell">
-    <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">tca_results</span><span class="o">.</span><span class="n">join_tables</span><span class="p">[</span><span class="s1">&#39;broker_id&#39;</span><span class="p">]</span>
-</pre></div>
-
-    </div>
-</div>
-</div>
-
-<div class="output_wrapper">
-<div class="output">
-
-
-<div class="output_area">
-
-    <div class="prompt output_prompt">Out[18]:</div>
-
-
-
-<div class="output_html rendered_html output_subarea output_execute_result">
-<div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>broker_id notional (rep cur)</th>
-      <th>broker_id slippage (bp)</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>broker2</th>
-      <td>19743083.0</td>
-      <td>-0.14</td>
-    </tr>
-    <tr>
-      <th>broker3</th>
-      <td>21398742.0</td>
-      <td>-0.11</td>
-    </tr>
-    <tr>
-      <th>broker4</th>
-      <td>3586887.0</td>
-      <td>-0.21</td>
-    </tr>
-    <tr>
-      <th>broker5</th>
-      <td>8986275.0</td>
-      <td>-0.10</td>
-    </tr>
-    <tr>
-      <th>broker6</th>
-      <td>27237125.0</td>
-      <td>-0.12</td>
-    </tr>
-  </tbody>
-</table>
-</div>
-</div>
-
-</div>
-
-</div>
-</div>
-
-</div>
-<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
-</div><div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
-<p>We can see the styled table, is a string of HTML code within an HTML IFrame. We could write this to disk as an HTML file or display to a user.</p>
-
-</div>
-</div>
-</div>
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-<div class="prompt input_prompt">In&nbsp;[19]:</div>
-<div class="inner_cell">
-    <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">tca_results</span><span class="o">.</span><span class="n">styled_join_tables</span><span class="p">[</span><span class="s1">&#39;broker_id&#39;</span><span class="p">]</span>
-</pre></div>
-
-    </div>
-</div>
-</div>
-
-<div class="output_wrapper">
-<div class="output">
-
-
-<div class="output_area">
-
-    <div class="prompt output_prompt">Out[19]:</div>
-
-
-
-
-<div class="output_text output_subarea output_execute_result">
-<pre>Iframe(height=&#39;300px&#39;, sandbox=&#39;&#39;, srcDoc=&#39;&lt;style&gt;&lt;/style&gt;\n&lt;table border=&#34;0&#34;&gt;\n  &lt;thead&gt;\n    &lt;tr style=&#34;text-align: right;&#34;&gt;\n      &lt;th&gt;&lt;/th&gt;\n      &lt;th&gt;broker_id notional (rep cur)&lt;/th&gt;\n      &lt;th&gt;broker_id slippage (bp)&lt;/th&gt;\n    &lt;/tr&gt;\n  &lt;/thead&gt;\n  &lt;tbody&gt;\n    &lt;tr&gt;\n      &lt;th&gt;broker2&lt;/th&gt;\n      &lt;td&gt;19743083.0&lt;/td&gt;\n      &lt;td&gt;-0.14&lt;/td&gt;\n    &lt;/tr&gt;\n    &lt;tr&gt;\n      &lt;th&gt;broker3&lt;/th&gt;\n      &lt;td&gt;21398742.0&lt;/td&gt;\n      &lt;td&gt;-0.11&lt;/td&gt;\n    &lt;/tr&gt;\n    &lt;tr&gt;\n      &lt;th&gt;broker4&lt;/th&gt;\n      &lt;td&gt;3586887.0&lt;/td&gt;\n      &lt;td&gt;-0.21&lt;/td&gt;\n    &lt;/tr&gt;\n    &lt;tr&gt;\n      &lt;th&gt;broker5&lt;/th&gt;\n      &lt;td&gt;8986275.0&lt;/td&gt;\n      &lt;td&gt;-0.10&lt;/td&gt;\n    &lt;/tr&gt;\n    &lt;tr&gt;\n      &lt;th&gt;broker6&lt;/th&gt;\n      &lt;td&gt;27237125.0&lt;/td&gt;\n      &lt;td&gt;-0.12&lt;/td&gt;\n    &lt;/tr&gt;\n  &lt;/tbody&gt;\n&lt;/table&gt;&#39;, width=&#39;975px&#39;, style={&#39;border&#39;: &#39;thin lightgrey solid&#39;, &#39;padding&#39;: &#39;0&#39;, &#39;margin&#39;: &#39;0&#39;})</pre>
-</div>
-
-</div>
-
-</div>
-</div>
-
-</div>
-<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
-</div><div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
-<h1 id="Conclusion">Conclusion<a class="anchor-link" href="#Conclusion">&#182;</a></h1><p>We have seen how to call tcapy programatically for more involved usage, in particular how to use it for compliance purposes.</p>
-<p>If you are interesting supporting this project, such as sponsoring new features or to get commerical support, please contact saeed@cuemacro.com.</p>
+<h1 id="Conclusion">Conclusion<a class="anchor-link" href="#Conclusion">&#182;</a></h1><p>We have examined the data formats tcapy expects for trade/order data, as well as market data.</p>
+<p>We have seen how to configure both MySQL and MongoDB to work with trade/order data respectively. We've also seen how we can populate a SQL database with trade/order data, using tcapy, and dump it back out. On the market data side, we've investigated how we can read from an external source (Dukascopy) and dump the market data to disk, as well as how to populate MongoDB with it, all via using tcapy. We also talked about how you can use SQLite and PyStore, as flat file alternatives, if you are likely to be the sole user of the tcpay.</p>
+<p>It is important you properly maintain your databases for tcapy or indeed for any purpose. If large periods of time have missing tick data for example, you wont' be able to do TCA over those periods. Also having lots of missing trade data in your SQL database, could result in biased results. Data is key to any sort of TCA!</p>
 
 </div>
 </div>

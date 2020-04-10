@@ -26,6 +26,11 @@ export TCAPY_CELERY_WORKERS=12
 # Add Anaconda to the path (you might need to change this)
 # export PATH=~/anaconda3/bin:$PATH
 
+## Database settings ###################################################################################################
+
+export START_MYSQL=1
+export START_MONGODB=1
+
 ## Web server settings #################################################################################################
 
 # Can use gunicorn with either apache or nginx (mod_wsgi can only be used with apache and is depreciated)

@@ -18,7 +18,7 @@ import os
 from tcapy.conf.constants import Constants
 from tcapy.util.loggermanager import LoggerManager
 from tcapy.data.databasesource import DatabaseSourceCSV
-from tcapy.data.databasesource import DatabaseSourceArctic, DatabaseSourceKDB
+from tcapy.data.databasesource import DatabaseSourceArctic, DatabaseSourcePyStore
 
 constants = Constants()
 
@@ -29,21 +29,24 @@ if __name__ == '__main__':
     PLOT_BACK_DATA = False
     data_vendor = 'dukascopy' # 'dukascopy' or 'ncfx'
 
-    logger.info("About to upload data to arctic")
+    # Either use 'arctic' or 'pystore' to store market tick data
+    market_data_store = 'arctic'
+
+    logger.info("About to upload data to " + market_data_store)
 
     ## YOU WILL NEED TO CHANGE THE BELOW LINES #########################################################################
 
-    # parameters for testing
+    # Parameters for testing
     if True:
-        source = 'testharness'
+        data_vendor = 'testharness'
 
         # Load up market data from CSV and dump into Arctic database
         ticker_mkt = ['AUDUSD']
 
-        folder = None # What is the folder of the CSV of h5 file
+        csv_folder = None # What is the folder of the CSV of h5 file
 
-        exists_table = 'replace'
-        append_replace_ticker = 'replace'   # 'replace' will remove all market data for this ticker!
+        if_exists_table = 'replace'
+        if_append_replace_ticker = 'replace'   # 'replace' will remove all market data for this ticker!
                                             # 'append' will append it to the end (assumes no overlap in dataset!)
 
         file_extension = 'csv' # csv or h5
@@ -61,84 +64,80 @@ if __name__ == '__main__':
         # Should we remove consecutive duplicates (safe for most TCA operations, NOT when volume is involved)
         remove_duplicates = True
 
-    # More parameters for testing
-    if True:
-        source = 'testharness'
-
-        # Load up market data from CSV and dump into Arctic database
-        ticker_mkt = ['EURUSD']
-
-        folder = '/home/redhat/tcapy_tests_data/csv_dump/' # What is the folder of the CSV of h5 file
-
-        exists_table = 'replace'
-        append_replace_ticker = 'replace'   # 'replace' will remove all market data for this ticker!
-                                            # 'append' will append it to the end (assumes no overlap in dataset!)
-
-        file_extension = 'h5' # csv or h5
-
-        # NOTE: we can use wildcard characters eg. AUDUSD*.csv - we assume that the filenames are however correctly arranged
-        # in time (ie. AUDUSD1.csv is before AUDUSD2.csv etc)
-        csv_file = [x + '_' + data_vendor + '_*.' + file_extension for x in ticker_mkt]  # assume that ALL TIME IN UTC!
-
-        date_format = None
-        # date_format='%d-%m-%Y %H:%M:%S.%f'  # you may need to change this
-
-        # Should we read the file in reverse?
-        read_in_reverse = False
-
-        # Should we remove consecutive duplicates (safe for most TCA operations, NOT when volume is involved)
-        remove_duplicates = True
-
     # dukascopy or ncfx style parameters
-    if False:
-        source = 'ncfx'
+    if True:
+        data_vendor = 'dukascopy' # 'ncfx' or 'dukascopy'
 
-        ticker_mkt = ['EURUSD', 'GBPUSD', 'AUDUSD', 'NZDUSD', 'USDCAD', 'USDCHF', 'USDJPY']
+        ticker_mkt = ['EURUSD', 'GBPUSD', 'AUDUSD', 'NZDUSD', 'USDCAD', 'USDCHF',
+                      'EURNOK', 'EURSEK',
+                      'USDJPY',
+                      'USDNOK', 'USDSEK', 'EURJPY',
+                      'USDMXN', 'USDTRY', 'USDZAR', 'EURPLN']
 
-        folder = '/home/redhat/tcapy_tests_data/csv_dump/'
+        csv_folder = '/home/tcapyuser/csv_dump/'
 
-        exists_table = 'append'
-        append_replace_ticker = 'replace'
+        if_exists_table = 'append' #
+        if_append_replace_ticker = 'replace'
 
-        file_extension = 'h5'  # csv or h5
+        ticker_mkt = ['EURUSD', 'GBPUSD', 'AUDUSD', 'NZDUSD', 'USDCAD', 'USDCHF',
+                      'EURNOK', 'EURSEK',
+                      'USDJPY']
 
-        csv_file = [x + '_' + data_vendor + '_*.' + file_extension for x in ticker_mkt]  # assume that ALL TIME IN UTC!
+        data_vendor = 'ncfx'
+        csv_folder = '/home/tcapyuser/ncfx_agg/'
+
+        file_extension = 'parquet'  # 'parquet' or 'csv' or 'h5' on disk
+
+        # Files dumped by DatabasePopulator look like this
+        ## 'AUDUSD_dukascopy_2016-01-03_22_00_01.868000+00_002016-01-31_23_59_57.193000+00_00.parquet'
+
+        csv_file = [x + '_' + data_vendor + '_*.' + file_extension for x in
+                    ticker_mkt]  # assume that ALL TIME IN UTC!
 
         date_format = None
-
         read_in_reverse = False
+        remove_duplicates = False
 
-        remove_duplicates = True
-
-        ####################################################################################################################
+    ####################################################################################################################
 
     # Load market data
     data_source_csv = DatabaseSourceCSV()
 
-    market_data_store = 'arctic'
-
+    # Create market data store for database and associated data vendor
     if market_data_store == 'arctic':
-        database_source = DatabaseSourceArctic(postfix=source)
+        database_source = DatabaseSourceArctic(postfix=data_vendor)
         market_data_database_table = constants.arctic_market_data_database_table
 
-    if folder is None:
-        folder = Constants().test_data_folder
+    if market_data_store == 'pystore':
+        database_source = DatabaseSourcePyStore(postfix=data_vendor)
+        market_data_database_table = constants.pystore_market_data_database_table
 
-    # This relies on you have market data stored in H5/CSV files already (eg. by downloading from DukasCopy)
+    if csv_folder is None:
+        csv_folder = Constants().test_data_folder
+
+    # This relies on you have market data stored in Parquet/H5/CSV files already (eg. by downloading from DukasCopy)
     # note: whilst free FX data can be used for testing (in particular for generating randomised trades),
-    # we recommend using higher quality data for actual benchmark
+    # you may to choose other high frequency quality data for actual benchmark
 
-    csv_market_data = [os.path.join(folder, x) for x in csv_file]
+    csv_market_data = [os.path.join(csv_folder, x) for x in csv_file]
 
     # for each ticker, read in the H5/CSV file and then dump into tick database
     for i in range(0, len(ticker_mkt)):
         ticker = ticker_mkt[i]
         csv_file = csv_market_data[i]
 
+        # On the second time through the loop, we make sure to append to table
+        # otherwise will keep overwriting!
+        if if_exists_table == 'replace':
+            if i >= 1:
+                if_exists_table = 'append'
+            else:
+                if_exists_table = 'replace'
+
         database_source.convert_csv_to_table(csv_file, ticker, market_data_database_table,
-                                            if_exists_table=exists_table, remove_duplicates=remove_duplicates,
-                                            if_exists_ticker=append_replace_ticker, date_format=date_format,
-                                            read_in_reverse=read_in_reverse)
+                                             if_exists_table=if_exists_table, remove_duplicates=remove_duplicates,
+                                             if_exists_ticker=if_append_replace_ticker, date_format=date_format,
+                                             read_in_reverse=read_in_reverse)
 
         # It is worth plotting the data to check validity sometimes (make sure you choose appropriate start/finish dates
         # loading a *very* large tick history into memory will result in your computer running out of memory
@@ -148,7 +147,7 @@ if __name__ == '__main__':
             import datetime
             import pandas as pd
 
-            df = DatabaseSourceArctic(postfix=source).fetch_market_data(
+            df = database_source.fetch_market_data(
                 start_date='01 Jan 2000', finish_date=datetime.datetime.utcnow(), ticker=ticker)
 
             df = pd.DataFrame(df.resample('5min').mean())
@@ -162,5 +161,5 @@ if __name__ == '__main__':
 
             print(df)
 
-    logger.info("Finished uploading data to arctic")
+    logger.info("Finished uploading data to " + market_data_store)
 

@@ -6,6 +6,20 @@
 
 ## Coding log
 
+* 10 April 2020
+    * Bug fixes for MySQL download/upload
+    * Bug fixes for saving CacheHandle to VolatileCache
+    * Bug fixes for periods without market data (including for cross rates)
+    * Improved labelling for various charts with aggregation labels
+    * Updated Jupyter notebook to reflect changes (eg. aggregation labels)
+    * Added support for ChunkStore from Arctic, resulting in a very large speed improvement when fetching data from MongoDB
+    * Added Jupyter notebook for populating database (MySQL, SQLite, Arctic and PyStore)
+    * Added experimental support for using PyStore (partitioned Parquet files) to store market tick data
+        * Having issues with append
+    * Added support for SQLite to store trade/order data
+    * Refactored ResultsForm init
+    * Now uses Parquet as default binary format on disk
+    * Updated dependencies (especially Python libraries)
 * 02 April 2020
     * Added HTML versions of Jupyter notebooks
     * Added `DataNorm` as a parameter to `DataRequest`

@@ -102,7 +102,7 @@ class DataNorm(object):
     """
 
     def normalize_market_data(self, df, dataset, data_request):
-        df = TimeSeriesOps().localize_as_UTC(df)
+        df = Mediator.get_time_series_ops().localize_as_UTC(df)
 
         # For each dataset have a different field mapping (get field mapping for that dataset from stored CSV files)
 
@@ -113,9 +113,7 @@ class DataNorm(object):
         # The dataset is very dense, we assume it is stored on disk ordered (Arctic only allows this)
         # df = df.sort_index()
 
-        df = self.offset_data_ms(df, data_request)
-
-        return df
+        return self.offset_data_ms(df, data_request)
 
     def normalize_trade_data(self, df, dataset, data_request):
 
@@ -133,6 +131,9 @@ class DataNorm(object):
         # Convert buy/sell to -1/+1
 
         # TODO do regex/case insensitive version
+        # vals_to_replace = {'buy': 1, 'sell' : -1, 'Buy' : 1, 'Sell' : -1, 'BUY' : 1, 'SELL' : -1}
+        # df['side'] = df['side'].map(vals_to_replace)
+
         df['side'].replace('buy', 1, inplace=True)
         df['side'].replace('sell', -1, inplace=True)
         df['side'].replace('Buy', 1, inplace=True)
@@ -144,7 +145,7 @@ class DataNorm(object):
             df['event_type'].replace('execution', 'trade', inplace=True)
 
         # Also assume selected date columns are UTC (eg. benchmark start and finish dates for the orders)
-        df = TimeSeriesOps().localize_cols_as_UTC(df, constants.date_columns, index=True).sort_index()
+        df = Mediator.get_time_series_ops().localize_cols_as_UTC(df, constants.date_columns, index=True).sort_index()
 
         df = self.offset_data_ms(df, data_request)
 

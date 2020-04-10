@@ -22,18 +22,18 @@ if __name__ == '__main__':
 
     from tcapy.conf.constants import Constants
 
-    remove_duplicate_follow_on = True  # Constants().ncfx_remove_duplicates
+    remove_duplicate_follow_on = False
 
     data_vendor = 'dukascopy' # 'dukascopy' or 'ncfx'
     write_csv = True
-    csv_folder = '/tmp/'
+    csv_folder = '/home/tcapyuser/csv_dump' # Make sure this folder exists!
     constants = Constants()
 
     # How the data should be downloaded?
     FIRST_DOWNLOAD = 0      # First time we want to populate database
     DAILY_RUN_APPEND = 0    # Can be run daily/regularly to download data from external -> disk -> database
-    ONE_OFF = 0
-    WRITE_CSV = 1           # Purely for downloading from the external source to CSV file
+    ONE_OFF = 0             # One off upload of files
+    WRITE_CSV = 0           # Purely for downloading from the external source to CSV/Parquet/HDF5 file
 
     # Where should we dump the temporary FX data mini files and large H5 files
     # sometimes we might want to specify just a small section to download and specific tickers

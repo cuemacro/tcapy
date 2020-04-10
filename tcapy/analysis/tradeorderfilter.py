@@ -11,6 +11,8 @@ __author__ = 'saeedamen'  # Saeed Amen / saeed@cuemacro.com
 import abc
 import pytz
 
+import pandas as pd
+
 from tcapy.conf.constants import Constants
 from tcapy.util.timeseries import TimeSeriesOps
 
@@ -25,8 +27,6 @@ class TradeOrderFilter(ABC):
     def __init__(self, **kwargs):
         self._time_series_ops = TimeSeriesOps()
         self._util_func = UtilFunc()
-        pass
-        # self.logger = LoggerManager().getLogger(__name__)
 
     def set_trade_order_params(self, **kwargs):
         """Sets the parameters for our trade/order filtering
@@ -195,7 +195,7 @@ class TradeOrderFilterTimeOfDayWeekMonth(TradeOrderFilter):
                               'sep': 9, 'oct': 10, 'nov': 11, 'dec': 12}
 
     def __init__(self, tca_request=None, time_of_day={'start_time': '07:00:00', 'finish_time': '17:00:00'},
-                 day_of_week=None, month_of_year=None, time_zone='utc'):
+                 day_of_week=None, month_of_year=None, specific_dates=None, time_zone='utc'):
         """Initialise our filter, by the times of day, days of the week and months we wish to filter our trade/filters by.
         Note that it is optional which period to filter by (eg. we can filter just by time of day if we want to).
 
@@ -217,10 +217,11 @@ class TradeOrderFilterTimeOfDayWeekMonth(TradeOrderFilter):
             Time zone to use (eg. 'utc')
         """
         self.set_trade_order_params(tca_request=tca_request, time_of_day=time_of_day,
-                                    day_of_week=day_of_week, month_of_year=month_of_year, time_zone=time_zone)
+                                    day_of_week=day_of_week, month_of_year=month_of_year, specific_dates=specific_dates,
+                                    time_zone=time_zone)
 
     def set_trade_order_params(self, tca_request=None, time_of_day=None,
-                               day_of_week=None, month_of_year=None,
+                               day_of_week=None, month_of_year=None, specific_dates=None,
                                time_zone='utc'):
         """Initialise our filter, by the times of day, days of the week and months we wish to filter our trade/filters by.
         Note that it is optional which period to filter by (eg. we can filter just by time of day if we want to).
@@ -239,6 +240,9 @@ class TradeOrderFilterTimeOfDayWeekMonth(TradeOrderFilter):
         month_of_year : str
             Which month of the of the year to filter by?
 
+        specific_dates : str / str (list)
+            Which dates to filter by
+
         time_zone : str
             Time zone to use (eg. 'utc')
         """
@@ -247,9 +251,13 @@ class TradeOrderFilterTimeOfDayWeekMonth(TradeOrderFilter):
         self.time_of_day = time_of_day
         self.day_of_week = day_of_week
         self.month_of_year = month_of_year
+        self.specific_dates = specific_dates
         self.time_zone = time_zone
 
+        self._util_func = UtilFunc()
+
     def filter_trade_order(self, trade_order_df=None, time_of_day=None, day_of_week=None, month_of_year=None,
+                           specific_dates=None,
                            time_zone=None):
         """
 
@@ -258,10 +266,23 @@ class TradeOrderFilterTimeOfDayWeekMonth(TradeOrderFilter):
         trade_order_df : DataFrame
             Trades/orders to be filed
 
-        time_of_day
-        day_of_week
-        month_of_year
-        time_zone
+        time_of_day : dict
+            Filter trades/orders between certain times of day
+            Eg. {'start_time' : '10:00', 'finish_time' : '12:00'}
+
+        day_of_week : str
+            Filter trades/orders by certain day of week
+            Eg. Mon, Tue etc.
+
+        month_of_year : str
+            Filter trades/orders by certain month of year
+            Eg. Jan, Feb etc.
+
+        specific_dates : str / list(str)
+            Filter trades by specific user defined dates
+
+        time_zone : str
+            Timezone for the time of day
 
         Returns
         -------
@@ -271,6 +292,7 @@ class TradeOrderFilterTimeOfDayWeekMonth(TradeOrderFilter):
         if time_of_day is None: time_of_day = self.time_of_day
         if day_of_week is None: day_of_week = self.day_of_week
         if month_of_year is None: month_of_year = self.month_of_year
+        if specific_dates is None: specific_dates = self.specific_dates
         if time_zone is None: time_zone = self.time_zone
 
         # Filter by time of day
@@ -293,7 +315,7 @@ class TradeOrderFilterTimeOfDayWeekMonth(TradeOrderFilter):
 
         # Filter by day of week
         if day_of_week is not None and trade_order_df is not None:
-            if not (isinstance(day_of_week, list)): day_of_week = [day_of_week]
+            if not(isinstance(day_of_week, list)): day_of_week = [day_of_week]
 
             day_of_week = [self.day_of_week_ordinals[x.lower()[0:3]] for x in day_of_week]
 
@@ -301,10 +323,34 @@ class TradeOrderFilterTimeOfDayWeekMonth(TradeOrderFilter):
 
         # Filter by month of year
         if month_of_year is not None and trade_order_df is not None:
-            if not (isinstance(month_of_year, list)): month_of_year = [month_of_year]
+            if not(isinstance(month_of_year, list)): month_of_year = [month_of_year]
 
             month_of_year = [self.month_of_year_ordinals[x.lower()[0:3]] for x in month_of_year]
 
             trade_order_df = trade_order_df[trade_order_df.index.month.isin(month_of_year)]
+
+        # Filter by specific dates
+        if specific_dates is not None and trade_order_df is not None:
+            if not(isinstance(specific_dates, list)): specific_dates = [specific_dates]
+
+            trade_order_df_list = []
+
+            for d in specific_dates:
+                # If the user has specified the start date/time & finish date/time as a list
+                # eg. ["01 Jan 2017", "10 Jan 2017"]
+                if isinstance(d, list):
+                    start = self._util_func.parse_datetime(d[0])
+                    finish = self._util_func.parse_datetime(d[1])
+                else:
+                    start, finish = self._util_func.period_bounds(self._util_func.parse_datetime(d), period='day')
+
+                if start.tzinfo is None:
+                    start = start.replace(tzinfo=pytz.timezone(time_zone))
+                if finish.tzinfo is None:
+                    finish = finish.replace(tzinfo=pytz.timezone(time_zone))
+
+                trade_order_df_list.append(trade_order_df[start:finish])
+
+            trade_order_df = pd.concat(trade_order_df_list)
 
         return trade_order_df

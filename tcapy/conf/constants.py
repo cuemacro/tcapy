@@ -58,7 +58,7 @@ class Constants(object):
 
     # Default format for writing small binary files to disk (eg. by DatabasePopulator, UtilFunc..)
     # 'hdf5' or 'parquet'
-    binary_default_dump_format = 'hdf5'
+    binary_default_dump_format = 'parquet'
 
     # 'snappy' or 'gzip'
     parquet_compression = 'gzip'
@@ -106,10 +106,11 @@ class Constants(object):
     csv_folder = '/tmp/csv/'
     temp_data_folder = '/tmp/tcapy/'
 
-    ### DukasCopy tickers
+    ### Dukascopy tickers
     dukascopy_tickers = {'AUDUSD': 'AUDUSD', 'EURNOK': 'EURNOK', 'EURSEK': 'EURSEK', 'EURUSD': 'EURUSD',
                          'GBPUSD': 'GBPUSD', 'NZDUSD': 'NZDUSD', 'USDCAD': 'USDCAD', 'USDCHF': 'USDCHF',
-                         'USDJPY': 'USDNOK', 'USDSEK': 'USDSEK', 'USDTRY': 'USDTRY', 'USDZAR': 'USDZAR'}
+                         'USDJPY': 'USDJPY', 'USDNOK':'USDNOK', 'USDSEK': 'USDSEK', 'USDTRY': 'USDTRY', 'USDZAR': 'USDZAR',
+                         'EURPLN': 'EURPLN', 'USDMXN':'USDMXN', 'EURHUF' : 'EURHUF', 'EURJPY' : 'EURJPY'}
 
     dukascopy_data_store = 'arctic-dukascopy'
     dukascopy_threads = 1 # Dukascopy downloader not thread-safe so only use 1!
@@ -185,8 +186,10 @@ class Constants(object):
     ##### Assets & venues etc ##########################################################################################
 
     test_available_tickers_dictionary = OrderedDict([
-        ('All', ['EURUSD', 'GBPUSD', 'AUDUSD', 'NZDUSD', 'USDCAD', 'USDCHF', 'USDJPY', 'AUDJPY', 'NZDCAD', 'AUDSEK', 'EURJPY']),
-        ('G10', ['EURUSD', 'GBPUSD', 'AUDUSD', 'NZDUSD', 'USDCAD', 'USDCHF', 'USDJPY', 'AUDJPY', 'NZDCAD', 'AUDSEK', 'EURJPY']),
+        ('All', ['EURUSD', 'GBPUSD', 'AUDUSD', 'NZDUSD', 'USDCAD', 'USDCHF', 'USDJPY', 'AUDJPY', 'NZDCAD', 'AUDSEK', 'EURJPY',
+                 'EURSEK', 'SEKJPY', 'GBPSEK', 'USDSEK']),
+        ('G10', ['EURUSD', 'GBPUSD', 'AUDUSD', 'NZDUSD', 'USDCAD', 'USDCHF', 'USDJPY', 'AUDJPY', 'NZDCAD', 'AUDSEK', 'EURJPY',
+                 'EURSEK' 'SEKJPY', 'GBPSEK', 'USDSEK']),
         ('EM', ['USDZAR', 'USDTRY'])
     ])
 
@@ -261,8 +264,13 @@ class Constants(object):
     # Only attempt to start Flask directly in DEV environment, in PROD use eg. nginx/gunicorn!
     debug_start_flask_server_directly = False
 
-    valid_data_stores = ['csv', 'ms_sql_server', 'arctic-ncfx', 'arctic-dukascopy', 'arctic-testharness',
-                         'kdb-testharness']
+    valid_data_stores = ['csv',
+                         'mysql',
+                         'ms_sql_server',
+                         'arctic-ncfx', 'arctic-dukascopy', 'arctic-testharness',
+                         'pystore-dukascopy', 'pystore-ncfx', 'pystore-testharness',
+                         'kdb-testharness',
+                         'influxdb-testharness']
 
     ##### database configuration #######################################################################################
 
@@ -352,12 +360,31 @@ class Constants(object):
 
     ## MySQL
     mysql_host = '127.0.0.1'
-    mysql_port = '1033'
+    mysql_port = '3306'
 
     mysql_trade_data_database_name = 'trade_database'
 
-    mysql_username = 'TODO'
-    mysql_password = 'TODO'
+    mysql_username = 'OVERWRITE_IN_ConstantsCred'
+    mysql_password = 'OVERWRITE_IN_ConstantsCred'
+
+    mysql_dump_record_chunksize = 10000    # Making the chunk size very big for MySQL can slow down inserts significantly
+
+    mysql_trade_order_mapping = OrderedDict(
+        [('trade_df', 'trade_database.trade'),     # Name of the table which holds broker messages to clients
+         ('order_df', 'trade_database.order')])    # Name of the table which has orders from client
+
+    ## sqlite
+    sqlite_trade_data_database_name = '/home/tcapyuser/db/trade_database.db'
+
+    sqlite_trade_order_mapping = OrderedDict(
+        [('trade_df', 'trade_table'),   # Name of the table which holds broker messages to clients
+         ('order_df', 'order_table')])  # Name of the table which has orders from client
+
+    ### PyStore settings
+    pystore_path = '/home/tcapyuser/pystore'
+
+    pystore_data_store = 'tcapy_store'
+    pystore_market_data_database_table = 'market_data_table'
 
     ### Arctic/MongoDB
     arctic_host = database_host
@@ -375,11 +402,14 @@ class Constants(object):
 
     arctic_timeout_ms = 10 * 1000  # How many millisections should we have a timeout for in Arctic/MongoDB
 
-    arctic_trade_order_mapping = OrderedDict(
-        [('trade_df', 'trade'),     # Name of the table which holds broker messages to clients
-         ('order_df', 'order')])    # Name of the table which has orders from client
+    # https://arctic.readthedocs.io/en/latest/ has more discussion on the differences between the
+    # various storage engines, and the various pros and cons
+    # By default we use 'CHUNK_STORE' with 'D' (daily) bucketing - corresponding to our 'daily' fetching when using
+    # with Celery
+    arctic_lib_type = 'CHUNK_STORE'  # storage engines: VERSION_STORE or TICK_STORE or CHUNK_STORE (default)
 
-    arctic_lib_type = 'VERSION_STORE'  # VERSION_STORE (default) or TICK_STORE
+    # 'D' is for daily, you can also choose 'M' and other chunk sizes (depends on how you wish to cache data)
+    arctic_chunk_store_freq = 'D'
 
     arctic_quota_market_data_GB = 80
 
@@ -398,7 +428,7 @@ class Constants(object):
     influxdb_username = None
     influxdb_password = None
     influxdb_protocol = 'line'  # 'json' or 'line'
-    influxdb_chunksize = 100000  # Number of records to write at once
+    influxdb_chunksize = 1000  # Number of records to write at once
 
     influxdb_market_data_database_table = 'market_data'
 
@@ -425,10 +455,10 @@ class Constants(object):
 
     # Celery keeps workers open anyway
 
-    # On windows recommend using 'thread', whilst on Linux preferred to use 'multiprocess'
+    # On Windows recommend using 'thread', whilst on Linux preferred to use 'multiprocess'
     database_populator_threading_library = 'multiprocess'
 
-    # Allow use of multithreading in general (if set to False, will avoid eg. using celery)
+    # Allow use of multithreading in general (if set to False, will avoid eg. using Celery)
     use_multithreading = True
 
     parallel_library = 'multiprocess' # For the default swim
@@ -438,7 +468,9 @@ class Constants(object):
     # such as orders which straddle the end of the month
     # currently experimental given that it doesn't pass tests for these edge cases (it is disabled for any calculations
     # involving anything other than point in time executions (ie. trade_df)
-    multithreading_params = {# True or False (note: if orders go over 'week'/'month' boundaries will have inaccurate answers
+    multithreading_params = {# True or False
+                             # Note: if orders go over 'day/week'/'month' boundaries will have inaccurate answers with "True"
+                             # So recommend to leave this False
                              # around boundaries, often the cache period will be more important thing to change
                              'splice_request_by_dates': False,
 
@@ -601,14 +633,18 @@ class Constants(object):
         ### set these variables *after* overwriting (may need changing)
         try:
             ### trade order mapping
-            self.trade_order_mapping = {'arctic': self.arctic_trade_order_mapping,
-                                        'ms_sql_server': self.ms_sql_server_trade_order_mapping
+            self.trade_order_mapping = {'mysql': self.mysql_trade_order_mapping,
+                                        'ms_sql_server': self.ms_sql_server_trade_order_mapping,
+                                        'sqlite' : self.sqlite_trade_order_mapping
                                         }
 
             ### these are the FX crosses which are available in each set of market data
             self.market_data_tickers = {'arctic-ncfx': self.ncfx_tickers,
                                         'arctic-dukascopy': self.dukascopy_tickers,
                                         'arctic-testharness': self.test_harness_tickers,
+                                        'pystore-ncfx': self.ncfx_tickers,
+                                        'pystore-dukascopy': self.dukascopy_tickers,
+                                        'pystore-testharness': self.test_harness_tickers,
                                         'influxdb-ncfx' : self.ncfx_tickers,
                                         'influxdb-testharness' : self.test_harness_tickers,
                                         'kdb-ncfx': self.ncfx_tickers,

@@ -179,15 +179,15 @@ class LayoutImplBoardGen(Layout):
         self.id_flags = {
 
             # aggregated trader page
-            'aggregated_bar_trade_order': {'execution-by-ticker': 'bar_trade_df_by_ticker',
-                                           'execution-by-broker_id': 'bar_trade_df_by_broker_id',
-                                           'execution-by-venue': 'bar_trade_df_by_venue'},
+            'aggregated_bar_trade_order': {'execution-by-ticker': 'bar_trade_df_by/mean/ticker',
+                                           'execution-by-broker_id': 'bar_trade_df_by/mean/broker_id',
+                                           'execution-by-venue': 'bar_trade_df_by/mean/venue'},
 
-            'aggregated_timeline_trade_order': {'execution-by-ticker': 'timeline_trade_df_by_ticker'},
+            'aggregated_timeline_trade_order': {'execution-by-ticker': 'timeline_trade_df_by/mean_date/ticker'},
 
-            'aggregated_dist_trade_order': {'execution-by-ticker': 'dist_trade_df_by_ticker',
-                                            'execution-by-broker_id': 'dist_trade_df_by_broker_id',
-                                            'execution-by-venue': 'dist_trade_df_by_venue'},
+            'aggregated_dist_trade_order': {'execution-by-ticker': 'dist_trade_df_by/pdf/ticker',
+                                            'execution-by-broker_id': 'dist_trade_df_by/pdf/broker_id',
+                                            'execution-by-venue': 'dist_trade_df_by/pdf/venue'},
 
             'aggregated_table_trade_order': {'execution': 'table_trade_df_markout_by_all'},
 

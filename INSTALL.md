@@ -126,6 +126,7 @@ can choose to skip). We paste the code below, with comments.
     source install_virtual_env.sh
     
     # Install the Microsoft SQL Server driver on Linux (only necessary if we want to use SQL Server for trade data)
+    # assumes that Microsoft SQL Server has already been installed (or you are accessing it over a network)
     sudo ./install_sql_driver.sh
     
     # Install all the Python packages in the py36tca environment
@@ -138,6 +139,9 @@ can choose to skip). We paste the code below, with comments.
     # Install database for tick data (MongoDB)
     # note that we can run MongoDB, MySQL and Redis on different computers
     source install_mongo.sh
+    
+    # Increases the number of open files for root user (for MongoDB)
+    source increase_file_limits.sh
     
     # Install database for trade/order data (MySQL) - PostgreSQL also supported
     source install_mysql.sh
@@ -156,14 +160,14 @@ can choose to skip). We paste the code below, with comments.
     # Install wkhtmltopdf for converting HTML to PDF
     source install_pdf.sh
     
+    # Install weasyprint dependencies
+    source install_weasyprint.sh
+    
     # Install Jupyter extensions
     source install_jupyter_extensions.sh
     
     # Install Redis key-value store for general caching and as Celery message broker (recommend on same server)
     source install_redis.sh
-    
-    # We need to open ports to allow access to MongoDB and to give web access to specific clients
-    # source add_ip_to_firewall.sh
 
 For the databases, you will need to make sure they are populated with trade data and also market data. tcapy includes
 various Python scripts for populating a market tick database from external sources (Dukascopy and NCFX at present), and
@@ -206,6 +210,9 @@ and then install tcapy on VirtualBox/Linux
     * some dependencies may work, but they are not officially supported on WSL 
         * eg. MongoDB on WSL, although in this instance, there is a Windows version of MongoDB you could use
     * also WSL doesn't support all Linux functionality such as UI, although this will likely change in newer versions
+    * it is easy to access files in WSL in Windows and vice versa
+        * view WSL/Linux files on Windows by navigating to `\\wsl$`
+        * view Windows files in WSL/Linux by navigating to `/mnt/c` (for example for C drive)
 
 3. install tcapy directly on Windows, but some libraries may not be fully supported (eg. Celery)
     * we assume that you've already installed any databases you'd like to use (eg. MongoDB for market tick data, 

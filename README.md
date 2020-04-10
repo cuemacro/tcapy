@@ -20,7 +20,6 @@ tcapy is one of the first open source libraries for TCA. You can run the library
 data can be kept private. It has been in development since June 2017, originally for a large asset manager and was open 
 sourced in March 2020.
 
-
 We've made tcapy to be vendor independent, hence for example it supports:
 
 * multiple database types for storing
@@ -47,7 +46,7 @@ tcapy has been in development for several years and currently supports FX spot b
 also planning adding other asset classes. It has several FX specific features that include:
 
 * conversion of trade/order data booked in wrong convention eg. USDGBP is converted to GBPUSD
-* ability to generate synthetic cross rates from benchmark data for exotic crosses
+* ability to generate synthetic cross rates from benchmark data for exotic crosses if underlying data doesn't exist
 
 # What are trades and orders?
 
@@ -113,8 +112,10 @@ There are three ways to use tcapy, which are:
 
 * [Introducing tcapy and explaining TCA](tcapy_notebooks/introducing_tcapy.ipynb) - how to use tcapy in more detail 
 and gives many examples of how to call it programmatically
-* [Compliance and other more involved TCA calculations](tcapy_notebooks/compliance_tca_calculations) - shows how to do 
+* [Compliance and other more involved TCA calculations](tcapy_notebooks/compliance_tca_calculations) - how to do 
 TCA calculations for compliance and other more involved use cases
+* [Populating databases for tcpay](tcapy_notebooks/populating_databases_for_tcapy.ipynb) - how to 
+populate your trade/order (MySQL/SQLite/Microsoft SQL Server) and market data databases (Arctic/MongoDB/PyStore)
 
 A few things to note:
 

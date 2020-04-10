@@ -19,7 +19,10 @@ import os
 
 from tcapy.data.datatestcreator import DataTestCreator
 from tcapy.conf.constants import Constants
-from tcapy.data.databasesource import DatabaseSourceCSV, DatabaseSourceArctic, DatabaseSourceMSSQLServer
+from tcapy.data.databasesource import DatabaseSourceCSV, DatabaseSourceArctic, DatabaseSourceMSSQLServer, \
+    DatabaseSourceMySQL
+
+constants = Constants()
 
 if __name__ == '__main__':
     COPY_MARKET_CSV_DATA = False
@@ -30,11 +33,21 @@ if __name__ == '__main__':
     data_source_csv = DatabaseSourceCSV()
 
     data_source = 'dukascopy'
-    data_test_creator = DataTestCreator(market_data_postfix=data_source)
+
+    csv_marker = 'small_test'
+    start_date_trade_generation = '01 Apr 2017'; finish_date_trade_generation = '05 Jun 2017'
+
+    # csv_marker = 'large_test'
+    # start_date_trade_generation = '01 Apr 2016'; finish_date_trade_generation = '31 Mar 2020'
+
+    # 'mysql' or 'ms_sql_server'
+    sql_trade_database_type = 'mysql'
+
+    data_test_creator = DataTestCreator(market_data_postfix=data_source,
+                                        sql_trade_database_type=sql_trade_database_type)
 
     # Use database source as Arctic for market data and SQL Server for trade/order data
     data_test_creator._database_source_market = DatabaseSourceArctic(postfix=data_source)
-    data_test_creator._database_source_trade = DatabaseSourceMSSQLServer()
 
     # data_test_creator.fetch_test_database()
 
@@ -42,41 +55,42 @@ if __name__ == '__main__':
     ticker = ['EURUSD', 'GBPUSD', 'AUDUSD', 'NZDUSD', 'USDCAD', 'USDCHF', 'USDNOK', 'USDSEK', 'EURNOK', 'EURSEK',
               'USDTRY', 'USDJPY']
 
-    # Trades for these tickers
+    # Generate trades/orders for these tickers
     ticker_trade = ['EURUSD', 'GBPUSD', 'AUDUSD', 'NZDUSD', 'USDCAD', 'USDCHF', 'EURNOK', 'EURSEK',
-              'USDJPY', 'AUDJPY', 'NZDCAD', 'EURJPY']
+                    'USDJPY', 'AUDJPY', 'NZDCAD', 'EURJPY']
 
     # folder = '/ext_data/tcapy_data/'
     folder = None
 
     if folder is None:
-        folder = Constants().test_data_folder
+        folder = Constants().test_data_harness_folder
 
-    # Copy market data from flat files (can be either .csv or .h5 file - much quicker to use .h5 files)
+    # Copy market data from flat files (can be either .csv or .h5 or .parquet file - much quicker to use .parquet files)
     # to Arctic market database
 
-    # This relies on you have market data stored in H5 files already (eg. by downloading from DukasCopy)
-    # note: whilst free FX data can be used for testing (in particular for generating randomised trades),
-    # we recommend using higher quality data for actual benchmark
-    if COPY_MARKET_CSV_DATA :
-        csv_file = ['test_market_' + x + '.h5' for x in ticker]
+    # This relies on you have market data stored in Parquet files already (eg. by downloading from DukasCopy)
+    # Note: whilst free FX data can be used for testing (in particular for generating randomised trades),
+    # you may use any other data you'd like
+    if COPY_MARKET_CSV_DATA:
+        csv_file = ['test_market_' + x + '.parquet' for x in ticker]
         csv_market_data = [os.path.join(folder, x) for x in csv_file]
 
-        data_test_creator.populate_test_database_with_csv(csv_market_data = csv_market_data, ticker = ticker,
-                                                          csv_trade_data = None,
-                                                          if_exists_table = 'append', if_exists_ticker = 'replace')
+        data_test_creator.populate_test_database_with_csv(csv_market_data=csv_market_data, ticker=ticker,
+                                                          csv_trade_data=None,
+                                                          if_exists_table='append', if_exists_ticker='replace')
 
     # Create randomised trade/order data, dump to CSV (and then read back those CSVs to dump to database)
     # want to have CSVs so easier to check output
+    # Note: won't overwrite the premade test trade/order CSVs
     if GENERATE_RANDOM_TRADE_ORDER_CSV_DATA:
         # Store the test trade/order data in different CSV files (and database tables)
         csv_trade_data = \
-            {'trade_df' : os.path.join(folder, 'trade_open_df.csv'),
-             'order_df': os.path.join(folder, 'order_open_df.csv'),
+            {'trade_df': os.path.join(folder, csv_marker + '_trade_df_generated.csv'),
+             'order_df': os.path.join(folder, csv_marker + '_order_df_generated.csv'),
              }
 
-        trade_order = data_test_creator.create_test_trade_order(ticker_trade, start_date = '01 Apr 2017',
-                                                                finish_date = '05 Jun 2017')
+        trade_order = data_test_creator.create_test_trade_order(ticker_trade, start_date=start_date_trade_generation,
+                                                                finish_date=finish_date_trade_generation)
 
         # We do not need to specify the ticker
         # We assume that each of the following (with multiple tickers)
@@ -84,19 +98,17 @@ if __name__ == '__main__':
         for c in csv_trade_data.keys():
             trade_order[c].to_csv(csv_trade_data[c])
 
-
     if COPY_TRADE_ORDER_CSV_DATA:
         # Users may want to modify these paths to their own trade/order data, when running in production
-        csv_trade_mapping = {'trade': os.path.join(folder, 'trade_open_df.csv'),
-                             'order': os.path.join(folder, 'order_open_df.csv'),
-                                 }
+        # This will copy premade files in the tests folder
+        database_table_trade_mapping = {'trade': os.path.join(folder, csv_marker + '_trade_df.csv'),
+                                        'order': os.path.join(folder, csv_marker + '_order_df.csv'),
+                                        }
 
         # Should we append to our existing trade data, or should we replace it
         # if we are just updating our trade data we should seek to 'append'
         if_exists_trade_table = 'replace'  # 'replace' or 'append'
 
         data_test_creator.populate_test_database_with_csv(csv_market_data=None, ticker=None,
-                                                              csv_trade_data=csv_trade_mapping,
-                                                              if_exists_trade_table=if_exists_trade_table)
-
-
+                                                          csv_trade_data=database_table_trade_mapping,
+                                                          if_exists_trade_table=if_exists_trade_table)

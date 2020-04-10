@@ -14,11 +14,11 @@ if %TCAPY_PYTHON_ENV_TYPE%==virtualenv (
 
 if %TCAPY_PYTHON_ENV_TYPE%==conda (
     echo 'Creating Python3 conda...'
-    call deactivate
+    call %CONDA_ACTIVATE%
 
     REM can be quite slow to update conda (also latest versions can have issues!)
     REM call conda update -n base conda
-    REM call conda remove --name %TCAPY_PYTHON_ENV% --all --yes
+    call conda remove --name %TCAPY_PYTHON_ENV% --all --yes
 
     REM try an older version of conda - https://github.com/conda/conda/issues/9004
     call conda create -n %TCAPY_PYTHON_ENV% python=3.6 --yes

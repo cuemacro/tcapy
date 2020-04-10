@@ -22,7 +22,7 @@ sudo rm -f /tmp/mongod-27017.sock
 sudo killall mongod
 
 # Stop MySQL
-sudo service mysqld stop
+sudo service mysql stop
 
 # kill Redis
 sudo service redis-server stop
@@ -36,21 +36,29 @@ sudo service memcached stop
 sleep 10s
 
 # Make sure file opened limit is very large (otherwise Mongo will rollover!)
-# sudo sh -c "ulimit -c 60000 && exec su $LOGNAME"
+# This should have been adjusted in limits.conf
+# sudo sh -c "ulimit -c 100000 && exec su $LOGNAME"
 
-# Now start up redis and mongod in the background
+# source $SCRIPT_FOLDER/activate_file_limits.sh
+
+# Now start up redis, mysql and mongod in the background
 # sudo service mongod start
-sudo mongod --config $TCAPY_CUEMACRO/tcapy/conf/mongo.conf
+if [ $START_MONGODB == 1 ]; then
+  # Starting MongoDB as root
+  sudo mongod --config $TCAPY_CUEMACRO/tcapy/conf/mongo.conf
+  echo "Started MongoDB"
+fi
 
 # Start MySQL
-sudo service mysqld start
+if [ $START_MYSQL == 1 ]; then
+  sudo service mysql start
+  echo "Started MySQL"
+fi
 
 # Start Redis and flush cache
 sudo redis-server $TCAPY_CUEMACRO/tcapy/conf/redis.conf --daemonize yes
-redis-cli flushall
+sudo redis-cli flushall
 
 # Start Memcached and flush cache
 sudo service memcached start
 echo flush_all > /dev/tcp/localhost/11211
-
-

@@ -146,7 +146,7 @@ class TCACallerImplBoardGen(TCACaller):
                         try:
                         #if True:
                             timeline_trade_df_metric_by_ticker = self.get_cached_computation_analysis(
-                                key='timeline_trade_df_' + metric_val + '_by_ticker',
+                                key='timeline_trade_df_' + metric_val + '_by/mean_date/ticker',
                                 tca_engine=self._tca_engine,
                                 force_calculate=True,
 

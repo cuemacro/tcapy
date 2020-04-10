@@ -19,7 +19,7 @@ from tcapy.conf.constants import *
 from tcapy.util.timeseries import TimeSeriesOps, RandomiseTimeSeries
 from tcapy.util.utilfunc import UtilFunc
 
-from tcapy.data.databasesource import DatabaseSourceArctic, DatabaseSourceMSSQLServer
+from tcapy.data.databasesource import DatabaseSourceArctic, DatabaseSourceMSSQLServer, DatabaseSourceMySQL
 
 from tcapy.analysis.tcarequest import MarketRequest
 from tcapy.util.loggermanager import LoggerManager
@@ -34,7 +34,7 @@ class DataTestCreator(object):
 
     """
 
-    def __init__(self, market_data_postfix='dukascopy', csv_market_data=None, write_to_db=True):
+    def __init__(self, market_data_postfix='dukascopy', csv_market_data=None, write_to_db=True, sql_trade_database_type='ms_sql_server'):
         if csv_market_data is None:
             self._market_data_source = 'arctic-' + market_data_postfix
         else:
@@ -45,12 +45,16 @@ class DataTestCreator(object):
         # Assumes MongoDB for tick data and MSSQL for trade/order data
         if write_to_db:
             self._database_source_market = DatabaseSourceArctic(postfix=market_data_postfix) # market data source
-            self._database_source_trade = DatabaseSourceMSSQLServer()                        # trade data source
 
             self._market_data_database_name = constants.arctic_market_data_database_name
             self._market_data_database_table = constants.arctic_market_data_database_table
 
-            self._trade_data_database_name = constants.ms_sql_server_trade_data_database_name
+            if sql_trade_database_type == 'ms_sql_server':
+                self._database_source_trade = DatabaseSourceMSSQLServer()                        # trade data source
+                self._trade_data_database_name = constants.ms_sql_server_trade_data_database_name
+            elif sql_trade_database_type == 'mysql':
+                self._database_source_trade = DatabaseSourceMySQL()                        # trade data source
+                self._trade_data_database_name = constants.mysql_trade_data_database_name
 
         self.time_series_ops = TimeSeriesOps()
         self.rand_time_series = RandomiseTimeSeries()

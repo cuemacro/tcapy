@@ -122,9 +122,8 @@ class TCAMarketTradeLoaderImpl(TCAMarketTradeLoader):
         # For each currency pair select collect the trades and market data, then calculate benchmarks and slippage
         result = []
 
-        no_of_tries = 5
 
-        i = 0
+
         keep_looping = True
 
         trade_order_list = self._util_func.dict_key_list(tca_request_list[0].trade_order_mapping)
@@ -140,12 +139,14 @@ class TCAMarketTradeLoaderImpl(TCAMarketTradeLoader):
         start_date = tca_request_list[0].start_date
         finish_date = tca_request_list[0].finish_date
 
-        # Error trapping for Celery
-        # if have failed event retry it
+        # Parameters for the loop
+        i = 0; no_of_tries = 5
+
+        # Error trapping for Celery, if have failed event retry it
         while i < no_of_tries and keep_looping:
 
             try:
-                # for each TCA request kick off a thread
+                # For each TCA request kick off a thread
                 for tca_request_single_ticker in tca_request_list:
 
                     # Split up the request by date (monthly/weekly chunks)
@@ -168,6 +169,8 @@ class TCAMarketTradeLoaderImpl(TCAMarketTradeLoader):
                         elif parallel_library == 'single':
                             # This is not actually parallel, but is mainly for debugging purposes
                             for tca_request_s in tca_request_date_split:
+
+                                print(tca_request_s.start_date)
                                 market_df, trade_order_df_dict = tca_ticker_loader.get_market_trade_order_holder(
                                     tca_request_s, return_cache_handles=False)
 
@@ -183,7 +186,9 @@ class TCAMarketTradeLoaderImpl(TCAMarketTradeLoader):
 
                     else:
                         # Otherwise work on parallel chunks by date
-                        # doesn't currently work with orders which straddle day/week/month boundaries (but should work with points in time)
+                        # doesn't currently work with orders which straddle day/week/month boundaries
+                        # but should work with points in time
+                        #
                         # In practice, it's not really much faster than the above code
                         if parallel_library == 'celery':
                             for tca_request_data in tca_request_date_split:
@@ -227,7 +232,8 @@ class TCAMarketTradeLoaderImpl(TCAMarketTradeLoader):
 
                 keep_looping = False
 
-            # Exception likely related to Celery and possibly lack of communication with Redis
+            # Exception likely related to Celery and possibly lack of communication with Redis message broker
+            # or Memcached results backend
             except Exception as e:
                 if i == no_of_tries - 1:
                     err_msg = "Failed with " + parallel_library + " after multiple attempts: " + str(e) + ", " + str(traceback.format_exc())
@@ -255,8 +261,9 @@ class TCAMarketTradeLoaderImpl(TCAMarketTradeLoader):
 
         dates = []
 
-        # Break up dates into monthly/weekly chunks - our cache works on monthly/weekly chunks (can specify in constants)
-        # careful to floor dates for midnight for caching purposes
+        # Break up dates into day/week/month chunks - our cache works on day/week/month chunks (can specify in constants)
+        # Typically day chunks seem optimal
+        # Careful to floor dates for midnight for caching purposes
         if split_dates:
             if period == 'month':
                 split_dates_freq = 'MS'

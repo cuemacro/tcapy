@@ -11,31 +11,23 @@ __author__ = 'saeedamen'  # Saeed Amen / saeed@cuemacro.com
 # See the License for the specific language governing permissions and limitations under the License.
 #
 
-
-
 if __name__ == '__main__':
-    import multiprocess;
-
-    multiprocess.freeze_support()
-
     import time
 
     start = time.time()
 
     from tcapy.conf.constants import Constants
 
-    remove_duplicate_follow_on = True  # Constants().ncfx_remove_duplicates
-
-    data_vendor = 'ncfx' # 'ncfx' or 'dukascopy'
+    data_vendor = 'dukascopy' # 'ncfx' or 'dukascopy'
     write_large_csv = False
-    write_large_hdf5 = True
+    write_large_hdf5_parquet = True
     return_df = True # returns the dataframe (DO NOT DO this for large datasets, as it will cause you to run out of memory)
-    remove_duplicates = False   # removes duplicate data points (the vast proportion of datapoints will be duplicates
+    remove_duplicates = False   # Removes duplicate data points (the vast proportion of datapoints will be duplicates
                                 # this will make the CSV files much bigger, which is ok for archival purposes
                                 # however, when finally copying to the Arctic database, we recommend removing duplicates
                                 # otherwise, it quickly results in going out of memory
 
-    csv_folder = '/media/sf_tcapy_tests_data/csv_dump/'
+    csv_folder = '/home/tcapyuser/csv_dump/'
     constants = Constants()
 
     # Where should we dump the temporary FX data mini files and large H5 files
@@ -51,30 +43,32 @@ if __name__ == '__main__':
 
     # You may need to change these folders
     temp_data_folder = constants.temp_data_folder; temp_large_data_folder = constants.temp_large_data_folder
-    temp_data_folder = '/media/sf_tcapy_tests_data/temp/'
-    temp_large_data_folder = '/media/sf_tcapy_tests_data/large/'
+    temp_data_folder = '/home/tcapyuser/csv_dump/temp/'
+    temp_large_data_folder = '/home/tcapyuser/csv_dump/temp/large/'
 
-    start_date_csv = '01 Jan 2016'; finish_date_csv = '01 May 2018'; split_size = 'monthly' # 'daily' or 'monthly'
-
-    delete_cached_files = False
-    # tickers = constants.ncfx_tickers # eg. {'EURUSD' : 'EURUSD'}
-
-    tickers = {'EURUSD' : 'EURUSD', 'GBPUSD': 'GBPUSD', 'USDCAD': 'USDCAD', 'NZDUSD': 'NZDUSD', 'USDCHF' : 'USDCHF',
-               'USDJPY' : 'USDJPY'}
+    start_date_csv = '01 Jan 2016'; finish_date_csv = '07 Apr 2020'; split_size = 'monthly' # 'daily' or 'monthly'
 
     if data_vendor == 'ncfx':
         from tcapy.data.databasepopulator import DatabasePopulatorNCFX as DatabasePopulator
+
+        tickers = constants.ncfx_tickers
     elif data_vendor == 'dukascopy':
         from tcapy.data.databasepopulator import DatabasePopulatorDukascopy as DatabasePopulator
+
+        tickers = constants.dukascopy_tickers
+
+    # tickers = {'EURUSD' : 'EURUSD', 'GBPUSD': 'GBPUSD', 'USDCAD': 'USDCAD', 'NZDUSD': 'NZDUSD', 'USDCHF' : 'USDCHF',
+    #            'USDJPY' : 'USDJPY'}
+    tickers = {'EURJPY' : 'EURJPY', 'EURHUF' : 'EURHUF'}
 
     db_populator = DatabasePopulator(temp_data_folder=temp_data_folder, temp_large_data_folder=temp_large_data_folder,
                                               tickers=tickers)
 
-    # Writes a CSV to disk from data vendor (does not attempt to write anything to the database)
+    # Writes a CSV/Parquet to disk from data vendor (does not attempt to write anything to the database)
     # Will also dump temporary HDF5 files to disk (to avoid reloading them)
     msg, df_dict = db_populator.download_to_csv(start_date_csv, finish_date_csv, tickers, split_size=split_size,
-                                                csv_folder=csv_folder, return_df=False, remove_duplicates=False, write_large_csv=write_large_csv,
-                                                write_large_hdf5_parquet=write_large_hdf5)
+        csv_folder=csv_folder, return_df=False, remove_duplicates=False, write_large_csv=write_large_csv,
+        write_large_hdf5_parquet=write_large_hdf5_parquet)
 
     print(msg)
     print(df_dict)

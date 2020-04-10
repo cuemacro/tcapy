@@ -188,7 +188,10 @@ class JinjaRenderer(Renderer):
             with open(self._logo_path, 'rb') as img_f:
                 logo = base64.b64encode(img_f.read()).decode('utf8')
 
-        html = template.render(elements_to_render_dict=elements_to_render_dict, logo=logo)
+        # Add timestamp for generation date/time
+        generation_date = str(datetime.datetime.utcnow().strftime("%b %d %Y %H:%M"))
+
+        html = template.render(elements_to_render_dict=elements_to_render_dict, logo=logo, generation_date=generation_date)
 
         # Taking HTML as input write to disk as HTML file (or PDF), and return the binary representation (which can
         # be more easily handled by eg. a web server)

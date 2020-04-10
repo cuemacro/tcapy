@@ -18,7 +18,7 @@ if __name__ == '__main__':
     REVERSE_SORT_CSV = False
 
     # Convert from H5 to CSV file (change path as appropriate) - change path as appropriate
-    h5_file = '/media/sf_tcapy_tests_data/dukascopy/test_market_EURUSD.h5'
+    h5_file = '/mnt/e/Remote/tcapy/tests_harness_data/test_market_EURUSD.h5'
 
     df = UtilFunc().read_dataframe_from_binary(h5_file)
 

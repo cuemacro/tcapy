@@ -12,6 +12,7 @@ or sponsoring the addition of new features, please contact saeed@cuemacro.com
     * This would make it easier to compare TCA output between providers and compare against internal computation
 * Adding ability to do more general computations (non-TCA) on market data in the same framework
     * Eg. calculate volatility based on market tick data
+* Adding more visualisations from Plotly
 * Adding more data providers for market tick data
 * Adding more database wrappers both for trade/order data and market data (eg. [PyStore](https://github.com/ranaroussi/pystore))
 * Making it easier to install and start tcapy

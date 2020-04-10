@@ -167,11 +167,11 @@ class TCAMarketTradeLoader(ABC):
         DataFrame (dict), DataFrame (dict)
         """
 
-        # load market/trade data and compute metrics/benchmarks etc. per ticker
+        # Load market/trade data and compute metrics/benchmarks etc. per ticker
         market_df_dict, trade_order_results_df_dict, tca_request_list = \
             self.get_market_trade_metrics(tca_request, dummy_market=dummy_market)
 
-        # if every ticker we have selected doesn't have trades, can't do any TCA at all
+        # If every ticker we have selected doesn't have trades, can't do any TCA at all
         if len(trade_order_results_df_dict) == 0:
             logger = LoggerManager.getLogger(__name__)
 
@@ -182,7 +182,7 @@ class TCAMarketTradeLoader(ABC):
             raise DataMissingException(err_msg)
 
         # trade_df = trade_order_results_df_dict['trade_df']
-        # now summarize those metrics across all the tickers, for easier display
+        # Now summarize those metrics across all the tickers, for easier display
         return self.summarize_metrics(market_df_dict, trade_order_results_df_dict, tca_request_list,
                                       dummy_market=dummy_market)
 

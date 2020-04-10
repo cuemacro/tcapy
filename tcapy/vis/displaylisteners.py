@@ -301,7 +301,7 @@ class DisplayListeners(object):
         def callback(_):
             # make sure all the parameters have been selected
             if self._session_manager.check_session_reset_tag('redraw-' + tca_type + '-' + trade_order + '-bar-plot'):
-                key, _, _, _ = self._create_df_dictionary_key(trade_order_tag)
+                key, _, _, _, _ = self._create_df_dictionary_key(trade_order_tag)
 
                 # print(key)
 
@@ -339,7 +339,7 @@ class DisplayListeners(object):
             # Make sure all the parameters have been selected
             if self._session_manager.check_session_reset_tag(
                     'redraw-' + tca_type + '-' + trade_order + '-timeline-plot'):
-                key, _, _, _ = self._create_df_dictionary_key(trade_order_tag)
+                key, _, _, _, _ = self._create_df_dictionary_key(trade_order_tag)
 
                 return self._plot_render.plot_timeline(
                     title=self._session_manager.get_session_flag(tca_type + '-title'),
@@ -374,7 +374,7 @@ class DisplayListeners(object):
             if self._session_manager.check_session_reset_tag('redraw-' + tca_type + '-' + trade_order + '-dist-plot'): # and \
                 # self._session_manager.check_session_tag(tca_type + '-visualization'):
 
-                key, metric, split_by, _ = self._create_df_dictionary_key(trade_order_tag)
+                key, metric, split_by, _, _ = self._create_df_dictionary_key(trade_order_tag)
 
                 # raise dash.exceptions.PreventUpdate("No data changed - dist")
                 return self._plot_render.plot_dist(
@@ -394,7 +394,7 @@ class DisplayListeners(object):
             Which trade/order does it refer to (eg. 'execution-by-ticker')
 
         trade_order_tag : str
-            The DataFrame we need to fetch (eg. 'dist_trade_df_by_ticker')
+            The DataFrame we need to fetch (eg. 'scatter_trade_df_by_ticker')
 
         tca_type : str
             Type of TCA (eg. 'aggregated)
@@ -447,7 +447,7 @@ class DisplayListeners(object):
 
                 # if not (self._session_manager.check_session_tag('visualization')): return None
 
-                key, _, _ = self._create_df_dictionary_key(trade_order_tag)
+                key, _, _, _, _ = self._create_df_dictionary_key(trade_order_tag)
 
                 df = self._tca_caller.get_cached_computation_analysis(key=key)
 
@@ -525,16 +525,23 @@ class DisplayListeners(object):
         str, str, str
         """
 
-        t = trade_order_tag.split('_by_')
+
 
         metric = '';
         by_partition = ''
         scatter_fields = ''
+        aggregation_metric = ''
 
         # Handle those cases where metrics are specified on the fly (eg. user specified metric)
-        if 'df_by' in trade_order_tag:
+        if 'df_by/' in trade_order_tag:
+            t = trade_order_tag.split('_by/')
             metric = self._session_manager.get_session_flag('metric')
-            return t[0] + '_' + metric + '_by_' + t[1], metric, t[1]
+            return t[0] + '_' + metric + '_by/' + t[1], metric, t[1].split('/')[1], scatter_fields, t[1].split('/')[0]
+
+        elif 'df_by' in trade_order_tag:
+            t = trade_order_tag.split('_by_')
+            metric = self._session_manager.get_session_flag('metric')
+            return t[0] + '_' + metric + '_by_' + t[1], metric, t[1], scatter_fields, aggregation_metric
 
         # Handle those cases we are planning to do scatter plots
         elif 'df_' in trade_order_tag and '_vs_' in trade_order_tag:
@@ -542,16 +549,21 @@ class DisplayListeners(object):
 
         # These instances, the metrics have been hardcoded in, before runtime
         try:
+            t = trade_order_tag.split('_by_')
+
+            # t = trade_order_tag.split('_by/')
             metric = t[0].split('_df_')[1];
         except:
             pass
 
         try:
+            t = trade_order_tag.split('_by_')
+
             by_partition = t[1]
         except:
             pass
 
-        return trade_order_tag, metric, by_partition, scatter_fields
+        return trade_order_tag, metric, by_partition, scatter_fields, aggregation_metric
 
     ##### click/change callback listeners on each plot, table component etc. ###########################################
 
@@ -698,13 +710,13 @@ class PlotRender(object):
 
     def _check_empty(self, df):
         if df is None:
-            raise dash.exceptions.PreventUpdate("No data changed - empty plot")
+            raise dash.exceptions.PreventUpdate("No data changed - empty plot - perhaps need more data to construct?")
 
         if df is []:
-            raise dash.exceptions.PreventUpdate("No data changed - empty plot")
+            raise dash.exceptions.PreventUpdate("No data changed - empty plot - perhaps need more data to construct?")
 
         if df.empty:
-            raise dash.exceptions.PreventUpdate("No data changed - empty plot")
+            raise dash.exceptions.PreventUpdate("No data changed - empty plot - perhaps need more data to construct?")
 
 
     def plot_markout(self, markout_detail_df=None, title=None, width=constants.chart_width, height=constants.chart_height):
@@ -1059,12 +1071,12 @@ class PlotRender(object):
         # Get the bid/ask values (and co-ordinates), so they can be added to the plot as additional lines later
         if split_by == 'side':
 
-            if not(dist_df.empty):
+            if not (dist_df.empty):
                 pdf_label_list = ['Norm-PDF:', 'KDE-PDF:']
                 hist_label = 'Histogram: ' + ticker
 
-                # Only select those PDF and histogram columns which are present (will not always have both buy and sell trades
-                # in the same sample)
+                # Only select those PDF and histogram columns which are present
+                # will not always have both buy and sell trades in the same sample)
                 cols_plot = []
                 color = [];
                 # x_y_line = [];
@@ -1072,34 +1084,34 @@ class PlotRender(object):
 
                 chart_type = []
 
-                sides = [-1, 1]
+                col_labels = [-1, 1]
 
-                sides_colour = {-1: 'red', 1: 'green'}
+                col_color = {-1: 'red', 1: 'green'}
                 # dash_type = {'Norm-PDF: ' + ticker: 'line', 'KDE-PDF: ' + ticker: 'dash'}
                 dash_type = {'Norm-PDF:': 'line', 'KDE-PDF:': 'dash'}
 
                 # Remove .0 from column names
                 dist_df.columns = [x.replace('.0', '') for x in dist_df.columns]
 
-                for i in sides:
+                for col in col_labels:
                     try:
                         # PDF plots properties
                         for pdf_label in pdf_label_list:
 
-                            pdf = pdf_label + ' ' + str(i)
+                            pdf = pdf_label + ' ' + str(col)
 
                             if pdf in dist_df.columns:
                                 cols_plot.append(pdf);
-                                color.append(sides_colour[i]);
+                                color.append(col_color[col]);
                                 chart_type.append(dash_type[pdf_label]);
                                 linewidth.append(1)
 
                         # histogram plots properties
-                        hist = hist_label + ' ' + str(i)
+                        hist = hist_label + ' ' + str(col)
 
                         if hist in dist_df.columns:
                             cols_plot.append(hist);
-                            color.append(sides_colour[i]);
+                            color.append(col_color[col]);
                             chart_type.append('scatter');
                             linewidth.append(3)
                     except Exception as e:
@@ -1110,14 +1122,16 @@ class PlotRender(object):
                 dist_df = dist_df[cols_plot]
 
             style = Style(title=title, subplots=False, color=color,
-                        linewidth=linewidth, x_title=metric.replace('_', ' ') + ' (bp)', connect_line_gaps=True,
-                        x_y_line=x_y_line, y_title='Notional', plotly_plot_mode=constants.plotly_plot_mode,
-                        width=width, height=height, scale_factor=final_scale_factor, plotly_webgl=constants.plotly_webgl)
+                          linewidth=linewidth, x_title=metric.replace('_', ' ') + ' (bp)', connect_line_gaps=True,
+                          x_y_line=x_y_line, y_title='Notional', plotly_plot_mode=constants.plotly_plot_mode,
+                          width=width, height=height, scale_factor=final_scale_factor,
+                          plotly_webgl=constants.plotly_webgl)
         else:
             style = Style(title=title, x_title=metric.replace('_', ' ') + ' (bp)', connect_line_gaps=True,
                           x_y_line=x_y_line,
                           y_title='Notional', plotly_plot_mode=constants.plotly_plot_mode,
-                          width=width, height=height, scale_factor=final_scale_factor, plotly_webgl=constants.plotly_webgl)
+                          width=width, height=height, scale_factor=final_scale_factor,
+                          plotly_webgl=constants.plotly_webgl)
 
         if 'Bid' in dist_df.columns: dist_df = dist_df.drop('Bid', axis=1)
         if 'Ask' in dist_df.columns: dist_df = dist_df.drop('Ask', axis=1)

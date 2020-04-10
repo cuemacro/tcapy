@@ -8,17 +8,14 @@ __author__ = 'saeedamen'  # Saeed Amen / saeed@cuemacro.com
 # See the License for the specific language governing permissions and limitations under the License.
 #
 
-## data analysis libraries
-import numpy
-import pandas
+import numpy as np
+import pandas as pd
+
 from scipy.stats.kde import gaussian_kde
-
-from statsmodels.stats.weightstats import DescrStatsW
 from scipy.stats import norm
+from statsmodels.stats.weightstats import DescrStatsW
 
-from tcapy.util.timeseries import TimeSeriesOps
-from tcapy.util.utilfunc import UtilFunc
-
+from tcapy.util.mediator import Mediator
 
 class ResultsSummary(object):
     """Calculates summarised statistics for a group of trades. This includes calculating average slippage for each
@@ -28,8 +25,8 @@ class ResultsSummary(object):
     """
 
     def __init__(self):
-        self.time_series_ops = TimeSeriesOps()
-        self.util_func = UtilFunc()
+        self._time_series_ops = Mediator.get_time_series_ops()
+        self._util_func = Mediator.get_util_func()
 
     def _create_histogram_distribution(self, df, min_x=None, max_x=None, extend_x_proportion_percentage=20,
                                        postfix_label=None, obs_weights=None, denormalised=True):
@@ -53,15 +50,15 @@ class ResultsSummary(object):
 
         if denormalised: density = False
 
-        vals = df.T.values.astype(numpy.float64)
+        vals = df.T.values.astype(np.float64)
 
         # Create a histogram with 10 buckets
-        hist, bins = numpy.histogram(vals, bins=10, range=[float(min_hist_x), float(max_hist_x)], density=density, weights=obs_weights)
+        hist, bins = np.histogram(vals, bins=10, range=[float(min_hist_x), float(max_hist_x)], density=density, weights=obs_weights)
         bin_cent = (bins[1:] + bins[:-1]) * 0.5
 
         number_of_elements = len(df.values)
 
-        dist_space = numpy.linspace(min_x, max_x, 100)
+        dist_space = np.linspace(min_x, max_x, 100)
 
         if postfix_label is None:
             postfix_label = ''
@@ -74,7 +71,7 @@ class ResultsSummary(object):
             if obs_weights is None:
                 kde = gaussian_kde(vals)
             else:
-                kde = gaussian_weighted_kde(vals, weights=obs_weights.values.astype(numpy.float64))
+                kde = gaussian_weighted_kde(vals, weights=obs_weights.values.astype(np.float64))
 
             # Sometimes need to transpose so the dimensions are consistent
             try:
@@ -96,15 +93,15 @@ class ResultsSummary(object):
             # Scale pdf_fit (and normal PDF) by total/bin size
             if denormalised:
                 bin_width = abs(bins[1] - bins[0])
-                N = numpy.sum(hist)
+                N = np.sum(hist)
                 pdf_fit = pdf_fit * (bin_width * N)
                 normal_pdf_fit = normal_pdf_fit * (bin_width * N)
 
-            df_hist = pandas.DataFrame(index=bin_cent, data=hist, columns=['Histogram' + postfix_label])
-            df_pdf = pandas.DataFrame(index=dist_space, data=pdf_fit, columns=['KDE-PDF' + postfix_label])
+            df_hist = pd.DataFrame(index=bin_cent, data=hist, columns=['Histogram' + postfix_label])
+            df_pdf = pd.DataFrame(index=dist_space, data=pdf_fit, columns=['KDE-PDF' + postfix_label])
             df_pdf['Norm-PDF' + postfix_label] = normal_pdf_fit
         else:
-            return pandas.DataFrame(), pandas.DataFrame()
+            return pd.DataFrame(), pd.DataFrame()
 
         return df_hist, df_pdf
 
@@ -183,7 +180,7 @@ class ResultsSummary(object):
             # Check that obs_weights don't add up to zero... in which case just use equal weighting
             obs_weights_total = obs_weights.abs().sum()
 
-            if obs_weights_total == numpy.nan:
+            if obs_weights_total == np.nan:
                 obs_weights = None
             elif obs_weights_total == 0:
                 obs_weights = None
@@ -231,9 +228,9 @@ class ResultsSummary(object):
                     df_list.append(df_pdf)
 
             if df_list == []:
-                df = pandas.DataFrame()
+                df = pd.DataFrame()
             else:
-                df = self.time_series_ops.outer_join(df_list)
+                df = self._time_series_ops.outer_join(df_list)
 
         # TODO add bid/ask columns and mid
 
@@ -302,6 +299,12 @@ class ResultsSummary(object):
             elif by_date == 'time':
                 group = [trade_df.index.time]
 
+            elif by_date == 'timeldn':
+                group = [trade_df.index.copy().tz_convert('Europe/London').time]
+
+            elif by_date == 'timenyc':
+                group = [trade_df.index.copy().tz_convert('America/New_York').time]
+
             if aggregate_by_field is not None:
                 group.append(aggregate_by_field)
 
@@ -311,14 +314,14 @@ class ResultsSummary(object):
             displayed_fields = [metric_name]
 
         # remove duplicated list elements
-        displayed_fields = self.util_func.remove_duplicated_str(displayed_fields)
+        displayed_fields = self._util_func.remove_duplicated_str(displayed_fields)
 
         group = [x for x in group if x is not None]
 
         agg = trade_df.groupby(group)[displayed_fields]
 
         # def weighted_avg(group, avg_name, weight_name):
-        #     """ http://stackoverflow.com/questions/10951341/pandas-dataframe-aggregate-function-using-multiple-columns
+        #     """ http://stackoverflow.com/questions/10951341/pd-dataframe-aggregate-function-using-multiple-columns
         #     In rare instance, we may not have weights, so just return the mean. Customize this if your business case
         #     should return otherwise.
         #     """
@@ -335,8 +338,8 @@ class ResultsSummary(object):
                 agg = agg.mean()
 
             else:
-                # calculate a weighted average of the metric for each group
-                agg = agg.apply(self.time_series_ops.weighted_average_lambda, metric_name, weighting_field)
+                # Calculate a weighted average of the metric for each group
+                agg = agg.apply(self._time_series_ops.weighted_average_lambda, metric_name, weighting_field)
 
         elif aggregation_metric == 'sum':
             agg = agg.sum()
@@ -345,9 +348,9 @@ class ResultsSummary(object):
             agg = agg.count()
 
         else:
-            return None
+            return Exception(aggregation_metric + " is not a valid aggregation, must be one of mean, sum or count.")
 
-        df = pandas.DataFrame(agg).transpose()
+        df = pd.DataFrame(agg).transpose()
 
         if (by_date is not None):
             df = df.melt()
@@ -355,11 +358,11 @@ class ResultsSummary(object):
             df.index.name = 'Date'
             df = df.drop([df.columns[0]], axis=1)
 
-            df = pandas.pivot_table(df, index='Date', columns=aggregate_by_field, values=df.columns[-1])
+            df = pd.pivot_table(df, index='Date', columns=aggregate_by_field, values=df.columns[-1])
         else:
-            df = pandas.pivot_table(df, index=aggregate_by_field, values=df.columns).transpose()
+            df = pd.pivot_table(df, index=aggregate_by_field, values=df.columns).transpose()
 
-        return pandas.DataFrame(df)
+        return pd.DataFrame(df)
 
     def query_trade_order_population(self, trade_df, query_fields=['ticker', 'broker_id']):
         """Finds the unique values for particular fields, such as 'ticker'. Can be useful for working out which assets
@@ -392,15 +395,13 @@ class ResultsSummary(object):
         return query_dict
 
 
-####### Rewritten version of scipy's gaussian KDE below allows weighting of points #####################################
+####### Rewritten version of scipy's Gaussian KDE below allows weighting of points #####################################
 
-# original source http://nbviewer.jupyter.org/gist/tillahoffmann/f844bce2ec264c1c8cb5
+# Original source http://nbviewer.jupyter.org/gist/tillahoffmann/f844bce2ec264c1c8cb5
 
-import numpy as np
 from scipy.spatial.distance import cdist
 
 import six
-
 
 class gaussian_weighted_kde(object):
     """Representation of a kernel-density estimate using Gaussian kernels.

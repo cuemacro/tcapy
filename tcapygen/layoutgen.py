@@ -310,17 +310,17 @@ class LayoutImplGen(Layout):
                                                      'order': 'sparse_market_order_df'},
             'detailed_markout_trade_order': {'execution': 'trade_df', 'order': 'order_df'},
             'detailed_table_trade_order': {'execution': 'table_trade_df_markout_by_all'},
-            'detailed_dist_trade_order': {'execution': 'dist_trade_df_by_side', 'order': 'dist_trade_df_by_side'},
+            'detailed_dist_trade_order': {'execution': 'dist_trade_df_by/pdf/side', 'order': 'dist_order_df_by/pdf/side'},
             'detailed_download_link_trade_order': {'execution-candle-timeline': 'sparse_market_trade_df',
                                                    'order-candle-timeline': 'sparse_market_order_df'},
 
             # Aggregated trader page
-            'aggregated_bar_trade_order': {'execution-by-ticker': 'bar_trade_df_by_ticker',
-                                           'execution-by-venue': 'bar_trade_df_by_venue'},
-            'aggregated_timeline_trade_order': {'execution-by-ticker': 'timeline_trade_df_by_ticker',
-                                                'execution-by-venue': 'timeline_trade_df_by_venue'},
-            'aggregated_dist_trade_order': {'execution-by-ticker': 'dist_trade_df_by_ticker',
-                                            'execution-by-venue': 'dist_trade_df_by_venue'},
+            'aggregated_bar_trade_order': {'execution-by-ticker': 'bar_trade_df_by/mean/ticker',
+                                           'execution-by-venue': 'bar_trade_df_by/mean/venue'},
+            'aggregated_timeline_trade_order': {'execution-by-ticker': 'timeline_trade_df_by/mean_date/ticker',
+                                                'execution-by-venue': 'timeline_trade_df_by/mean_date/venue'},
+            'aggregated_dist_trade_order': {'execution-by-ticker': 'dist_trade_df_by/pdf/ticker',
+                                            'execution-by-venue': 'dist_trade_df_by/pdf/venue'},
 
             # Compliance page
             'compliance_metric_table_trade_order':

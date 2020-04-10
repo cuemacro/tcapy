@@ -248,7 +248,7 @@ class TCACallerImplGen(TCACaller):
                         try:
                             # if True:
                             timeline_trade_df_metric_by_ticker = self.get_cached_computation_analysis(
-                                key='timeline_trade_df_' + metric_val + '_by_ticker',
+                                key='timeline_trade_df_' + metric_val + '_by/mean_date/ticker',
                                 start_date=start_date_val,
                                 finish_date=finish_date_val,
                                 event_type=event_type_val,
