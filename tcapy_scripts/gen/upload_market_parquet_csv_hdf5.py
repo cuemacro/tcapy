@@ -18,7 +18,7 @@ import os
 from tcapy.conf.constants import Constants
 from tcapy.util.loggermanager import LoggerManager
 from tcapy.data.databasesource import DatabaseSourceCSV
-from tcapy.data.databasesource import DatabaseSourceArctic, DatabaseSourcePyStore
+from tcapy.data.databasesource import DatabaseSourceArctic, DatabaseSourcePyStore, DatabaseSourceInfluxDB, DatabaseSourceKDB
 
 constants = Constants()
 
@@ -30,7 +30,7 @@ if __name__ == '__main__':
     data_vendor = 'dukascopy' # 'dukascopy' or 'ncfx'
 
     # Either use 'arctic' or 'pystore' to store market tick data
-    market_data_store = 'arctic'
+    market_data_store = 'influxdb'
 
     logger.info("About to upload data to " + market_data_store)
 
@@ -84,7 +84,7 @@ if __name__ == '__main__':
         # Files dumped by DatabasePopulator look like this
         ## 'AUDUSD_dukascopy_2016-01-03_22_00_01.868000+00_002016-01-31_23_59_57.193000+00_00.parquet'
 
-        csv_file = [x + '_' + data_vendor + '_*.' + file_extension for x in
+        csv_file = [x + '_' + data_vendor + '_2016-01*.' + file_extension for x in
                     ticker_mkt]  # assume that ALL TIME IN UTC!
 
         date_format = None
@@ -104,6 +104,14 @@ if __name__ == '__main__':
     if market_data_store == 'pystore':
         database_source = DatabaseSourcePyStore(postfix=data_vendor)
         market_data_database_table = constants.pystore_market_data_database_table
+
+    if market_data_store == 'influxdb':
+        database_source = DatabaseSourceInfluxDB(postfix=data_vendor)
+        market_data_database_table = constants.influxdb_market_data_database_table
+
+    if market_data_store == 'kdb':
+        database_source = DatabaseSourceKDB(postfix=data_vendor)
+        market_data_database_table = constants.kdb_market_data_database_table
 
     if csv_folder is None:
         csv_folder = Constants().test_data_folder

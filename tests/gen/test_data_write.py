@@ -84,13 +84,13 @@ test_harness_mysql_data_store = 'mysql'
 test_harness_sqlite_trade_data_database = '/home/tcapyuser/db/trade_database_test_harness.db'
 test_harness_sqlite_data_store = 'sqlite'
 
-# mainly just to speed up tests - note: you will need to generate the HDF5 files using convert_csv_to_h5.py from the CSVs
+# Mainly just to speed up tests - note: you will need to generate the Parquet files using convert_csv_to_h5.py from the CSVs
 use_parquet_market_files = True
 
 run_arctic_tests = True
-run_pystore_tests = True
+run_pystore_tests = False
 run_influx_db_tests = False
-run_kdb_tests = False
+run_kdb_tests = True
 
 run_ms_sql_server_tests = True
 run_mysql_server_tests = True
@@ -501,7 +501,7 @@ def test_write_market_data_db():
         test_harness_market_data_table = test_harness_market_data_table_list[i]
         test_harness_data_store = test_harness_data_store_list[i]
 
-        ### Test we can read data from CSV and dump to InfluxDB (and when read back it matches CSV)
+        ### Test we can read data from CSV and dump to InfluxDB/KDB/PyStore (and when read back it matches CSV)
         db_start_date = '01 Jan 2016'; db_finish_date = pd.Timestamp(datetime.datetime.utcnow())
 
         replace_append = ['replace', 'append']
@@ -541,7 +541,7 @@ def test_append_market_data_db():
         test_harness_market_data_table = test_harness_market_data_table_list[i]
         test_harness_data_store = test_harness_data_store_list[i]
 
-        ### Test we can append (non-overlapping) data to KDB/InfluxDB
+        ### Test we can append (non-overlapping) data to InfluxDB/KDB/PyStore
         db_start_date = '01 Jan 2016'; db_finish_date = pd.Timestamp(datetime.datetime.utcnow())
 
         # TODO
@@ -596,7 +596,7 @@ def test_delete_market_data_db():
         db_start_date = '01 Jan 2016';
         db_finish_date = pd.Timestamp(datetime.datetime.utcnow())
 
-        # Write test market CSV to KDB first replacing any other test data (ie. deleting full folder)
+        # Write test market CSV to InfluxDB/KDB/PyStore first replacing any other test data (ie. deleting full folder)
         database_source.convert_csv_to_table(csv_market_data_store, ticker,
                                                  test_harness_market_data_table,
                                                  if_exists_table='replace',
@@ -605,7 +605,7 @@ def test_delete_market_data_db():
 
         db_start_cut_off = '26 Apr 2017 00:00'; db_finish_cut_off = '27 Apr 2017 00:50'
 
-        # Read back from KDB test database
+        # Read back from InfluxDB/KDB/PyStore test database
         market_df_old = database_source.fetch_market_data(
              start_date=db_start_date, finish_date=db_finish_date, ticker=ticker, table_name=test_harness_market_data_table)
 

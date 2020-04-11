@@ -1,4 +1,4 @@
-"""Converts CSV files with DataFrames into HDF5 and dumps to disk
+"""Converts CSV files with DataFrames into Parquet (or HDF5) and dumps to disk
 """
 
 from __future__ import print_function, division
@@ -24,6 +24,10 @@ if __name__ == '__main__':
 
     csv_market_data_files = ['small_test_market_df.csv.gz', 'small_test_market_df_reverse.csv.gz']
 
+    # Can either dump to Parquet (default) or HDF (optional)
+    # format = 'hdf5'; file_ext = 'h5'
+    format = 'parquet'; file_ext = 'parquet'
+
     for csv_market_data in csv_market_data_files:
         csv_market_data = os.path.join(folder, csv_market_data)
 
@@ -37,5 +41,5 @@ if __name__ == '__main__':
         if REVERSE_SORT:
             df = df.sort_index(ascending=False)
 
-        h5_market_data = csv_market_data.replace('.csv.gz', '.h5')
-        UtilFunc().write_dataframe_to_binary(df, h5_market_data)
+        h5_market_data = csv_market_data.replace('.csv.gz', '.' + file_ext)
+        UtilFunc().write_dataframe_to_binary(df, h5_market_data, format=format)

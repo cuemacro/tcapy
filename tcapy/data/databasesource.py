@@ -2894,7 +2894,7 @@ class DatabaseSourceInfluxDB(DatabaseSourceTickData):
                             start_date_str = self._convert_influxdb_date_string(start_date)
 
                             # now select the Dates which could overlap
-                            temp_df = engine.sync("select from %s where Date >= %s" % (ticker, start_date_str))
+                            temp_df = engine.sendSync("select from %s where Date >= %s" % (ticker, start_date_str))
 
                         except:
                             temp_df = None
@@ -2916,7 +2916,7 @@ class DatabaseSourceInfluxDB(DatabaseSourceTickData):
 
                     # Delete the data for a ticker
                     try:
-                        engine.query("drop measurement %s"(ticker))
+                        engine.query("drop measurement \"%s\"..\"%s\""(table_name, ticker))
                     except Exception as e:
                         logger.warn("Didn't delete anything from table %s for ticker %s" % (table_name, ticker))
 
@@ -2932,7 +2932,8 @@ class DatabaseSourceInfluxDB(DatabaseSourceTickData):
                     logger.debug("Writing chunk %s of %s in %s for ticker %s..." % (
                     str(chunk_no), str(no_of_chunks), table_name, ticker))
 
-                    engine.write_points(df[start], ticker, protocol=constants.influxdb_protocol)
+                    engine.write_points(df[start], ticker, protocol=constants.influxdb_protocol,
+                                        time_precision=constants.influxdb_time_precision)
 
                     chunk_no = chunk_no + 1
 
@@ -3009,7 +3010,7 @@ class DatabaseSourceInfluxDB(DatabaseSourceTickData):
         if date is None:
             return ''
 
-        return date.strftime('%Y-%m-%dT%H:%M:%S.%f')
+        return date.strftime('%Y-%m-%dT%H:%M:%S.%fZ')
 
     def fetch_market_data(self, start_date=None, finish_date=None, ticker=None, table_name=None):
         logger = LoggerManager.getLogger(__name__)
@@ -3023,21 +3024,23 @@ class DatabaseSourceInfluxDB(DatabaseSourceTickData):
 
         engine, store = self._get_database_engine(table_name=table_name)
 
-        # Format like 2005.01.03D04:00:00
+        # Format like 2005.01.03T04:00:00Z
         start_date_str = self._convert_influxdb_date_string(start_date)
         finish_date_str = self._convert_influxdb_date_string(finish_date)
 
         # ticker = ticker.replace('-', '_')
+        query = "select * from \"%s\"..\"%s\" where Time >= \'%s\' and Time <= \'%s\'" % (table_name, ticker, start_date_str, finish_date_str)
+        df = engine.query(query)
 
-        df = engine.query(
-            "select * from %s where Date >= '%s' and Date <= '%s'" % (ticker, start_date_str, finish_date_str))
-
-        df = df[ticker].describe()
+        try:
+            df = df[ticker]
+        except:
+            df = None
 
         logger.debug("Extracted InfluxDB library: " + str(table_name) + " for ticker " + str(ticker) +
                      " between " + str(start_date) + " - " + str(finish_date))
 
-        # downsample floats to reduce memory footprint
+        # Downsample floats to reduce memory footprint
         return self._downsample_localize_utc(df)
 
     def fetch_trade_order_data(self, start_date=None, finish_date=None, ticker=None):
@@ -3058,13 +3061,13 @@ class DatabaseSourceInfluxDB(DatabaseSourceTickData):
         # Can't have "-" in KDB names
         # ticker = ticker.replace('-', '_')
 
-        # format like 2005.01.03T04:00:00
+        # Format like 2005.01.03T04:00:00Z
         start_date_str = self._convert_influxdb_date_string(start_date)
         finish_date_str = self._convert_influxdb_date_string(finish_date)
 
         try:
             engine.query(
-                "delete from %s where Date >= '%s' and Date <= '%s'" % (ticker, start_date_str, finish_date_str))
+                "delete from \"%s\"..\"%s\" where Time >= '%s' and Time <= '%s'" % (table_name, ticker, start_date_str, finish_date_str))
         except:
             logger.warn("Error deleting data between " + start_date_str + " " + finish_date_str)
 
@@ -3181,9 +3184,9 @@ class DatabaseSourceKDB(DatabaseSourceTickData):
         engine.close()
 
     def _delete_table(self, engine, table_name):
-        engine.sync("diR:{$[11h=type d:key x;raze x,.z.s each` sv/:x,/:d;d]}")
-        engine.sync("nuke:hdel each desc diR@")
-        engine.sync("nuke`:%s" % (table_name))
+        engine.sendSync("diR:{$[11h=type d:key x;raze x,.z.s each` sv/:x,/:d;d]}")
+        engine.sendSync("nuke:hdel each desc diR@")
+        engine.sendSync("nuke`:%s" % (table_name))
 
     def _write_to_db(self, df, engine, store, table_name, ticker, if_exists_ticker, existing_datacheck='yes'):
         logger = LoggerManager.getLogger(__name__)
@@ -3214,10 +3217,12 @@ class DatabaseSourceKDB(DatabaseSourceTickData):
                             start_date_str = self._convert_kdb_date_string(start_date)
 
                             # Load table from disk
-                            engine.sync('%s: get `:%s/%s' % (ticker, table_name, ticker))
+                            engine.sendSync('%s: get `:%s/%s' % (ticker, table_name, ticker))
 
-                            # Now select the Dates which could overlapp
-                            temp_df = engine.sync("select from %s where Date >= %s" % (ticker, start_date_str))
+                            # Now select the Dates which could overlap
+                            temp_df = engine.sendSync("select from %s where Date >= %s" % (ticker, start_date_str))
+
+                            temp_df = self._stringify_dataframe(temp_df)
 
                         except:
                             temp_df = None
@@ -3244,10 +3249,10 @@ class DatabaseSourceKDB(DatabaseSourceTickData):
                     engine('set', np.string_(ticker + '_temp'), df)
 
                     # Do a join of the new data with existing ticker data
-                    engine.sync('`%s upsert %s' % (ticker, ticker + '_temp'))
+                    engine.sendSync('`%s upsert %s' % (ticker, ticker + '_temp'))
 
                     # Store the combined ticker to a given path of folder
-                    engine.sync('`:%s/%s set %s' % (table_name, ticker, ticker))
+                    engine.sendSync('`:%s/%s set %s' % (table_name, ticker, ticker))
 
                 elif if_exists_ticker == 'replace':
                     engine.open()
@@ -3255,8 +3260,8 @@ class DatabaseSourceKDB(DatabaseSourceTickData):
                     # Delete the data for a ticker
                     try:
                         # Load ticker from disk and delete
-                        engine.sync('%s: get `:%s/%s' % (ticker, table_name, ticker))
-                        engine.sync("hdel `%s" % (ticker))
+                        engine.sendSync('%s: get `:%s/%s' % (ticker, table_name, ticker))
+                        engine.sendSync("hdel `%s" % (ticker))
                     except Exception as e:
                         logger.warn("Didn't delete anything from table %s for ticker %s" % (table_name, ticker))
 
@@ -3268,7 +3273,7 @@ class DatabaseSourceKDB(DatabaseSourceTickData):
                     engine('set', np.string_(ticker), df)
 
                     # Persist deleted changes to disk
-                    engine.sync('`:%s/%s set %s' % (table_name, ticker, ticker))
+                    engine.sendSync('`:%s/%s set %s' % (table_name, ticker, ticker))
                 else:
                     logger.info('Nothing written')
 
@@ -3374,9 +3379,11 @@ class DatabaseSourceKDB(DatabaseSourceTickData):
 
         ticker = ticker.replace('-', '_')
 
-        engine.sync('%s: get `:%s/%s' % (ticker, table_name, ticker))
-        df = engine.sync("select from %s where Date within %s %s" % (
+        engine.sendSync('%s: get `:%s/%s' % (ticker, table_name, ticker))
+        df = engine.sendSync("select from %s where Date within %s %s" % (
         ticker, start_date_str, finish_date_str))  # , str(start_date), (finish_date)))  where Date >= %s and Date <= %s
+
+        df = self._stringify_dataframe(df)
 
         try:
             engine.close()
@@ -3418,17 +3425,27 @@ class DatabaseSourceKDB(DatabaseSourceTickData):
 
         try:
             # Get the data for the ticker
-            engine.sync('%s: get `:%s/%s' % (ticker, table_name, ticker))
+            engine.sendSync('%s: get `:%s/%s' % (ticker, table_name, ticker))
 
             # Delete the section between the Dates
-            engine.sync("delete from `%s where Date within %s %s" % (ticker, start_date_str, finish_date_str))
+            engine.sendSync("delete from `%s where Date within %s %s" % (ticker, start_date_str, finish_date_str))
 
             # Persist deleted changes to disk
-            engine.sync('`:%s/%s set %s' % (table_name, ticker, ticker))
+            engine.sendSync('`:%s/%s set %s' % (table_name, ticker, ticker))
         except:
             logger.warn("Error deleting data between " + start_date_str + " " + finish_date_str)
 
         engine.close()
+
+    def _stringify_dataframe(self, df):
+        cols = df.select_dtypes([np.object]).columns
+
+        if cols is not None:
+            if len(cols) > 0:
+                for c in cols:
+                    df[c] = df[c].str.decode('utf-8')
+
+        return df
 
 
 ########################################################################################################################

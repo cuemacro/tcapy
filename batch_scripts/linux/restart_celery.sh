@@ -33,4 +33,4 @@ echo 'Current working folder'
 echo $PWD
 
 echo 'About to start celery...'
-celery -A tcapy.conf.celery_calls worker --purge --discard --loglevel=debug -Q celery --concurrency=12 -f $TCAPY_CUEMACRO/log/celery.log &
+celery -A tcapy.conf.celery_calls worker --purge --discard --loglevel=debug -Q celery --concurrency=$TCAPY_CELERY_WORKERS -f $TCAPY_CUEMACRO/log/celery.log &

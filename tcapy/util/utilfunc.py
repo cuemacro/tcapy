@@ -291,7 +291,7 @@ class UtilFunc(object):
             return data_frame
 
     def write_dataframe_to_binary(self, data_frame, fname, format=constants.binary_default_dump_format):
-        """Writes a DataFrame to disk in HDF5/Paquet format
+        """Writes a DataFrame to disk in Parquet, HDF5, CSV or CSV.GZ format
 
         Parameters
         ----------
@@ -301,39 +301,43 @@ class UtilFunc(object):
         fname : str
             Path of file to be written
 
-        format : str (default: 'hdf5')
-            What is the binary format? ('hdf5' and 'parquet' are supported)
+        format : str (default: 'parquet')
+            What is the format? ('parquet', 'hdf5', 'csv' or 'csv.gz' are supported)
 
         Returns
         -------
 
         """
 
-        # feather is not fully implemented at this stage in tcapy, and not recommended
-        if format == 'parquet':
-            # delete the old copy
-            try:
-                os.remove(fname)
-            except:
-                pass
+        # Try to delete the old copy
+        try:
+            os.remove(fname)
+        except:
+            pass
 
+        # Parquet is preferred
+        if format == 'parquet':
             if data_frame is not None:
                 if not (data_frame.empty):
                     data_frame.to_parquet(fname, compression=constants.parquet_compression)
 
         elif format == 'hdf5':
-            # delete the old copy
-            try:
-                os.remove(fname)
-            except:
-                pass
-
             if data_frame is not None:
                 if not(data_frame.empty):
                     store = pd.HDFStore(fname)
 
                     store.put(key='data', value=data_frame, format='fixed')
                     store.close()
+
+        elif format == 'csv':
+            if data_frame is not None:
+                if not (data_frame.empty):
+                    data_frame.to_csv(fname)
+
+        elif format == 'csv.gz':
+            if data_frame is not None:
+                if not (data_frame.empty):
+                    data_frame.to_csv(fname, compression='gzip')
 
     ####################################################################################################################
 

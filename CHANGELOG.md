@@ -6,6 +6,9 @@
 
 ## Coding log
 
+* 11 April 2020
+    * Bug fixes for Influx download/upload (still need to speed up writing)
+    * KDB fixes for download/upload (with new qPython version)
 * 10 April 2020
     * Bug fixes for MySQL download/upload
     * Bug fixes for saving CacheHandle to VolatileCache

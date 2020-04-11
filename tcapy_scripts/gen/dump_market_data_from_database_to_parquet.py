@@ -19,7 +19,7 @@ constants = Constants()
 
 if __name__ == '__main__':
     # 'arctic' or 'pystore'
-    database_dialect = 'pystore'
+    database_dialect = 'arctic'
 
     # 'dukascopy' or 'ncfx'
     data_vendor = 'dukascopy'
@@ -36,6 +36,8 @@ if __name__ == '__main__':
         from tcapy.data.databasesource import DatabaseSourceArctic as DatabaseSource
     elif database_dialect == 'pystore':
         from tcapy.data.databasesource import DatabaseSourcePyStore as DatabaseSource
+    elif database_dialect == 'influxdb':
+        from tcapy.data.databasesource import DatabaseSourceInfluxDB as DatabaseSource
 
     database_source = DatabaseSource(postfix=data_vendor)
 

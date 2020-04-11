@@ -288,7 +288,6 @@ class BarResultsForm(ResultsForm):
                                              aggregate_by_field=aggregate_by_field,
                                              aggregation_metric=aggregation_metric,
                                              tag_value_combinations=tag_value_combinations)
-
         self._by_date = None
         self._results_form_tag = 'bar'
         self._scalar = scalar
@@ -419,6 +418,7 @@ class JoinTables(object):
         for i in range(0, len(table_list)):
             table = table_list[i]
 
+            # If the table in the output
             if table in df_dict.keys():
                 df = df_dict[table].copy()
 
@@ -427,14 +427,17 @@ class JoinTables(object):
 
                 df = self._util_func.replace_text_in_cols(df, replace_text)
 
+                # Round/multiply elements in the table if requested
                 if df is not None:
                     df = self._time_series_ops.multiply_scalar_dataframe(df, scalar=scalar)
                     df = self._time_series_ops.round_dataframe(df, round_figures_by)
 
                     agg_results.append(df)
             else:
-                logger.warning(table + ' not in TCA output, are you use the dictionary entry is correct?')
+                logger.warning(table + ' not in calculation output, are you use the dictionary entry is correct?')
 
+        # If we've collected the tables, try doing a join on all them
+        # to combine them into one large table
         if agg_results != []:
             if len(agg_results) > 1:
                 df_joined = self._time_series_ops.outer_join(agg_results)

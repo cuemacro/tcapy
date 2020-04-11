@@ -189,8 +189,8 @@ class Constants(object):
         ('All', ['EURUSD', 'GBPUSD', 'AUDUSD', 'NZDUSD', 'USDCAD', 'USDCHF', 'USDJPY', 'AUDJPY', 'NZDCAD', 'AUDSEK', 'EURJPY',
                  'EURSEK', 'SEKJPY', 'GBPSEK', 'USDSEK']),
         ('G10', ['EURUSD', 'GBPUSD', 'AUDUSD', 'NZDUSD', 'USDCAD', 'USDCHF', 'USDJPY', 'AUDJPY', 'NZDCAD', 'AUDSEK', 'EURJPY',
-                 'EURSEK' 'SEKJPY', 'GBPSEK', 'USDSEK']),
-        ('EM', ['USDZAR', 'USDTRY'])
+                 'EURSEK', 'SEKJPY', 'GBPSEK', 'USDSEK']),
+        ('EM',  ['USDZAR', 'USDTRY'])
     ])
 
     test_venues_dictionary = \
@@ -267,10 +267,11 @@ class Constants(object):
     valid_data_stores = ['csv',
                          'mysql',
                          'ms_sql_server',
-                         'arctic-ncfx', 'arctic-dukascopy', 'arctic-testharness',
+                         'sqlite',
+                         'arctic-dukascopy', 'arctic-ncfx', 'arctic-testharness',
                          'pystore-dukascopy', 'pystore-ncfx', 'pystore-testharness',
                          'kdb-testharness',
-                         'influxdb-testharness']
+                         'influxdb-dukasacopy', 'influxdb-ncfx', 'influxdb-testharness']
 
     ##### database configuration #######################################################################################
 
@@ -420,17 +421,18 @@ class Constants(object):
     kdb_port = 5000
     kdb_username = None
     kdb_password = None
-    kdb_market_data_database_table = 'market_data'
+    kdb_market_data_database_table = 'market_data_table'
 
     ### InfluxDB tickers
     influxdb_host = 'localhost'
     influxdb_port = 8086
     influxdb_username = None
     influxdb_password = None
-    influxdb_protocol = 'line'  # 'json' or 'line'
-    influxdb_chunksize = 1000  # Number of records to write at once
+    influxdb_protocol = 'line'      # 'json' or 'line'
+    influxdb_chunksize = 500000     # Number of records to write at once
+    influxdb_time_precision = 'n'   # 'n' for nanosecond
 
-    influxdb_market_data_database_table = 'market_data'
+    influxdb_market_data_database_table = 'market_data_table'
 
     GB = 1073741824  # bytes (do not change)
 
@@ -646,6 +648,7 @@ class Constants(object):
                                         'pystore-dukascopy': self.dukascopy_tickers,
                                         'pystore-testharness': self.test_harness_tickers,
                                         'influxdb-ncfx' : self.ncfx_tickers,
+                                        'influxdb-dukascopy': self.dukascopy_tickers,
                                         'influxdb-testharness' : self.test_harness_tickers,
                                         'kdb-ncfx': self.ncfx_tickers,
                                         'kdb-testharness': self.test_harness_tickers,

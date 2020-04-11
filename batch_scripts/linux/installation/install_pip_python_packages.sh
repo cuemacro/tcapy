@@ -28,7 +28,7 @@ if [ $TCAPY_PYTHON_ENV_TYPE == "virtualenv" ]; then
         mysql-connector-python==8.0.19 \
         IPython==7.13.0 chartpy==0.1.5 findatapy==0.1.10 dash-auth==1.3.1 cufflinks==0.17 plotly_express==0.4.1 \
         dash==1.9.0 dash-html-components==1.0.2 dash-core-components==1.8.1 plotly==4.5.4 dash-table==4.6.1 dtale==1.8.1 \
-        qpython==2.0.0 influxdb==5.2.2 \
+        qpython==2.0.0 influxdb==5.2.3 \
         Flask-Session==0.3.1 \
         celery==4.4.0 pytest-tap kombu==4.6.7 python-memcached==1.59 numba==0.48.0 vispy==0.6.4 jinja2==2.11.1 \
         jupyterlab jupyter_contrib_nbextensions jupyter_nbextensions_configurator RISE bqplot WeasyPrint==51 \
@@ -61,7 +61,7 @@ elif [ $TCAPY_PYTHON_ENV_TYPE == "conda" ]; then
     # to allow celery to use Redis
     pip install mysql-connector-python==8.0.19 chartpy==0.1.5 findatapy==0.1.10 dash-auth==1.3.1 cufflinks==0.17 plotly_express==0.4.1 \
         dash==1.9.0 dash-html-components==1.0.2 dash-core-components==1.8.0 plotly==4.5.4 dash-table==4.6.0 dtale==1.8.1 \
-        qpython==2.0.0 influxdb==5.2.2 \
+        qpython==2.0.0 influxdb==5.2.3 \
         Flask-Session==0.3.1 \
         celery==4.4.0 pytest-tap kombu==4.6.7 python-memcached==1.59 WeasyPrint==51 pystore==0.1.15
 
