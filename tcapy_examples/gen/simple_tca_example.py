@@ -64,7 +64,7 @@ def single_ticker_tca_example():
     # Note: running Orca might not work in WSL, also when generating Plotly charts, might get an error with WSL, if
     # it doesn't have silent_display=True, as it will try to open a web page in a browser (which isn't supported in WSL1
     # but is in WSL2)
-    PLOT = False
+    PLOT = True
 
     # clear entire cache
     # Mediator.get_volatile_cache().clear_cache()
@@ -103,6 +103,11 @@ def single_ticker_tca_example():
                                                                aggregation_metric='sum', scalar=1.0),
 
                                            # Aggregate the average slippage on trades by venue
+                                           HeatmapResultsForm(metric_name=['slippage', 'transient_market_impact'],
+                                                              aggregate_by_field=['venue', 'ticker'], scalar=10000.0,
+                                                              trade_order_list='trade_df'),
+
+                                           # Aggregate the average slippage on trades by venue
                                            BarResultsForm(metric_name='slippage', aggregate_by_field='venue', scalar=10000.0,
                                                           trade_order_list='trade_df'),
 
@@ -128,6 +133,11 @@ def single_ticker_tca_example():
     print(dict_of_df['trade_df'])
 
     print(dict_of_df.keys())
+
+    # Heatmap of slippage and transient market impact broken down by venue and ticker
+    heatmap_slippage_market_impact_df = dict_of_df['heatmap_' + trade_order_type + '_slippage#transient_market_impact_by/mean/venue#ticker']
+
+    print(heatmap_slippage_market_impact_df)
 
     # Average slippage per date/hour
     timeline_slippage_df = dict_of_df['timeline_' + trade_order_type + '_slippage_by/mean_datehour/all']

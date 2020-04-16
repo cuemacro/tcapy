@@ -13,8 +13,8 @@ source $SCRIPT_FOLDER/set_tcapy_env_vars.sh
 cd $TCAPY_CUEMACRO
 
 # Get orca from Plotly
-wget https://github.com/plotly/orca/releases/download/v1.2.1/orca-1.2.1-x86_64.AppImage
+wget https://github.com/plotly/orca/releases/download/v1.3.1/orca-1.3.1-x86_64.AppImage
 
-chmod +x orca-1.2.1-x86_64.AppImage
+chmod +x orca-1.3.1-x86_64.AppImage
 
-ln -s $TCAPY_CUEMACRO/orca-1.2.1-x86_64.AppImage /usr/bin/orca
+ln -s $TCAPY_CUEMACRO/orca-1.3.1-x86_64.AppImage /usr/bin/orca

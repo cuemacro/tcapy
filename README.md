@@ -102,11 +102,16 @@ supported it is possible to write an adapter for it.
 
 # How do you use tcapy?
 
-There are three ways to use tcapy, which are:
+There are four ways to use tcapy, which are:
 
 * Via web GUI, built with Dash
 * Programmatically
+* Via Excel spreadsheet via xlwings (see example spreadsheet [here](tcapy/excel/tcapy_xl.xlsm))
 * Via RESTful API (very basic functionality at present)
+
+Below we have a montage illustrating some of the ways you can interact with tcapy out-of-the-box!
+
+<img src="img/tcapy_montage.png?raw=true" width="750"/>
 
 # Jupyter notebook to show how to use tcpay
 
@@ -114,8 +119,10 @@ There are three ways to use tcapy, which are:
 and gives many examples of how to call it programmatically
 * [Compliance and other more involved TCA calculations](tcapy_notebooks/compliance_tca_calculations) - how to do 
 TCA calculations for compliance and other more involved use cases
-* [Populating databases for tcpay](tcapy_notebooks/populating_databases_for_tcapy.ipynb) - how to 
+* [Populating databases for tcapy](tcapy_notebooks/populating_databases_for_tcapy.ipynb) - how to 
 populate your trade/order (MySQL/SQLite/Microsoft SQL Server) and market data databases (Arctic/MongoDB/PyStore)
+* [Excel/xlwings with tcapy](tcapy_notebooks/excel_xlwings_with_tcapy.ipynb) - how to run tcapy from Excel
+with xlwings, with a demo spreadsheet
 
 A few things to note:
 
@@ -135,7 +142,7 @@ computation it uses Celery. Hence if we ask for TCA to be performed on multiple 
 pick up the task from the message broker (Redis) and will return the final results to the results backend (Memcached). 
 
 There is also extensive caching of trade and market data used internally with Redis, so it doesn't repeatedly hit the 
-database, which can be slow. 
+database, which can be slow particularly if you are using over a network with a lot of latency.
 
 # Contributors
 

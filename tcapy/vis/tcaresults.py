@@ -46,6 +46,7 @@ class TCAResults(ComputationResults):
             bar_charts = {}
             dist_charts = {}
             scatter_charts = {}
+            heatmap_charts = {}
             styled_tables = {}
             styled_join_tables = {}
 
@@ -93,6 +94,12 @@ class TCAResults(ComputationResults):
                                                         scatter_fields=tag_dict['scatter_fields'],
                                                         width=self._chart_width, height=self._chart_height)
 
+            # heatmap charts
+            for h in self._util_func.dict_key_list(self.heatmap.keys()):
+                title = self._prettify_title(h)
+                heatmap_charts[b] = self._plot_render.plot_heatmap(heatmap_df=self.heatmap[h], title=title,
+                                                        width=self._chart_width, height=self._chart_height)
+
 
             # styled tables
             for t in self._util_func.dict_key_list(self.table.keys()):
@@ -107,6 +114,7 @@ class TCAResults(ComputationResults):
             self.bar_charts = bar_charts
             self.dist_charts = dist_charts
             self.scatter_charts = scatter_charts
+            self.heatmap_charts = heatmap_charts
             self.styled_tables = styled_tables
             self.styled_join_tables = styled_join_tables
 
@@ -119,6 +127,7 @@ class TCAResults(ComputationResults):
 
         title = title.replace('_', ' ')
         title = title.capitalize()
+        title = title.replace('#', ' & ')
 
         # Make case of assets same as tickers
         tickers = constants.available_tickers_dictionary['All'].copy()
@@ -196,6 +205,8 @@ class TCAResults(ComputationResults):
         sparse_market = DataFrames with a mixture of market data/trade/order data
         bar = DataFrames with bar chart style data
         dist = DataFrames with distribution style data
+        heatmap = DataFrame with heatmap style data
+        scatter = DataFrames with scatter chart style data
         table = DataFrames intended to be displayed as tables
         market = DataFrames with high frequency tick market data
         jointables = DataFrames intended to be displayed as tables
@@ -227,6 +238,7 @@ class TCAResults(ComputationResults):
         bar = {}
         dist = {}
         scatter = {}
+        heatmap = {}
         table = {}
         market = {}
         join_tables = {}
@@ -262,6 +274,11 @@ class TCAResults(ComputationResults):
 
                 simpler_d = d.replace('scatter_', '')
                 scatter[simpler_d] = dict_of_df[d]
+
+            elif d.find('heatmap_') == 0:
+
+                simpler_d = d.replace('heatmap_', '')
+                heatmap[simpler_d] = dict_of_df[d]
                 
             elif d.find('jointables_') == 0:
 
@@ -312,6 +329,7 @@ class TCAResults(ComputationResults):
         self.bar = bar
         self.dist = dist
         self.scatter = scatter
+        self.heatmap = heatmap
         self.table = table
         self.join_tables = join_tables
         self.market = market
@@ -396,6 +414,14 @@ class TCAResults(ComputationResults):
         self.__scatter = scatter
         
     @property
+    def heatmap(self):
+        return self.__heatmap
+
+    @heatmap.setter
+    def heatmap(self, heatmap):
+        self.__heatmap = heatmap
+        
+    @property
     def table(self):
         return self.__table
 
@@ -452,6 +478,14 @@ class TCAResults(ComputationResults):
     @scatter_charts.setter
     def scatter_charts(self, scatter_charts):
         self.__scatter_charts = scatter_charts
+        
+    @property
+    def heatmap_charts(self):
+        return self.__heatmap_charts
+
+    @heatmap_charts.setter
+    def heatmap_charts(self, heatmap_charts):
+        self.__heatmap_charts = heatmap_charts
 
     @property
     def candlestick_charts(self):

@@ -54,6 +54,9 @@ class TCAReport(ComputationReport):
         # Generate the HTML for all the scatter charts
         charts_dict['Scatter charts'] = self._create_chart_html(self._computation_results.scatter_charts, embed_chart=embed_chart)
 
+        # Generate the HTML for all the scatter charts
+        charts_dict['Heatmap charts'] = self._create_chart_html(self._computation_results.heatmap_charts, embed_chart=embed_chart)
+
         # Include the HTML for tables
         tables_dict['Tables'] = self._create_table_html(self._computation_results.styled_tables)
 

@@ -12,9 +12,11 @@ fi
 echo 'Activating Python environment' $TCAPY_PYTHON_ENV '... and adding tcapy to PYTHONPATH' $TCAPY_CUEMACRO
 export PYTHONPATH=$TCAPY_CUEMACRO/:$PYTHONPATH
 
-if [ "$TCAPY_PYTHON_ENV_TYPE" == "conda" ]; then
+if [ $TCAPY_PYTHON_ENV_TYPE == "conda" ]; then
+    echo 'Python env type' $TCAPY_PYTHON_ENV_TYPE 'and' $CONDA_ACTIVATE
     source $CONDA_ACTIVATE
     source activate $TCAPY_PYTHON_ENV
-elif [ "$TCAPY_PYTHON_ENV_TYPE" == "virtualenv" ]; then
+elif [ $TCAPY_PYTHON_ENV_TYPE == "virtualenv" ]; then
+    echo 'Python env type ' $TCAPY_PYTHON_ENV_TYPE
     source $TCAPY_PYTHON_ENV/bin/activate
 fi

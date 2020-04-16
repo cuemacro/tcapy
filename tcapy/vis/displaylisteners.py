@@ -313,6 +313,41 @@ class DisplayListeners(object):
 
         return callback
 
+    def plot_heatmap(self, trade_order, trade_order_tag, tca_type):
+        """Fetches DataFrame to be displayed as a heatmap chart.
+
+        Parameters
+        ----------
+        trade_order : str
+            Which trade/order to focus on (eg. 'execution-by-ticker)
+
+        trade_order_tag : str
+            DataFrame tag to fetch (eg. 'bar_trade_df_by_ticker)
+
+        tca_type : str
+            Type of TCA (eg. 'detailed)
+
+        Returns
+        -------
+        plotly.Fig
+        """
+
+        # Callback triggered by Dash application
+        def callback(_):
+            # make sure all the parameters have been selected
+            if self._session_manager.check_session_reset_tag('redraw-' + tca_type + '-' + trade_order + '-heatamp-plot'):
+                key, _, _, _, _ = self._create_df_dictionary_key(trade_order_tag)
+
+                # print(key)
+
+                return self._plot_render.plot_heatmap(
+                    title=self._session_manager.get_session_flag(tca_type + '-title'),
+                    bar_df=self._tca_caller.get_cached_computation_analysis(key=key))
+
+            raise dash.exceptions.PreventUpdate("No data changed - heatmap") # not very elegant but only way to prevent plots disappearing
+
+        return callback
+
     def plot_timeline(self, trade_order, trade_order_tag, tca_type):
         """Timeline to be fetched from the cache and plotted relating to a particular type of analysis on a trade/order,
         using a PlotRender object.
@@ -631,6 +666,16 @@ class DisplayListeners(object):
                         callback_manager.output_callback(p, t + '-scatter-plot'),
                         callback_manager.input_callback(p, 'status')
                     )(self.plot_scatter(t, layout.id_flags[key][t], p))
+
+            ## Heatmap plots
+            key = p + '_heatmap_trade_order'
+
+            if key in self._util_func.dict_key_list(layout.id_flags.keys()):
+                for t in self._util_func.dict_key_list(layout.id_flags[key].keys()):
+                    app.callback(
+                        callback_manager.output_callback(p, t + '-heatmap-plot'),
+                        callback_manager.input_callback(p, 'status')
+                    )(self.plot_heatmap(t, layout.id_flags[key][t], p))
 
             ## Markout tables
             key = p + '_table_trade_order'
@@ -1001,9 +1046,37 @@ class PlotRender(object):
                       plotly_plot_mode=constants.plotly_plot_mode, width=width,
                       height=height, scale_factor=final_scale_factor, plotly_webgl=constants.plotly_webgl)
 
-        plot = self._chart.plot(bar_df, style=style)
+        return self._chart.plot(bar_df, style=style)
 
-        return plot
+    def plot_heatmap(self, heatmap_df=None, title=None, width=constants.chart_width, height=constants.chart_height):
+        """Plots a heatmap chart as a plotly Fig object
+
+        Parameters
+        ----------
+        bar_df : DataFrame
+            Data to be plotted as a bar chart
+
+        title : str
+            Title of the chart
+
+        width : int
+            Width of plot
+
+        height : int
+            Height of plot
+
+        Returns
+        -------
+        plotly.Fig
+        """
+
+        self._check_empty(heatmap_df)
+
+        style = Style(title=title, chart_type='heatmap',
+                      plotly_plot_mode=constants.plotly_plot_mode, width=width,
+                      height=height, scale_factor=final_scale_factor, plotly_webgl=constants.plotly_webgl)
+
+        return self._chart.plot(heatmap_df, style=style)
 
     def plot_dist(self, dist_df=None, metric=None, title=None, split_by='all', ticker=None, width=constants.chart_width,
                   height=constants.chart_height):
@@ -1076,7 +1149,7 @@ class PlotRender(object):
                 hist_label = 'Histogram: ' + ticker
 
                 # Only select those PDF and histogram columns which are present
-                # will not always have both buy and sell trades in the same sample)
+                # will not always have both buy and sell trades in the same sample
                 cols_plot = []
                 color = [];
                 # x_y_line = [];
@@ -1085,8 +1158,8 @@ class PlotRender(object):
                 chart_type = []
 
                 col_labels = [-1, 1]
-
                 col_color = {-1: 'red', 1: 'green'}
+
                 # dash_type = {'Norm-PDF: ' + ticker: 'line', 'KDE-PDF: ' + ticker: 'dash'}
                 dash_type = {'Norm-PDF:': 'line', 'KDE-PDF:': 'dash'}
 
@@ -1106,7 +1179,7 @@ class PlotRender(object):
                                 chart_type.append(dash_type[pdf_label]);
                                 linewidth.append(1)
 
-                        # histogram plots properties
+                        # Histogram plots properties
                         hist = hist_label + ' ' + str(col)
 
                         if hist in dist_df.columns:
@@ -1149,7 +1222,7 @@ class PlotRender(object):
 
     def plot_scatter(self, scatter_df=None, title=None, scatter_fields=None, width=constants.chart_width,
                   height=constants.chart_height):
-        """
+        """Plots a scatter chart, returning a Plotly Fig object
 
         Parameters
         ----------
@@ -1170,7 +1243,7 @@ class PlotRender(object):
 
         Returns
         -------
-
+        plotly.Fig
         """
 
         if title is None:
@@ -1184,9 +1257,7 @@ class PlotRender(object):
                         plotly_plot_mode=constants.plotly_plot_mode, width=width,
                         height=height, scale_factor=final_scale_factor, plotly_webgl=constants.plotly_webgl)
 
-        plot = self._chart.plot(scatter_df, style=style)
-
-        return plot
+        return self._chart.plot(scatter_df, style=style)
 
 
     def generate_candlesticks(self, market_downsampled_df, chart_type=constants.chart_type_candlesticks):
@@ -1317,7 +1388,6 @@ class PlotRender(object):
                 df_html = df_html.replace(' class="dataframe"', '')
                 df_html = df_html.replace('000+00:00', '')
                 df_html = df_html.replace('NaN', '')
-
 
                 return html.Iframe(srcDoc=df_html, width="975px", height="300px", sandbox='',
                                    style={'border': 'thin lightgrey solid', 'padding': '0', 'margin' : '0'},)

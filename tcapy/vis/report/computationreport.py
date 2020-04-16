@@ -20,6 +20,8 @@ from jinja2 import Environment, FileSystemLoader
 
 from chartpy import Canvas, Chart, Style
 
+import plotly.graph_objs as go
+
 from tcapy.conf.constants import Constants
 from tcapy.util.utilfunc import UtilFunc
 
@@ -66,7 +68,8 @@ class Renderer(object):
         """
         pass
 
-    def write_html_pdf(self, html, output_filename=None, output_format='html', pdf_converter='weasyprint', stylesheets=None):
+    def write_presentation_output(self, html, output_filename=None, output_format='html', pdf_converter='weasyprint',
+                                  stylesheets=None):
         """Writes HTML/PDF to disk and also returns the HTML/PDF as a string so it can be consumed elsewhere
 
         Parameters
@@ -150,7 +153,8 @@ class CanvasRenderer(Renderer):
 
         # Taking HTML as input write to disk as HTML file (or PDF), and return the binary representation (which can
         # be more easily handled by eg. a web server)
-        return self.write_html_pdf(html, output_filename=output_filename, output_format=output_format, pdf_converter=pdf_converter)
+        return self.write_presentation_output(html, output_filename=output_filename, output_format=output_format,
+                                              pdf_converter=pdf_converter)
 
 class JinjaRenderer(Renderer):
     """Uses Jinja HTML templates to create HTML reports and WeasyPrint to convert them into PDFs
@@ -195,8 +199,75 @@ class JinjaRenderer(Renderer):
 
         # Taking HTML as input write to disk as HTML file (or PDF), and return the binary representation (which can
         # be more easily handled by eg. a web server)
-        return self.write_html_pdf(html, output_filename=output_filename, output_format=output_format,
-                                   pdf_converter=pdf_converter)
+        return self.write_presentation_output(html, output_filename=output_filename, output_format=output_format,
+                                              pdf_converter=pdf_converter)
+
+class XlWingsRenderer(Renderer):
+    """Uses xlwings to add the report to a live Excel sheet
+
+    """
+
+    def __init__(self, xlwings_sht=None):
+        super(XlWingsRenderer, self).__init__()
+        self._xlwings_sht = xlwings_sht
+
+    def render_elements(self, elements_to_render_dict, title=None, output_filename=None, output_format='xlwings',
+                        extra_head_code=None):
+
+        if output_format not in ['xlwings']:
+            raise Exception("Invalid output format selected")
+
+        from xlwings.constants import InsertShiftDirection
+
+        # Clear the TCA properties and also any charts below that
+        self._xlwings_sht.range('listpoints').clear_contents()
+        self._xlwings_sht.range("A" + str(constants.chart_xlwings_listpoints_row) + ":Z4000")\
+            .api.Insert(InsertShiftDirection.xlShiftDown)
+
+        # Start putting the TCA properties in this row onwards
+        row = constants.chart_xlwings_listpoints_row
+
+        # listpoints
+        for pts in elements_to_render_dict['listpoints'].keys():
+            val = elements_to_render_dict['listpoints'][pts]
+
+            self._xlwings_sht.range('B' + str(row)).value = pts
+            self._xlwings_sht.range('C' + str(row)).value = val
+
+            row = row + 1
+
+        # create a gap to the next charts
+        row = (constants.chart_xlwings_top_row) * constants.chart_xlwings_row_height
+        top = 12 * constants.chart_xlwings_row_height + row
+        left = 50
+
+        timestamp = str(datetime.datetime.now()).replace(':', '-').replace(' ', '-').replace(".", "-")
+        filename = "fig_tcapy" + timestamp + ".png"
+
+        # charts
+        for c in elements_to_render_dict['charts'].keys():
+
+            # Eg. 'Heatmap charts'
+            mini_charts = elements_to_render_dict['charts'][c]
+
+            for m in mini_charts:
+                for n in m:
+                    if isinstance(n, go.Figure):
+                        n.write_image(filename)
+                        self._xlwings_sht.pictures.add(filename, top=top, left=left,
+                                                       width=constants.chart_xlwings_report_width,
+                                                       height=constants.chart_xlwings_report_height)
+
+                        top = top + constants.chart_xlwings_report_height \
+                              + constants.chart_xlwings_vertical_gap
+
+        try:
+            os.remove(filename)
+        except:
+            pass
+
+        # tables
+        # TODO
 
 class ComputationReport(ABC):
     """Converts ComputationResults (largely consisting of Plotly based Figures and HTML tables) into self contained HTML pages.
@@ -264,6 +335,8 @@ class ComputationReport(ABC):
         elif output_format == 'pdf':
             # For PDFs we need to create static SVGs of plotly charts
             embed_chart = 'offline_image_svg_in_html'
+        elif output_format == 'xlwings':
+            embed_chart = 'leave_as_fig'
 
         # Get a list of the HTML to render
         elements_to_render_dict = self._layout_computation_results_to_html(embed_chart)
@@ -351,7 +424,11 @@ class ComputationReport(ABC):
             except:
                 pass
 
-            html_output.append([self._chart.plot(chart[c], style=style)])
+            if embed_chart == 'leave_as_fig':
+                html_output.append([chart[c]])
+            else:
+                html_output.append([self._chart.plot(chart[c], style=style)])
+
 
         return html_output
 

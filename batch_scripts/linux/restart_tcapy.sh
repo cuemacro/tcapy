@@ -13,6 +13,9 @@
 export SCRIPT_FOLDER="$( dirname "$(readlink -f -- "$0")" )"
 source $SCRIPT_FOLDER/installation/set_tcapy_env_vars.sh
 
+# Set Python environment
+source $SCRIPT_FOLDER/installation/activate_python_environment.sh
+
 echo 'Batch folder' $SCRIPT_FOLDER
 echo 'Cuemacro TCAPY' $TCAPY_CUEMACRO
 
@@ -26,9 +29,6 @@ sudo killall apache2
 
 # Make sure permissions set properly
 sudo setenforce 0
-
-# Set Python environment
-source $SCRIPT_FOLDER/installation/activate_python_environment.sh
 
 # Create log folder (if it doesn't exist already)
 mkdir -p $TCAPY_CUEMACRO/log/

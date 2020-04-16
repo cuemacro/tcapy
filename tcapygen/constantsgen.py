@@ -101,6 +101,16 @@ class ConstantsGen(object):
     chart_report_width = 600
     chart_report_height = 400
 
+    # Default setting for xlwings charts we use to create reports (should generally be smaller)
+    # Note, depending on your version of Excel, these sizes/distances may need to be adjusted
+    chart_xlwings_report_width = chart_report_width * (2/3)
+    chart_xlwings_report_height = chart_report_height * (2/3)
+
+    chart_xlwings_listpoints_row = 12
+    chart_xlwings_top_row = 44
+    chart_xlwings_row_height = 12.25
+    chart_xlwings_vertical_gap = 75
+
     ########## PLOTLY SETTINGS
     plotly_world_readable = False
     plotly_sharing = 'private'

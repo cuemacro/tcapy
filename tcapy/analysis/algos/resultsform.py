@@ -247,31 +247,32 @@ class DistResultsForm(ResultsForm):
         trade_order_df = self._trade_order_filter_tag.filter_trade_order(trade_order_df,
                                                                          tag_value_combinations=tag_value_combinations)
 
-        if metric_name not in trade_order_df.columns: return [None]
-
         if weighting_field is not None and weighting_field not in trade_order_df.columns: return [None]
-
-        if filter_nan:
-            trade_order_df = trade_order_df.dropna(subset=[metric_name])
 
         if not (isinstance(aggregate_by_field, list)): aggregate_by_field = [aggregate_by_field]
         if not (isinstance(metric_name, list)): metric_name = [metric_name]
+
+        if filter_nan:
+            trade_order_df = trade_order_df.dropna(subset=metric_name)
 
         results = []
 
         # Go through all the fields we want to aggregate by (and all the metrics)
         for agg in aggregate_by_field:
             for met in metric_name:
-                results_df = None
+                if met not in trade_order_df.columns:
+                    results.append(None)
+                else:
+                    results_df = None
 
-                if trade_order_df is not None:
-                    results_df = self._results_summary.field_distribution(
-                        trade_order_df, market_df=market_df, postfix_label=ticker, pdf_only=True,
-                        weighting_field=weighting_field, aggregate_by_field=agg, metric_name=met, scalar=scalar)
+                    if trade_order_df is not None:
+                        results_df = self._results_summary.field_distribution(
+                            trade_order_df, market_df=market_df, postfix_label=ticker, pdf_only=True,
+                            weighting_field=weighting_field, aggregate_by_field=agg, metric_name=met, scalar=scalar)
 
-                if agg is None: agg = 'all'
+                    if agg is None: agg = 'all'
 
-                results.append((results_df, 'dist_' + trade_order_name + '_' + met + '_by/pdf/' + str(agg)))
+                    results.append((results_df, 'dist_' + trade_order_name + '_' + met + '_by/pdf/' + str(agg)))
 
         return results
 
@@ -283,7 +284,7 @@ class BarResultsForm(ResultsForm):
 
     def __init__(self, trade_order_list=None, metric_name=None, aggregate_by_field=None, aggregation_metric='mean',
                  tag_value_combinations={}, scalar=1.0, round_figures_by=None,
-                 weighting_field=constants.pdf_weighting_field):
+                 weighting_field=constants.pdf_weighting_field, combine_df=False):
         super(BarResultsForm, self).__init__(trade_order_list=trade_order_list, metric_name=metric_name,
                                              aggregate_by_field=aggregate_by_field,
                                              aggregation_metric=aggregation_metric,
@@ -293,6 +294,7 @@ class BarResultsForm(ResultsForm):
         self._scalar = scalar
         self._round_figures_by = round_figures_by
         self._weighting_field = weighting_field
+        self._combine_df = combine_df
 
     def aggregate_results(self, trade_order_df=None, market_df=None, trade_order_name=None, metric_name=None,
                           ticker=None, aggregate_by_field=None,
@@ -311,41 +313,45 @@ class BarResultsForm(ResultsForm):
         trade_order_df = self._trade_order_filter_tag.filter_trade_order(trade_order_df,
                                                                          tag_value_combinations=tag_value_combinations)
 
-        if metric_name not in trade_order_df.columns: return [None]
-
         if weighting_field is not None and weighting_field not in trade_order_df.columns: return [None]
-
-        if filter_nan:
-            trade_order_df = trade_order_df.dropna(subset=[metric_name])
 
         if not (isinstance(aggregate_by_field, list)): aggregate_by_field = [aggregate_by_field]
         if not (isinstance(metric_name, list)): metric_name = [metric_name]
+
+        if filter_nan:
+            trade_order_df = trade_order_df.dropna(subset=metric_name)
 
         results = []
 
         # Go through all the fields we want to aggregate by (and all the metrics)
         for agg in aggregate_by_field:
             for met in metric_name:
-                results_df = self._results_summary.field_bucketing(trade_order_df, metric_name=met,
-                                                                   aggregate_by_field=agg,
-                                                                   aggregation_metric=aggregation_metric,
-                                                                   weighting_field=weighting_field,
-                                                                   by_date=self._by_date) * scalar
-
-                results_df = self._time_series_ops.round_dataframe(results_df, round_figures_by)
-
-                if agg is None: agg = 'all'
-
-                results_df  = self._rename_columns(results_df, met)
-
-                if self._by_date is None:
-                    results.append(
-                        (results_df, self._results_form_tag + '_' + trade_order_name + '_' + met + '_by/'
-                         + aggregation_metric + '/' + str(agg)))
+                if met not in trade_order_df.columns:
+                    results.append(None)
                 else:
-                    results.append(
-                        (results_df, self._results_form_tag + '_' + trade_order_name + '_' + met + '_by/'
-                         + aggregation_metric + '_' + self._by_date + '/' + str(agg)))
+                    results_df = self._results_summary.field_bucketing(trade_order_df, metric_name=met,
+                                                                       aggregate_by_field=agg,
+                                                                       aggregation_metric=aggregation_metric,
+                                                                       weighting_field=weighting_field,
+                                                                       by_date=self._by_date) * scalar
+
+                    results_df = self._time_series_ops.round_dataframe(results_df, round_figures_by)
+
+                    if agg is None: agg = 'all'
+
+                    results_df = self._rename_columns(results_df, met)
+
+                    if self._by_date is None:
+                        results.append(
+                            (results_df, self._results_form_tag + '_' + trade_order_name + '_' + met + '_by/'
+                             + aggregation_metric + '/' + str(agg)))
+                    else:
+                        results.append(
+                            (results_df, self._results_form_tag + '_' + trade_order_name + '_' + met + '_by/'
+                             + aggregation_metric + '_' + self._by_date + '/' + str(agg)))
+
+        if self._combine_df:
+            results = self._summarize_df(results, trade_order_name, metric_name, aggregation_metric, aggregate_by_field)
 
         return results
 
@@ -355,27 +361,80 @@ class BarResultsForm(ResultsForm):
 
         return df
 
+    def _summarize_df(self, results, trade_order_name, metric_name, aggregation_metric, aggregate_by_field):
+
+        results = [r[0] for r in results]
+
+        if self._by_date is None:
+            tag = self._results_form_tag + '_' + trade_order_name + '_' + '#'.join(metric_name) + '_by/' \
+                  + aggregation_metric + '/' + '#'.join(aggregate_by_field)
+        else:
+            tag = self._results_form_tag + '_' + trade_order_name + '_' + '#'.join(metric_name) + '_by/' \
+                  + aggregation_metric + '_' + self._by_date + '/' + '#'.join(aggregate_by_field)
+
+        if len(results) <= 1:
+            return [(results, tag)]
+
+        df_indices = []
+
+        # Aggregate all the DataFrames into one (careful to append down for where there's a common metric, right
+        # where there's not)
+        for m in metric_name:
+            df_list = []
+
+            for df in results:
+                if df is not None:
+                    df.index.name = None
+
+                    if m in df.columns:
+                        df_list.append(df)
+
+            df_indices.append(pd.concat(df_list, axis=0))
+
+        return [(pd.concat(df_indices, axis=1), tag)]
+
 class TimelineResultsForm(BarResultsForm):
     """Takes in trade/orders and then creates aggregated metrics which are liked to be displayed as a timeline
 
     """
     def __init__(self, trade_order_list=None, metric_name=None, aggregate_by_field=None, aggregation_metric='mean',
                  tag_value_combinations={}, by_date='date', round_figures_by=None,
-                 weighting_field=constants.pdf_weighting_field, scalar=1.0):
+                 weighting_field=constants.pdf_weighting_field, scalar=1.0, combine_df=False):
         super(TimelineResultsForm, self).__init__(trade_order_list=trade_order_list, metric_name=metric_name,
                                                   aggregate_by_field=aggregate_by_field,
                                                   aggregation_metric=aggregation_metric,
                                                   tag_value_combinations=tag_value_combinations,
                                                   round_figures_by=round_figures_by,
-                                                  scalar=scalar)
+                                                  scalar=scalar, weighting_field=weighting_field, combine_df=combine_df)
 
         self._by_date = by_date
         self._results_form_tag = 'timeline'
-        self._weighting_field = weighting_field
 
     def _rename_columns(self, df, index_name):
         df.columns = [str(r) + '' for r in df.columns]
         df.index.name = 'Date'
+
+        return df
+
+class HeatmapResultsForm(BarResultsForm):
+    """Takes in trade/orders and then creates aggregated metrics which are likely to be displayed in a heatmap
+
+    """
+    def __init__(self, trade_order_list=None, metric_name=None, aggregate_by_field=None, aggregation_metric='mean',
+                 tag_value_combinations={}, by_date=None, round_figures_by=None,
+                 weighting_field=constants.pdf_weighting_field, scalar=1.0, combine_df=True):
+        super(HeatmapResultsForm, self).__init__(trade_order_list=trade_order_list, metric_name=metric_name,
+                                                  aggregate_by_field=aggregate_by_field,
+                                                  aggregation_metric=aggregation_metric,
+                                                  tag_value_combinations=tag_value_combinations,
+                                                  round_figures_by=round_figures_by,
+                                                  scalar=scalar, weighting_field=weighting_field,
+                                                  combine_df=combine_df)
+        self._results_form_tag = 'heatmap'
+        self._by_date = by_date
+
+    def _rename_columns(self, df, index_name):
+        df.columns = [index_name for r in df.columns]
 
         return df
 

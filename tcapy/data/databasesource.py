@@ -3077,15 +3077,21 @@ class DatabaseSourceInfluxDB(DatabaseSourceTickData):
 class DatabaseSourceKDB(DatabaseSourceTickData):
     """Wrapper for KDB access for tick data. Note, that minimal computations are done inside KDB, this mostly reads/writes
     tick data with KDB. Assumes that we store data on disk for each ticker in a single file under the folder for table_name,
-    ie. table_name/ticker. Uses qPython for interacting with KDB database and return_cache_handles are the conversions back and forth
-    between pandas data types and KDB data types.
+    ie. table_name/ticker, under the environment variable location KDB_HOME (or if not set will be in the current directory).
+
+    Uses qPython for interacting with KDB database and handles all the conversions back and forth between pandas data
+    types and KDB data types.
 
     The newer PyQ library is also available for interacting with KDB, but is trickier to install and is not supported
     yet by tcapy.
 
-    KDB supports many different schemes for data storage, including splaying columns in different files, or for very
-    high frequency data, we can store the data in different files for each day. If you choose a more complicated disk storage
-    method for your tick data, you will likely need to edit some of the KDB code).
+    KDB supports many different schemes for data storage, including
+    * binary files - single files for "small" number of records, eg. up to a few million rows (implemented by KDB)
+    * splaying files - columns in different files
+    * partitioned files - for very high frequency data (eg for each day).
+
+    If you choose to use splaying/partitioned files, you will need to rewrite the code method for your tick data, you
+    will likely need to edit some of the KDB code).
 
     Install KDB using instructions from https://code.kx.com/q/tutorials/install/linux/
 
@@ -3233,9 +3239,8 @@ class DatabaseSourceKDB(DatabaseSourceTickData):
 
                         if temp_df is not None:
                             if not (temp_df.empty):
-                                err_msg = "tcapy doesn't allow KDB to append overlapping data for " + ticker + " in " + table_name + ". " \
-                                                                                                                                     "Has data between " + str(
-                                    df.index[0]) + ' - ' + str(df.index[-1])
+                                err_msg = "tcapy doesn't allow KDB to append overlapping data for " + ticker + " in " \
+                                    + table_name + ". Has data between " + str(df.index[0]) + ' - ' + str(df.index[-1])
 
                                 logger.error(err_msg)
 

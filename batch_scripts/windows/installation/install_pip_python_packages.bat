@@ -21,7 +21,7 @@ if %TCAPY_PYTHON_ENV_TYPE%==virtualenv (
         pyodbc==4.0.23 ^
         pytest==5.1.0 pytest-cov==2.5.1 ^
         mysql-connector-python==8.0.19 ^
-        chartpy==0.1.5 findatapy==0.1.10 IPython==7.13.0 dash-auth==1.3.2 cufflinks==0.17 plotly_express==0.4.1 dash-auth==1.3.2 ^
+        chartpy==0.1.5 findatapy==0.1.11 IPython==7.13.0 dash-auth==1.3.2 cufflinks==0.17 plotly_express==0.4.1 dash-auth==1.3.2 ^
         dash==1.8.0 dash-html-components==1.0.2 dash-core-components==1.7.0 plotly==4.5.0 dash-table==4.6.0 dtale==1.8.1 ^
         qpython==2.0.0 influxdb==5.2.3 ^
         Flask-Session==0.3.1 ^
@@ -50,14 +50,15 @@ if %TCAPY_PYTHON_ENV_TYPE%==conda (
         jupyterlab jupyter_contrib_nbextensions jupyter_nbextensions_configurator nodejs rise bqplot ^
         dask=2.14.0 distributed=2.14.0 cloudpickle=1.3.0 python-snappy=0.5.4 bokeh=2.0.1 msgpack-python=1.0.0 --yes
 
+    Rem  # was 1.16.4
     REM Install charting libraries for flash recording of session variables to allow celery to use Redis
-    call pip install mysql-connector-python==8.0.19 chartpy==0.1.5 findatapy==0.1.10 cufflinks==0.17 plotly_express==0.4.1 dash-auth==1.3.2 ^
+    call pip install mysql-connector-python==8.0.19 chartpy==0.1.5 findatapy==0.1.11 cufflinks==0.17 plotly_express==0.4.1 dash-auth==1.3.2 ^
       dash==1.8.0 dash-html-components==1.0.2 dash-core-components==1.7.0 plotly==4.5.0 dash-table==4.6.0 dtale==1.8.1 ^
       qpython==2.0.0 influxdb==5.2.3 ^
       Flask-Session==0.3.1 ^
-      celery==4.4.0 msgpack-python pytest-tap kombu==4.6.7 python-memcached==1.59 boto3==1.5.11 pdfkit==0.6.1 WeasyPrint==51 pystore==0.1.15
+      celery==4.4.0 pytest-tap kombu==4.6.7 python-memcached==1.59 boto3==1.5.11 pdfkit==0.6.1 WeasyPrint==51 pystore==0.1.15
 
     REM celery[redis]==4.1.1 celery[msgpack]==4.1.1
     REM to allow printing of Plotly to PDF
-    call conda install -c plotly plotly-orca=1.2.1 --yes
+    call conda install -c plotly plotly-orca=1.3.1 --yes
 )

@@ -21,3 +21,6 @@ set TCAPY_PYTHON_ENV_BIN=%TCAPY_PYTHON_ENV%\bin\
 
 REM Only Python 3 is now supported
 set TCAPY_PYTHON_VERSION=3
+
+REM for using Excel/xlwings front end for tcapy
+set EXCEL_PATH="C:\Program Files\Microsoft Office\root\Office16\EXCEL.EXE"

@@ -6,6 +6,10 @@
 
 ## Coding log
 
+* 16 April 2020
+    * Added Excel addin/spreadsheet to use tcapy (with xlwings)
+    * Adding heatmaps (allowing for multiple metrics/breakdowns)
+    * Updated Python dependencies
 * 11 April 2020
     * Bug fixes for Influx download/upload (still need to speed up writing)
     * KDB fixes for download/upload (with new qPython version)

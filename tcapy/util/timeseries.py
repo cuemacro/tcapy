@@ -407,16 +407,20 @@ class TimeSeriesOps(object):
         return indices
 
     def outer_join(self, df_list):
-        """Does an outer join of a list of DataFrames, into a single DataFrame
+        """Does an outer join of a list of DataFrames, into a single DataFrame, can also
 
         Parameters
         ----------
         df_list : DataFrame (list)
             Data sets to be joined
 
+        smart_join : bool (default: False)
+            As opposed to doing an outer join, concats or joins the DataFrames, depending on whether columns/indices
+            are the same
+
         Returns
         -------
-        DataFrames
+        DataFrame
         """
         if df_list is None: return None
 
