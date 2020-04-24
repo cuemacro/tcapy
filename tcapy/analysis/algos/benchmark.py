@@ -391,7 +391,7 @@ class BenchmarkTWAP(BenchmarkTrade):
             date_end = np.searchsorted(market_df.index, date_end)
             bid_price = market_df[bid_benchmark].values
             ask_price = market_df[ask_benchmark].values
-            dt = market_df.index.to_series().diff().values / np.timedelta64(1, 's')
+            dt = market_df.index.to_series(keep_tz=False).diff().values / np.timedelta64(1, 's')
             dt[0] = 0  # first point should be weighted zero (since don't know how long it's been there)
 
             twap = []

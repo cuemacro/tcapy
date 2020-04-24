@@ -37,7 +37,7 @@ if [ $TCAPY_PYTHON_ENV_TYPE == "virtualenv" ]; then
     # Can't install orca with pip (has to be done manually or via conda)
     sudo apt-get install nodejs npm
 
-elif [ $TCAPY_PYTHON_ENV_TYPE == "conda" ]; then
+elif [ $TCAPY_PYTHON_ENV_TYPE == "conda" ] && [ $CONDA_FROM_YAML == 0 ]; then
 
     # Install conda forge packages
     conda install -c conda-forge \

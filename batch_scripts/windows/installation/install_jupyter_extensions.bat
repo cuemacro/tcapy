@@ -1,4 +1,4 @@
-REM Installs all the Python packages needed for tcapy
+REM Installs the Jupyter extensions which might be useful if you want to use Jupyter as a front end for tcapy
 set SCRIPT_FOLDER=%~dp0
 call %SCRIPT_FOLDER%\set_tcapy_env_vars
 

@@ -34,7 +34,7 @@
 # Install Python setup tools, gcc (compiler) and Apache web server etc.
 source install_python_tools_apache.sh
 
-# Setup the virtual Python environmnent (py36tca) - by default conda environment
+# Setup the virtual Python environmnent (py36tca) - by default conda environment from environment_linux_py36.yml
 source install_virtual_env.sh
 
 # Install the Microsoft SQL Server driver on Linux (only necessary if we want to use SQL Server for trade data)
@@ -42,6 +42,8 @@ source install_virtual_env.sh
 sudo ./install_sql_driver.sh
 
 # Install all the Python packages in the py36tca environment
+# If the conda environment has not already been created from the environment_linux_py36tca.yml file (default)
+# It is generally quicker to create from YML file rather than running conda/pip for each library
 source install_pip_python_packages.sh
 
 # Install nginx web server (primary web server supported by tcapy)

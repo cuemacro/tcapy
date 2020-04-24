@@ -18,13 +18,18 @@ elif [ $TCAPY_PYTHON_ENV_TYPE == "conda" ]; then
     echo 'Creating Python3 conda...'
     source $CONDA_ACTIVATE
 
-    # can be quite slow to update conda (also latest versions can have issues!)
-    conda update -n base conda
+    # Can be quite slow to update conda (also latest versions can have issues!)
+    conda update -n base conda --yes
     conda remove --name $TCAPY_PYTHON_ENV --all --yes
 
-    # try an older version of conda - https://github.com/conda/conda/issues/9004
-    # conda install conda=4.6.14
-    conda create -n $TCAPY_PYTHON_ENV python=3.6 --yes
+    if [ $CONDA_FROM_YAML == 1 ]; then
+        source $TCAPY_CUEMACRO/batch_scripts/linux/installation/install_conda_from_env_yaml.sh
+        source activate $TCAPY_PYTHON_ENV
+    elif [ $CONDA_FROM_YAML == 0 ]; then
+        # Sometimes might help to try an older version of conda - https://github.com/conda/conda/issues/9004
+        # conda install conda=4.6.14
+        conda create -n $TCAPY_PYTHON_ENV python=3.6 --yes
+    fi
 
     source activate $TCAPY_PYTHON_ENV
 fi

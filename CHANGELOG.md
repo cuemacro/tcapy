@@ -6,6 +6,11 @@
 
 ## Coding log
 
+* 24 April 2020
+    * Changed Redis repo, so installs latest version without compilation (given compilation very slow)
+    * Added scripts for creating conda environment via YAML file (quicker installation)
+    * Added links to view Jupyter notebooks by nbviewer
+    * Bug fix on Excel implementation, now removes previously drawn charts
 * 16 April 2020
     * Added Excel addin/spreadsheet to use tcapy (with xlwings)
     * Adding heatmaps (allowing for multiple metrics/breakdowns)
@@ -48,3 +53,11 @@
     * Fixed install link on README.md
 * 20 March 2020
     * First public upload of tcapy
+    
+## Bugs/performance issues to be fixed (with date of addition)
+
+* 24 Apr 2020
+    * BUG: On the very first run of web GUI (after running restart_tcapy.sh), it doesn't display results (but computation 
+    works in backend)
+* 23 Apr 2020
+    * PERFORMANCE: Speed up Dukascopy downloading, to reduce initialization time

@@ -47,6 +47,7 @@ if __name__ == '__main__':
     temp_large_data_folder = '/home/tcapyuser/csv_dump/temp/large/'
 
     start_date_csv = '01 Jan 2016'; finish_date_csv = '07 Apr 2020'; split_size = 'monthly' # 'daily' or 'monthly'
+    # start_date_csv = '01 Jan 2004'; finish_date_csv = '01 Jan 2006';
 
     if data_vendor == 'ncfx':
         from tcapy.data.databasepopulator import DatabasePopulatorNCFX as DatabasePopulator
@@ -57,9 +58,9 @@ if __name__ == '__main__':
 
         tickers = constants.dukascopy_tickers
 
+    # Example of manually specifying tickers
     # tickers = {'EURUSD' : 'EURUSD', 'GBPUSD': 'GBPUSD', 'USDCAD': 'USDCAD', 'NZDUSD': 'NZDUSD', 'USDCHF' : 'USDCHF',
     #            'USDJPY' : 'USDJPY'}
-    tickers = {'EURJPY' : 'EURJPY', 'EURHUF' : 'EURHUF'}
 
     db_populator = DatabasePopulator(temp_data_folder=temp_data_folder, temp_large_data_folder=temp_large_data_folder,
                                               tickers=tickers)

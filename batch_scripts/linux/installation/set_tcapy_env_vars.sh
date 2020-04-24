@@ -18,7 +18,6 @@ export TCAPY_PYTHON_ENV_BIN=$TCAPY_PYTHON_ENV/bin/
 export TCAPY_PYTHON_VERSION=3 # Only Python 3 is now supported
 
 export CONDA_ACTIVATE=/home/tcapyuser/anaconda3/bin/activate
-
 export TCAPY_USER=$USER # which user to run tcapy
 
 export TCAPY_CELERY_WORKERS=12
@@ -42,6 +41,11 @@ export TCAPY_WEB_SERVER="nginx" # apache or nginx
 # but we can also add other interfaces if we want
 export START_TCAPY_API=1        # Start Gunicorn RESTful API
 export START_TCAPY_BOARD=1      # Start Gunicorn tcapyboard web front-end
+
+## Installation parameters #############################################################################################
+
+export CONDA_FROM_YAML=1 # Install tca py36tca environment from environment_py36tca.yml
+export COMPILE_REDIS_FROM_SOURCE=0 # Compiling from source is slower, instead we use Chris Rea's repo version of Redis
 
 ## Get Linux distribution ##############################################################################################
 

@@ -14,7 +14,12 @@ import base64
 import os
 
 import pdfkit
-from weasyprint import HTML, CSS
+
+try:
+    from weasyprint import HTML, CSS
+except Exception as e:
+    print("You may need to check that you've installed WeasyPrint - check instructions at https://github.com/cuemacro/tcapy/blob/master/INSTALL.md")
+    print(str(e))
 
 from jinja2 import Environment, FileSystemLoader
 
@@ -217,12 +222,16 @@ class XlWingsRenderer(Renderer):
         if output_format not in ['xlwings']:
             raise Exception("Invalid output format selected")
 
-        from xlwings.constants import InsertShiftDirection
-
-        # Clear the TCA properties and also any charts below that
+        # Clear the TCA properties
         self._xlwings_sht.range('listpoints').clear_contents()
-        self._xlwings_sht.range("A" + str(constants.chart_xlwings_listpoints_row) + ":Z4000")\
-            .api.Insert(InsertShiftDirection.xlShiftDown)
+
+        # Delete all the TCA pictures/charts except for the logo (first picture!)
+        # no_of_pictures = len(self._xlwings_sht.pictures)
+
+        for pic in self._xlwings_sht.pictures:
+            if 'logo' not in pic.name:
+                pic.delete()
+
 
         # Start putting the TCA properties in this row onwards
         row = constants.chart_xlwings_listpoints_row

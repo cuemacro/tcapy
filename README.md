@@ -106,6 +106,8 @@ There are four ways to use tcapy, which are:
 
 * Via web GUI, built with Dash
 * Programmatically
+    * Via command prompt/IDE etc.
+    * Via Jupyter notebook to do interactive research studies
 * Via Excel spreadsheet via xlwings (see example spreadsheet [here](tcapy/excel/tcapy_xl.xlsm))
 * Via RESTful API (very basic functionality at present)
 
@@ -113,16 +115,26 @@ Below we have a montage illustrating some of the ways you can interact with tcap
 
 <img src="img/tcapy_montage.png?raw=true" width="750"/>
 
-# Jupyter notebook to show how to use tcpay
+# Jupyter notebook to show how to use and call tcapy programatically
+
+Given we can call tcapy programmatically, if you are doing a more customized sort of TCA research project, it is ideal
+to use Jupyter notebooks to mix code and results in one place.
+
+Sometimes GitHub might not render the Jupyter notebooks, in which case you can use the nbviewer link. Also see
+[here](tcapy_notebooks/jupyter_notebooks_description.md), which lists all the notebooks
 
 * [Introducing tcapy and explaining TCA](tcapy_notebooks/introducing_tcapy.ipynb) - how to use tcapy in more detail 
-and gives many examples of how to call it programmatically
+and gives many examples of how to call it programmatically 
+([nbviewer](https://nbviewer.jupyter.org/github/cuemacro/tcapy/blob/master/tcapy_notebooks/introducing_tcapy.ipynb))
 * [Compliance and other more involved TCA calculations](tcapy_notebooks/compliance_tca_calculations) - how to do 
 TCA calculations for compliance and other more involved use cases
+([nbviewer](https://nbviewer.jupyter.org/github/cuemacro/tcapy/blob/master/tcapy_notebooks/compliance_tca_calculations))
 * [Populating databases for tcapy](tcapy_notebooks/populating_databases_for_tcapy.ipynb) - how to 
 populate your trade/order (MySQL/SQLite/Microsoft SQL Server) and market data databases (Arctic/MongoDB/PyStore)
+([nbviewer](https://nbviewer.jupyter.org/github/cuemacro/tcapy/blob/master/tcapy_notebooks/populating_databases_for_tcapy.ipynb))
 * [Excel/xlwings with tcapy](tcapy_notebooks/excel_xlwings_with_tcapy.ipynb) - how to run tcapy from Excel
 with xlwings, with a demo spreadsheet
+([nbviewer](https://nbviewer.jupyter.org/github/cuemacro/tcapy/blob/master/tcapy_notebooks/excel_xlwings_with_tcapy.ipynb))
 
 A few things to note:
 

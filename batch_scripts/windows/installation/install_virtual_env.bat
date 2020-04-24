@@ -17,11 +17,17 @@ if %TCAPY_PYTHON_ENV_TYPE%==conda (
     call %CONDA_ACTIVATE%
 
     REM can be quite slow to update conda (also latest versions can have issues!)
-    REM call conda update -n base conda
+    call conda update -n base conda --yes
     call conda remove --name %TCAPY_PYTHON_ENV% --all --yes
 
-    REM try an older version of conda - https://github.com/conda/conda/issues/9004
-    call conda create -n %TCAPY_PYTHON_ENV% python=3.6 --yes
+    REM setup the conda environment (and all the libaries) directly from YAML so don't need
+    REM to install all the libraries via conda/pip later (ie. don't need to run install_pip_python_packages.bat later)
+    if %CONDA_FROM_YAML%==1 (
+        call %TCAPY_CUEMACRO%\batch_scripts\windows\installation\install_conda_from_env_yaml.bat
+    ) else if %CONDA_FROM_YAML%==0 (
+        REM try an older version of conda - https://github.com/conda/conda/issues/9004
+        call conda create -n %TCAPY_PYTHON_ENV% python=3.6 --yes
+    )
 
     call activate %TCAPY_PYTHON_ENV%
 )

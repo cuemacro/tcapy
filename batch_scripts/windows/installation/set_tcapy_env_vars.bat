@@ -19,6 +19,9 @@ set CONDA_ACTIVATE=C:\Anaconda3\Scripts\activate.bat
 set TCAPY_PYTHON_ENV=py36tca
 set TCAPY_PYTHON_ENV_BIN=%TCAPY_PYTHON_ENV%\bin\
 
+REM Installation parameters - create conda environment from YAML (1 or 0)
+set CONDA_FROM_YAML=1
+
 REM Only Python 3 is now supported
 set TCAPY_PYTHON_VERSION=3
 

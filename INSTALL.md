@@ -122,7 +122,7 @@ can choose to skip). We paste the code below, with comments.
     # Install Python setup tools, gcc (compiler) and Apache web server etc.
     source install_python_tools_apache.sh
     
-    # Setup the virtual Python environmnent (py36tca) - by default conda environment
+    # Setup the virtual Python environmnent (py36tca) - by default conda environment from environment_linux_py36.yml
     source install_virtual_env.sh
     
     # Install the Microsoft SQL Server driver on Linux (only necessary if we want to use SQL Server for trade data)
@@ -130,6 +130,8 @@ can choose to skip). We paste the code below, with comments.
     sudo ./install_sql_driver.sh
     
     # Install all the Python packages in the py36tca environment
+    # If the conda environment has not already been created from the environment_linux_py36tca.yml file (default)
+    # It is generally quicker to create from YML file rather than running conda/pip for each library
     source install_pip_python_packages.sh
     
     # Install nginx web server (primary web server supported by tcapy)
@@ -168,6 +170,9 @@ can choose to skip). We paste the code below, with comments.
     
     # Install Redis key-value store for general caching and as Celery message broker (recommend on same server)
     source install_redis.sh
+    
+    # We need to open ports to allow access to MongoDB and to give web access to specific clients
+    # source add_ip_to_firewall.sh
 
 For the databases, you will need to make sure they are populated with trade data and also market data. tcapy includes
 various Python scripts for populating a market tick database from external sources (Dukascopy and NCFX at present), and
@@ -218,15 +223,15 @@ and then install tcapy on VirtualBox/Linux
     * we assume that you've already installed any databases you'd like to use (eg. MongoDB for market tick data, 
     Microsoft SQL Server for your trade/order data)
     * we strongly recommend that you install Ubuntu on WSL (with tcapy) before you install tcapy on Windows
-        * but if you aren't going to install WSL, you might also find it useful to install Redis for Windows, although
-    we note that this is a compiled [old version 3.2 from Microsoft's archive on GitHub](https://github.com/microsoftarchive/redis/releases) 
-    and is also not supported by Redis 
+        * but if you aren't going to install WSL, you might also find it useful to install Redis for Windows, 
+    and you can download a compiled [old version Redis 3.2 from Microsoft's archive on GitHub](https://github.com/microsoftarchive/redis/releases) 
+    but note that this is not officially supported by Redis, who recommend running Redis on Windows
     * download [Anaconda Python distribution for Windows](https://www.anaconda.com/distribution/) and then install in folder
     `C:\Anaconda3`
-    * it is possible to use other distributions of Python, but the project has been setup by default to use
+    * it is possible to use other distributions of Python, but the project has been setup by default and tested to use
     Anaconda Python and conda installation manager
-    * as with all the other cases, we need to clone the tcapy project from GitHub
-    * install [Git for Windows](https://gitforwindows.org/) and then run
+    * as with all the other cases, we need to clone the tcapy project from GitHub either via Git or manually
+    * install [Git for Windows](https://gitforwindows.org/) and then run (change local path of tcapy as appropriate)
     
             git clone https://github.com/cuemacro/tcapy.git e:\Remote\tcapy
     
@@ -259,11 +264,12 @@ and then install tcapy on VirtualBox/Linux
         which will activate it and also add the tcapy folder to your `PYTHONPATH`
         
     * to create PDF reports from tcapy output on Windows you'll need to separately install wkhtmltopdf and weasyprint, 
-    which are converters for HTML to PDF
+    which are converters for HTML to PDF, if these aren't installed PDF functionality in tcapy won't work
         * [wkhtmltopdf installation guide on Windows](https://github.com/JazzCore/python-pdfkit/wiki/Installing-wkhtmltopdf)
             * also requires adding the `wkhtmltopdf/bin folder` to your Windows path
         * [weasyprint installation guide on Windows](https://weasyprint.readthedocs.io/en/latest/install.html#windows)
-            * also requires downloading and installation of GTK64, which is detailed in the above instructions     
+            * also requires downloading and installation of GTK64, which is detailed in the above instructions
+            * in particular the section describing "GTK+ 64 Bit Installer"     
     
 4. install Linux using Microsoft's own Windows subsystem for Linux (WSL) and then install tcapy on WSL/Linux (step 2) and then 
 install tcapy directly on Windows (step 4)
@@ -283,7 +289,9 @@ Whilst option 3 (install tcapy directly on Windows) is feasible, note, that doin
 make it difficult to run certain features such as Celery which is not fully supported. We have not tested other functionality 
 such as the use of [nginx for Windows](http://nginx.org/en/docs/windows.html) to host the web GUI of tcapy directly on Windows.
 
-# Running tcapy
+# Running tcapy on Linux
+
+After tcapy installation it is recommended you restart you computer.
 
 In order to start tcapy, we need to first run `cd /home/tcapyuser/cuemacro/tcapy/batch_scripts/linux/` then run
 `./restart_db.sh` on Linux/WSL,  which will restart all the default databases and caching engines (also flushing the caches):
@@ -309,10 +317,12 @@ This will do several things, which includes:
     * If we do TCA on multiple assets, each asset is sent to a different Celery worker for computation
     * Celery also distributes the loading of data from the databases/caches by using different Celery workers
 
-If you change `use_multithreading` to `False` in `constantscred.py` you can avoid using Celery, which reduces the number
-of dependencies and is often easier to setup, particularly if you need to run Celery workers on Windows, where newer 
-versions of Celery need a workaround to work (see https://www.distributedpython.com/2018/08/21/celery-4-windows/). Note, 
-that calculations can be quite slow if Celery is not used (it will also reduce the caching opportunities)
+If you change `use_multithreading` to `False` in `constantscred.py` you can avoid using Celery and the backend, which reduces the number
+of dependencies and is often easier to setup, as you won't need to run Celery workers. 
+
+For Windows, if you want to kick off Celery workers for newer versions (4.x), it isn't supported, although there is a workaround 
+(see https://www.distributedpython.com/2018/08/21/celery-4-windows/) - so we'd recommend avoid attempting to kick off the Celery
+backend on Windows. Note, that calculations can be quite slow if Celery is not used (it will also reduce the caching opportunities)/
 
 # Installing new tcapy versions
 
