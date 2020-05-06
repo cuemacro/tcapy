@@ -68,13 +68,13 @@ web_proxies = {'https' : None}
 #     'https' : "https://127.0.0.1:7000",
 # }
 
-chunk_int_min_dict = {'dukascopy' : None, 'ncfx' : 5} # number of minutes to download from data vendor (eg. 5 minutes)
+chunk_int_min_dict = {'dukascopy' : None, 'ncfx' : 60} # number of minutes to download from data vendor (eg. 5 minutes)
 
 ########################################################################################################################
 folder = Constants().test_data_harness_folder
 
 #### change for your data vendor
-data_vendor_name_list = ['dukascopy', 'ncfx']
+data_vendor_name_list = ['ncfx', 'dukascopy']
 
 database_populator_dict = {'dukascopy' : DatabasePopulatorDukascopy(), 'ncfx' : DatabasePopulatorNCFX()}
 database_source_dict = {'dukascopy' : DatabaseSourceDukascopy(), 'ncfx' : DatabaseSourceNCFX()}
@@ -227,8 +227,8 @@ def test_daily_download_boundary_from_data_vendor():
         database_populator = database_populator_dict[data_vendor_name]
         chunk_int_min = chunk_int_min_dict[data_vendor_name]
 
-        start_date = '29 Apr 2018 21:00';
-        finish_date = '30 Apr 2018 01:00';
+        start_date = '29 Apr 2018 21:00'; # Saturday
+        finish_date = '30 Apr 2018 01:00'; # Monday
 
         msg, df = database_populator.download_from_external_source(remove_duplicates=False,
                                                                 chunk_int_min=chunk_int_min,
@@ -270,8 +270,8 @@ def test_weekend_download_boundary_from_data_vendor():
 
 if __name__ == '__main__':
 
-    test_write_csv_from_data_vendor()
-    test_fetch_market_data_from_data_vendor()
+    # test_write_csv_from_data_vendor()
+    # test_fetch_market_data_from_data_vendor()
 
     test_daily_download_boundary_from_data_vendor()
     test_weekend_download_boundary_from_data_vendor()

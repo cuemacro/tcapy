@@ -6,6 +6,14 @@
 
 ## Coding log
 
+* 06 May 2020
+    * Change default Windows path to `e:\cuemacro\tcapy` from `e:\Remote\tcapy` to 
+    make it more similar to Linux default
+    * Now downloads tick data from New Change FX/NCFX using their updated API `DatabaseSourceNCFX`
+    * Spun out some functionality for splitting up download dates from `DatabasePopulator` to `UtilFunc`
+    * Added script to resample tick data and dump as Parquet eg. if we want to use tick data outside of tcapy
+    * Fixed issue with `DatabasePopulator` ignoring downloading of points around end of periods if on weekend
+    * Updated Dash/Plotly Python dependencies - appears to fix problems with non-updates of GUI so far
 * 24 April 2020
     * Changed Redis repo, so installs latest version without compilation (given compilation very slow)
     * Added scripts for creating conda environment via YAML file (quicker installation)
@@ -56,6 +64,8 @@
     
 ## Bugs/performance issues to be fixed (with date of addition)
 
+* 30 Apr 2020
+    * ISSUE: web GUI times out after a while, requiring user to refresh web page
 * 24 Apr 2020
     * BUG: On the very first run of web GUI (after running restart_tcapy.sh), it doesn't display results (but computation 
     works in backend)

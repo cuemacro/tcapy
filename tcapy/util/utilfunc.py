@@ -681,9 +681,10 @@ class UtilFunc(object):
 
         return dates
 
-    def split_into_freq(self, start_date, finish_date, freq='5min', microseconds_offset = 0):
+    def split_into_freq(self, start_date, finish_date, freq='5min', microseconds_offset=0, chunk_int_min=None):
         """Between a defined start/finish date/time, split it up into chunks of arbitary size (by default, 5 minutes) and
-        return two lists which define the starting and ending points respectively.
+        return two lists which define the starting and ending points respectively. If the size is less than the miniumum chunksize
+        then return start/finish dates
 
         Parameters
         ----------
@@ -696,6 +697,9 @@ class UtilFunc(object):
         freq : str
             Chunksize of period (default: '5min')
 
+        chunk_size_min : int (optional)
+            Minimum chunk size in minutes
+
         microseconds_offset : int
             How many microseconds to offset the end point (default: 0)
 
@@ -703,6 +707,11 @@ class UtilFunc(object):
         -------
         Timestamp (list), Timestamp (list)
         """
+
+        if chunk_int_min is not None:
+            if finish_date - start_date < pd.Timedelta(minutes=chunk_int_min):
+                return [start_date], [finish_date]
+
         date_range = pd.date_range(start_date, finish_date, freq=freq)
 
         date_range_end = []
@@ -717,7 +726,8 @@ class UtilFunc(object):
 
         return date_range, date_range_end
 
-    def remove_weekend_points(self, start_date_hist, finish_date_hist):
+    def remove_weekend_points(self, start_date_hist, finish_date_hist, friday_close_utc_hour=constants.friday_close_utc_hour,
+                              sunday_open_utc_hour=constants.sunday_open_utc_hour):
         """Removes those periods where either the start or endpoint are in the weekend. So for example if we have periods which
         start or end on a Saturday these will be removed
 
@@ -728,6 +738,13 @@ class UtilFunc(object):
 
         finish_date_hist : Timestamp (list)
             List of dates which are the endpoints
+
+        friday_close_utc_hour : int
+            Closing hour for markets on Friday night in UTC
+
+        sunday_open_utc_hour : int
+            Opening hour for markets on Sunday night in UTC
+
 
         Returns
         -------
@@ -742,15 +759,16 @@ class UtilFunc(object):
         for i in range(0, len(start_date_hist)):
 
             # Ignore weekends/create a cutoff at Sunday open/Friday close
-            if self.is_weekday_point(start_date_hist[i], finish_date_hist[i]):
+            if self.is_weekday_point(start_date_hist[i], finish_date_hist[i], friday_close_utc_hour=friday_close_utc_hour,
+                                     sunday_open_utc_hour=sunday_open_utc_hour):
 
                 filtered_start_date_hist.append(start_date_hist[i])
                 filtered_finish_date_hist.append(finish_date_hist[i])
 
         return filtered_start_date_hist, filtered_finish_date_hist
 
-    def is_weekday_point(self, start_date, finish_date):
-        """Is the time duration between the start and finish date in normal FX working time? (ie. not on a Saturday, also
+    def is_weekday_point(self, start_date, finish_date, friday_close_utc_hour=constants.friday_close_utc_hour, sunday_open_utc_hour=constants.sunday_open_utc_hour):
+        """Is the time duration partially between the start and finish date in normal FX working time? (ie. not on a Saturday, also
         after Sunday 2200 GMT (this arbitrary, some data providers could provide data before this) and on Friday before 2200 GMT
 
         Parameters
@@ -761,14 +779,35 @@ class UtilFunc(object):
         finish_date : pd.Timestamp
             Finish date/time of the duration
 
+        friday_close_utc_hour : int
+            Closing hour for markets on Friday night in UTC
+
+        sunday_open_utc_hour : int
+            Opening hour for markets on Sunday night in UTC
+
         Returns
         -------
         bool
         """
 
-        return not ((start_date.dayofweek == 5 or finish_date.dayofweek == 5) \
-             or (start_date.dayofweek == 6 and start_date.hour < 22) \
-             or (start_date.dayofweek == 4 and finish_date.hour > 22))
+        # If we request more than 48 hours (or slightly less), it will cover more than the weekend!
+        if (finish_date - start_date).seconds >= constants.weekend_period_seconds:
+            return True
+        else:
+            return self.date_within_market_hours(start_date, friday_close_utc_hour=friday_close_utc_hour, \
+                                                 sunday_open_utc_hour=sunday_open_utc_hour) \
+                or self.date_within_market_hours(finish_date, friday_close_utc_hour=friday_close_utc_hour, \
+                                                 sunday_open_utc_hour=sunday_open_utc_hour)
+
+    def date_within_market_hours(self, date, friday_close_utc_hour=constants.friday_close_utc_hour, sunday_open_utc_hour=constants.sunday_open_utc_hour):
+        if (date.dayofweek >= 0 and date.dayofweek <= 3):
+            return True
+        elif date.dayofweek == 4 and date.hour < friday_close_utc_hour:
+            return True
+        elif date.dayofweek == 6 and date.hour >= sunday_open_utc_hour:
+            return True
+
+        return False
 
     def check_data_frame_points_in_every_hour(self, df, start_date, finish_date):
         """Checks if there are data points in every hour window between the start and finish date/time.
@@ -804,8 +843,8 @@ class UtilFunc(object):
             if self.is_weekday_point(st, fi):
                 df_mini = df.truncate(before=st, after=fi)
 
-                # special case for Friday close/Sunday open (ignore)
-                if df_mini.empty and not(fi.dayofweek == 4 and fi.hour > 21) and not(st.dayofweek == 0) and not(st.dayofweek == 6):
+                # Special case for Friday close/Sunday open (ignore)
+                if df_mini.empty and not(fi.dayofweek == 4 and fi.hour > constants.friday_close_utc_hour) and not(st.dayofweek == 0) and not(st.dayofweek == 6):
                     return False
 
         return True

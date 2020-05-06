@@ -338,14 +338,10 @@ class DatabasePopulator(ABC):
                 # Loop by day (otherwise can end up with too many open files!)
                 for i in range(0, len(start_date_list) - 1):
 
+                    # Specifying a chunk size can also be helpful for multithreading a request
                     if chunk_size_str is not None:
-                        if start_date_list[i + 1] - start_date_list[i] < pd.Timedelta(minutes=chunk_int_min):
-                            start_date_hist = [start_date_list[i]]
-                            finish_date_hist = [start_date_list[i + 1]]
-                        else:
-                            start_date_hist, finish_date_hist = UtilFunc().split_into_freq(start_date_list[i],
-                                                                                               start_date_list[i + 1],
-                                                                                               freq=chunk_size_str)
+                        start_date_hist, finish_date_hist = UtilFunc().split_into_freq(
+                            start_date_list[i], start_date_list[i + 1], freq=chunk_size_str, chunk_int_min=chunk_int_min)
                     else:
                         start_date_hist = [start_date_list[i]]
                         finish_date_hist = [start_date_list[i + 1]]
@@ -413,6 +409,8 @@ class DatabasePopulator(ABC):
                                 key =  '_' + self._get_postfix() + "_" + \
                                        (str(df.index[0]) + str(df.index[-1])).replace(":", '_').replace(" ", '_')
                                 filename = os.path.join(csv_folder, ticker + key) + '.' + fileformat
+
+                                logger.debug("Writing file... " + filename)
 
                                 # Temporary cache for testing purposes (also if the process crashes, we can read this back in)
                                 UtilFunc().write_dataframe_to_binary(df, filename, format=binary_format)
@@ -683,9 +681,6 @@ class DatabasePopulator(ABC):
         else:
             logger.warn("Couldn't write dataframe for " + ticker + " to database, appears it is empty!")
 
-    def _remove_saturday(self):
-        return True
-
 from tcapy.util.mediator import Mediator
 from tcapy.analysis.tcarequest import MarketRequest
 
@@ -739,20 +734,14 @@ class DatabasePopulatorNCFX(DatabasePopulator):
         start_time_stamp = pd.Timestamp(start)
         finish_time_stamp = pd.Timestamp(finish)
 
-        if self._remove_saturday():
-            weekend_data = "Saturday? " + key
-
-            # Ignore Saturday, and don't attempt to download
-            if start_time_stamp.dayofweek == 5 or finish_time_stamp.dayofweek == 5:
-                return None, weekend_data
-
         if self._remove_weekend_points():
             weekend_data = "Weekend? " + key
 
-            if start_time_stamp.dayofweek == 6 and start_time_stamp.hour < 20:
-                return None, weekend_data
+            weekday_point = UtilFunc().is_weekday_point(start_time_stamp, finish_time_stamp,
+                                                        friday_close_utc_hour=constants.friday_close_utc_hour,
+                                                        sunday_open_utc_hour=constants.sunday_open_utc_hour)
 
-            if start_time_stamp.dayofweek == 4 and start_time_stamp.hour > 22:
+            if not(weekday_point):
                 return None, weekend_data
 
         df = None
@@ -770,7 +759,6 @@ class DatabasePopulatorNCFX(DatabasePopulator):
                                                                  ticker=self._get_tickers_vendor()[ticker], web_proxies=web_proxies)
 
             if df is not None:
-                df = df.drop('ticker', axis=1)
 
                 if write_to_disk:
                     # Write a small temporary dataframe to disk (if the process fails later, these can be picked up,
@@ -824,4 +812,4 @@ class DatabasePopulatorDukascopy(DatabasePopulatorNCFX):
         return DatabaseSourceDukascopy()
 
     def _remove_weekend_points(self):
-        return False
+        return True

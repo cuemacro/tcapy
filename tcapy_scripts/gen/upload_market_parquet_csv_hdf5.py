@@ -27,10 +27,10 @@ if __name__ == '__main__':
     logger = LoggerManager.getLogger(__name__)
 
     PLOT_BACK_DATA = False
-    data_vendor = 'dukascopy' # 'dukascopy' or 'ncfx'
+    data_vendor = 'ncfx' # 'dukascopy' or 'ncfx'
 
-    # Either use 'arctic' or 'pystore' to store market tick data
-    market_data_store = 'influxdb'
+    # Either use 'arctic' or 'pystore' or 'influxdb' or 'kdb' to store market tick data
+    market_data_store = 'arctic'
 
     logger.info("About to upload data to " + market_data_store)
 
@@ -64,7 +64,8 @@ if __name__ == '__main__':
         # Should we remove consecutive duplicates (safe for most TCA operations, NOT when volume is involved)
         remove_duplicates = True
 
-    # dukascopy or ncfx style parameters
+    # dukascopy or ncfx style parameters for uploading a large number of Parquet files with market data
+    # Note: use of wildcard * to specify multiple files
     if True:
         data_vendor = 'dukascopy' # 'ncfx' or 'dukascopy'
 
@@ -74,17 +75,17 @@ if __name__ == '__main__':
                       'USDNOK', 'USDSEK', 'EURJPY',
                       'USDMXN', 'USDTRY', 'USDZAR', 'EURPLN']
 
-        csv_folder = '/home/tcapyuser/csv_dump/'
+        csv_folder = '/home/tcapyuser/csv_dump/' + data_vendor + '/'
 
-        if_exists_table = 'append' #
-        if_append_replace_ticker = 'replace'
+        if_exists_table = 'replace' # 'replace' or 'append'
+        if_append_replace_ticker = 'replace' # 'replace' or 'append'
 
-        file_extension = 'parquet'  # 'parquet' or 'csv' or 'h5' on disk
+        file_extension = 'parquet'  # 'parquet' (recommended) or 'csv' or 'h5' on disk
 
         # Files dumped by DatabasePopulator look like this
         ## 'AUDUSD_dukascopy_2016-01-03_22_00_01.868000+00_002016-01-31_23_59_57.193000+00_00.parquet'
 
-        csv_file = [x + '_' + data_vendor + '_2016-01*.' + file_extension for x in
+        csv_file = [x + '_' + data_vendor + '_20*.' + file_extension for x in
                     ticker_mkt]  # assume that ALL TIME IN UTC!
 
         date_format = None
@@ -148,8 +149,7 @@ if __name__ == '__main__':
             import datetime
             import pandas as pd
 
-            df = database_source.fetch_market_data(
-                start_date='01 Jan 2000', finish_date=datetime.datetime.utcnow(), ticker=ticker)
+            df = database_source.fetch_market_data(start_date='01 Jan 2000', finish_date=datetime.datetime.utcnow(), ticker=ticker)
 
             df = pd.DataFrame(df.resample('5min').mean())
 

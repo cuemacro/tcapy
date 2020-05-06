@@ -6,7 +6,7 @@ echo "Setting environment variables for tcapy for current script"
 REM Python environment settings ########################################################################################
 
 REM Folder where tcapy is, note, if you will need to change this in tcapy/conf/mongo.conf too
-set TCAPY_CUEMACRO=e:\Remote\tcapy
+set TCAPY_CUEMACRO=e:\cuemacro\tcapy
 
 REM Is the Python environment either "conda" or "virtualenv"?
 set TCAPY_PYTHON_ENV_TYPE=conda

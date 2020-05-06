@@ -233,34 +233,34 @@ and then install tcapy on VirtualBox/Linux
     * as with all the other cases, we need to clone the tcapy project from GitHub either via Git or manually
     * install [Git for Windows](https://gitforwindows.org/) and then run (change local path of tcapy as appropriate)
     
-            git clone https://github.com/cuemacro/tcapy.git e:\Remote\tcapy
+            git clone https://github.com/cuemacro/tcapy.git e:\cuemacro\tcapy
     
-    * this will clone it in the `e:\Remote\tcapy` folder (you can choose to install it elsewhere), alternatively, you
+    * this will clone it in the `e:\cuemacro\tcapy` folder (you can choose to install it elsewhere), alternatively, you
     can manually clone it from the GitHub website
-    * edit `e:\Remote\tcapy\batch_scripts\windows\installation\set_tcapy_env_vars.bat` if necessary change the several variables
-        * `TCAPY_CUEMACRO` - with the folder you installed tcapy (default: `e:\Remote\tcapy`)
+    * edit `e:\cuemacro\tcapy\batch_scripts\windows\installation\set_tcapy_env_vars.bat` if necessary change the several variables
+        * `TCAPY_CUEMACRO` - with the folder you installed tcapy (default: `e:\cuemacro\tcapy`)
         * `CONDA_ACTIVATE` - the path to Anaconda conda (default: `C:\Anaconda3\Scripts\activate.bat`)
-    * run `e:\Remote\tcapy\batch_scripts\windows\installation\install_virtual_env.bat` which will setup a new 
+    * run `e:\cuemacro\tcapy\batch_scripts\windows\installation\install_virtual_env.bat` which will setup a new 
     conda environment called `py36tca`
-    * run `e:\Remote\tcapy\batch_scripts\windows\installation\install_pip_python_packages.bat` which will install
+    * run `e:\cuemacro\tcapy\batch_scripts\windows\installation\install_pip_python_packages.bat` which will install
     all the packages you need in the `py36tca` environment for the tcapy library
-    * you can optionally also run `e:\Remote\tcapy\batch_scripts\windows\installation\install_jupyter_extensions.bat` if 
+    * you can optionally also run `e:\cuemacro\tcapy\batch_scripts\windows\installation\install_jupyter_extensions.bat` if 
     you're planning to use tcapy from Jupyter, and it will add some useful extensions like RISE for slides, ExecuteTime
     to make it easy to time the execution of cells etc.
     * you can now call the tcapy Python library on your computer from your Python scripts
-        * be sure to add `e:\Remote\tcapy` to your `PYTHONPATH` so it can find the tcapy library 
+        * be sure to add `e:\cuemacro\tcapy` to your `PYTHONPATH` so it can find the tcapy library 
         * you can do this globally or by adding the following to the start of your Python script
         
             ```import sys
             import os
-            tcapy_path = 'e:/Remote/tcapy'
+            tcapy_path = 'e:/cuemacro/tcapy'
             sys.path.insert(0, tcapy_path)
           
     * make sure to activate the `py36tca` conda environment if you want to use tcapy, you can do this by running
             
             conda activate py36tca 
     
-        in your Anaconda prompt or you can run `e:\Remote\tcapy\batch_scripts\windows\installation\activate_python_environment.bat`
+        in your Anaconda prompt or you can run `e:\cuemacro\tcapy\batch_scripts\windows\installation\activate_python_environment.bat`
         which will activate it and also add the tcapy folder to your `PYTHONPATH`
         
     * to create PDF reports from tcapy output on Windows you'll need to separately install wkhtmltopdf and weasyprint, 
@@ -323,6 +323,10 @@ of dependencies and is often easier to setup, as you won't need to run Celery wo
 For Windows, if you want to kick off Celery workers for newer versions (4.x), it isn't supported, although there is a workaround 
 (see https://www.distributedpython.com/2018/08/21/celery-4-windows/) - so we'd recommend avoid attempting to kick off the Celery
 backend on Windows. Note, that calculations can be quite slow if Celery is not used (it will also reduce the caching opportunities)/
+
+# Archiving log files
+
+It is recommended to archive the log files regularly, because they can become very big (many GB if continually appending)
 
 # Installing new tcapy versions
 

@@ -23,6 +23,7 @@ develop-eggs/
 dist/
 downloads/
 eggs/
+external/
 .eggs/
 htmlcov/
 lib/

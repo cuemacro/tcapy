@@ -79,6 +79,10 @@ class Constants(object):
     default_instrument = 'spot'
     default_asset_class = 'fx'
 
+    friday_close_utc_hour = 22; sunday_open_utc_hour = 20
+
+    weekend_period_seconds = 48 * 3600
+
     ##### Tickers for external data providers ##############################################################################
 
     ### NCFX
@@ -100,17 +104,19 @@ class Constants(object):
     ncfx_threads = 2
     ncfx_sleep_seconds = 30
     ncfx_retry_times = 20
-    ncfx_chunk_min_size = 5     # Minute size for downloading NCFX
+    ncfx_chunk_min_size = 60     # Minute size for downloading NCFX
     ncfx_data_store = 'arctic-ncfx'
 
     csv_folder = '/tmp/csv/'
     temp_data_folder = '/tmp/tcapy/'
 
     ### Dukascopy tickers
-    dukascopy_tickers = {'AUDUSD': 'AUDUSD', 'EURNOK': 'EURNOK', 'EURSEK': 'EURSEK', 'EURUSD': 'EURUSD',
-                         'GBPUSD': 'GBPUSD', 'NZDUSD': 'NZDUSD', 'USDCAD': 'USDCAD', 'USDCHF': 'USDCHF',
-                         'USDJPY': 'USDJPY', 'USDNOK':'USDNOK', 'USDSEK': 'USDSEK', 'USDTRY': 'USDTRY', 'USDZAR': 'USDZAR',
-                         'EURPLN': 'EURPLN', 'USDMXN':'USDMXN', 'EURHUF' : 'EURHUF', 'EURJPY' : 'EURJPY'}
+    dukascopy_tickers = {'EURUSD' : 'EURUSD',
+                         'GBPUSD' : 'GBPUSD', 'AUDUSD': 'AUDUSD', 'NZDUSD': 'NZDUSD', 'USDCAD' : 'USDCAD', 'USDCHF' : 'USDCHF',
+                         'USDJPY' : 'USDJPY',
+                         'EURNOK' : 'EURNOK', 'EURSEK': 'EURSEK', 'USDNOK' : 'USDNOK', 'USDSEK' : 'USDSEK',
+                         'USDTRY' : 'USDTRY', 'USDZAR': 'USDZAR',
+                         'EURPLN' : 'EURPLN', 'USDMXN': 'USDMXN', 'EURHUF' : 'EURHUF', 'EURJPY' : 'EURJPY'}
 
     dukascopy_data_store = 'arctic-dukascopy'
     dukascopy_threads = 1 # Dukascopy downloader not thread-safe so only use 1!

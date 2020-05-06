@@ -3524,8 +3524,6 @@ class DatabaseSourceDataFrame(DatabaseSource):
 # External data sources
 ########################################################################################################################
 
-
-
 class DatabaseSourceNCFX(DatabaseSource):
     """Implements DatabaseSource for calling New Change FX's external server, via their Rest/API. It is recommended to use
     this to download data from NCFX and then cache data locally in an Arctic/MongoDB database for reuse. Repeated calling
@@ -3548,25 +3546,48 @@ class DatabaseSourceNCFX(DatabaseSource):
 
         logger.debug("Downloading " + str(start_date) + " - " + str(finish_date) + " for " + str(ticker))
 
-        if timed > timedelta(minutes=constants.ncfx_chunk_min_size):
-            logger.error("Cannot download data from NCFX for more than " + str(constants.ncfx_chunk_min_size) + " minutes.")
-
-            return None
-
-        start_date = self._convert_date_to_string(start_date)
-        finish_date = self._convert_date_to_string(finish_date)
-
-        url = constants.ncfx_url + start_date + ";" + finish_date + ";" + ticker + ";,CSV," \
-              + constants.ncfx_username + "," + constants.ncfx_password
+        if timed > timedelta(minutes=self._max_chunk_size()):
+            logger.info("NCFX allows a maximum download of " + str(self._max_chunk_size()) + " minutes. Will split request.")
 
         # Much faster to parse date/time by position in this way (if somewhat messy!) than using strptime
         # constructor year, month, day, hour, minutes, seconds, microseconds
         # need to multiply by 1000, because one of the arguments is microseconds
-        dateparse = lambda x: datetime.datetime(int(x[6:10]), int(x[3:5]), int(x[0:2]),
+        dateparse = lambda x: datetime.datetime(int(x[0:4]), int(x[5:7]), int(x[8:10]),
                                                 int(x[11:13]), int(x[14:16]), int(x[17:19]), int(x[20:23]) * 1000)
 
-        # download via http from NCFX
-        df = self._download(url, dateparse, web_proxies)
+        df_list = []
+
+        chunk_size_str = str(self._max_chunk_size()) + "min"
+
+        # Create multiple download dates which don't exceed the chunk size minutes
+        start_date_hist, finish_date_hist = self._util_func.split_into_freq(start_date, finish_date,
+            freq=chunk_size_str, chunk_int_min=self._max_chunk_size())
+
+        # Remove weekend points, given FX market doesn't trade Friday night/Sunday open
+        start_date_hist, finish_date_hist = self._util_func.remove_weekend_points(start_date_hist, finish_date_hist)
+
+        if start_date_hist == [] and finish_date_hist == []:
+            logger.warn("Didn't attempt to download " + ticker + " from " + str(start_date) + " - " +
+                        str(finish_date) + ". Likely entire period is when market is closed (eg. weekend).")
+
+            return None
+
+        # Download via http from NCFX
+        for s, f in zip(start_date_hist, finish_date_hist):
+
+            s = self._convert_date_to_string(s)
+            f = self._convert_date_to_string(f)
+
+            df = self._download(ticker, s, f, dateparse, web_proxies)
+
+            if df is not None:
+                if not(df.empty):
+                    df_list.append(df)
+
+        if df_list == []:
+            df = None
+        else:
+            df = pd.concat(df_list)
 
         if df is None:
             logger.warn("Failed to download from NCFX for " + ticker + " from " + str(start_date) + " - " +
@@ -3579,11 +3600,6 @@ class DatabaseSourceNCFX(DatabaseSource):
 
             return None
 
-        df.index.name = "Date"
-        df.drop(['PriceType'], axis=1, inplace=True)
-        df = df.rename(columns={'Price': 'mid', 'CurrencyPair': 'ticker'})
-        df['ticker'] = ticker
-
         df.index = df.index.tz_localize(pytz.utc)
 
         return df
@@ -3593,53 +3609,54 @@ class DatabaseSourceNCFX(DatabaseSource):
 
     def _convert_date_to_string(self, date):
 
-        return date.strftime("%d%m%Y%H%M%S")
+        return date.strftime("%Y-%m-%d %H:%M:%S")
 
     def append_market_data(self, market_df, postfix=None):
         raise Exception("You cannot upload market data to NCFX")
 
-    def _download(self, url, dateparse, web_proxies):
+    def _max_chunk_size(self):
+        return constants.ncfx_chunk_min_size
+
+    def _download(self, ticker, start_date, finish_date, dateparse, web_proxies):
         logger = LoggerManager.getLogger(__name__)
 
-        def download(url):
+        def download(args):
+
+            (ticker, start_date, finish_date) = args
 
             https_proxy = web_proxies['https']
 
             # return pd.read_csv(url, index_col='DateTimeStamp', date_parser=dateparse)
 
-            if https_proxy is None:
-                response = requests.get(url)
+            #if https_proxy is None:
+            from requests.auth import HTTPBasicAuth
+            import json
 
-                status_code = response.status_code
-                s = response.text
-            else:
-                # Note requests has issues with HTTPS proxy, so need to use urllib2 (or urllib.requests in Python 3)
+            payload = [{
+                 "currencyPairs" : ticker,
+                 "startDate" : start_date,
+                 "endDate" : finish_date
+            }]
 
-                # response = requests.get(url, proxies={"https": https_proxy}).text
-                # status_code = response.status_code
-                # s = response.text
+            headers = {'Content-Type': 'application/json'}
 
-                # use urllib2 library
-                opener = urllib_gen.build_opener(
-                    urllib_gen.HTTPHandler(),
-                    urllib_gen.HTTPSHandler(),
-                    urllib_gen.ProxyHandler({'https': https_proxy})
-                )
+            response = requests.post(constants.ncfx_url, auth=HTTPBasicAuth(constants.ncfx_username, constants.ncfx_password),
+                                         data=json.dumps(payload), headers=headers, proxies=https_proxy)
 
-                urllib_gen.install_opener(opener)
-
-                response = opener.open(url)
-                status_code = response.get_code()
-
-                s = response.read()
+            status_code = response.status_code
+            s = response.text
 
             if status_code == 200:
                 raw_string = StringIO(s)
 
-                if 'DateTimeStamp' in s:
-                    df = pd.read_csv(raw_string, index_col='DateTimeStamp', date_parser=dateparse)
+                if ticker in s:
+                    df = pd.read_csv(raw_string, index_col=1, date_parser=dateparse, header=None,
+                                     names=['ticker', 'Date', 'Empty', 'mid'])
 
-                    # for pandas 0.25.0
+                    df.index.name = "Date"
+                    df.drop(['Empty', 'ticker'], axis=1, inplace=True)
+
+                    # For pandas 0.25.0
                     df = df.tz_localize(None)
 
                     return df
@@ -3648,8 +3665,7 @@ class DatabaseSourceNCFX(DatabaseSource):
 
             return None
 
-            # create a thread to download data - this way we can control the timeout better
-
+        # Create a thread to download data - this way we can control the timeout better
         swim = Swim(parallel_library=constants.database_source_threading_library)
 
         df = None
@@ -3657,15 +3673,16 @@ class DatabaseSourceNCFX(DatabaseSource):
         for i in range(0, constants.ncfx_retry_times):
             pool = swim.create_pool(thread_no=1)
 
-            # open the market data downloads in their own threads and return the results
-            result = pool.map_async(download, (url,))
+            data = [[ticker, start_date, finish_date]]
+            # Open the market data downloads in their own threads and return the results
+            result = pool.map_async(download, data)
 
             try:
                 df = result.get(timeout=constants.ncfx_sleep_seconds)
 
                 break
             except Exception as e:
-                logger.warn("Retrying... for " + str(i) + " time " + str(e.message) + " from URL " + url)
+                logger.warn("Retrying... for " + str(i) + " time " + str(e) + " from URL " + constants.ncfx_url)
 
                 time.sleep(constants.ncfx_sleep_seconds)
 
@@ -3714,7 +3731,7 @@ class DatabaseSourceExternalDownloader(DatabaseSource):
             start_date = pd.Timestamp(start_date)
             finish_date = pd.Timestamp(finish_date)
 
-            if start_date.dayofweek != 5 and finish_date.dayofweek != 6:
+            if self._util_func.is_weekday_point(start_date, finish_date): #start_date.dayofweek != 5 and finish_date.dayofweek != 6:
                 logger.warn("Failed to download from " + self._data_provider() + " for " + ticker + " from " + str(start_date) + " - " +
                             str(finish_date) + ". Check if network problem?")
             else:
