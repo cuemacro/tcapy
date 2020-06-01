@@ -11,6 +11,7 @@ __author__ = 'saeedamen'  # Saeed Amen / saeed@cuemacro.com
 import numpy as np
 import pandas as pd
 import pytz
+import re
 
 from datetime import timedelta
 
@@ -516,6 +517,129 @@ class TimeSeriesOps(object):
             unit_r = unit
 
         return unit_r
+
+    def get_time_delta(self, time_dict):
+        """Converts a dictionary of times (or a string time) into a timedelta object
+
+        Parameters
+        ----------
+        time_dict : dict (or str)
+            Eg. {'ms' : 500} - 500 milliseconds
+                {'s' : 1} - 1 second
+                {'m' : 1} - 1 minute
+                {'h' : 1} - 1 hour
+            Eg. 12:30 - 12 hours 30 minutes
+                12:30:30 - 12 hours 30 minutes 30 seconds
+
+        Returns
+        -------
+        timedelta
+        """
+        time = timedelta()
+
+        if not(isinstance(time_dict, dict)):
+            new_time_dict = {}
+
+            ## Match hh:mm
+            match = re.match("^([0-1][0-9]|[2][0-3]):([0-5][0-9])$", time_dict)
+
+            if match:
+                new_time_dict['h'] = int(match.group(1))
+                new_time_dict['m'] = int(match.group(2))
+
+            ## Match hh:mm:ss
+            match = re.match("^([0-1][0-9]|[2][0-3]):([0-5][0-9]):([0-5][0-9])$", time_dict)
+
+            if match:
+                new_time_dict['h'] = int(match.group(1))
+                new_time_dict['m'] = int(match.group(2))
+                new_time_dict['s'] = int(match.group(3))
+
+            ## Match hh:mm:ss.ms
+            match = re.match("^([0-1][0-9]|[2][0-3]):([0-5][0-9]):([0-5][0-9]).[0-9][0-9][0-9]$", time_dict)
+
+            if match:
+                new_time_dict['h'] = int(match.group(1))
+                new_time_dict['m'] = int(match.group(2))
+                new_time_dict['s'] = int(match.group(3))
+                new_time_dict['ms'] = int(match.group(4))
+
+            time_dict = new_time_dict
+
+        if 'ms' in time_dict:
+            time = time + timedelta(milliseconds=time_dict['ms'])
+
+        if 's' in time_dict:
+            time = time + timedelta(seconds=time_dict['s'])
+
+        if 'm' in time_dict:
+            time = time + timedelta(minutes=time_dict['m'])
+
+        if 'h' in time_dict:
+            time = time + timedelta(hours=time_dict['h'])
+
+        return time
+
+    def overwrite_time_of_day_in_datetimeindex(self, datetimeindex, overwrite_time_of_day, old_tz=None, overwrite_timezone=None):
+        """Overwrites the time component in a DatetimeIndex with a user specified time of day (which is in a user specified)
+        timezone.
+
+        We can for example, specify an overwrite_time of 16:00 and an overwrite_timezone of Europe/London. In this
+        instance, it will convert the DatetimeIndex which is typically in UTC supplied into Europe/London timezone and
+        then overwrite every time with 16:00 London. Finally, the DatetimeIndex will back converted into its original
+        timezone which is typically UTC.
+
+        Parameters
+        ----------
+        datetimeindex : DatetimeIndex
+            Date/times to be overwritten
+
+        overwrite_time_of_day : str
+            Eg. "16:00"
+
+        overwrite_timezone
+            Eg. "Europe/London"
+
+        Returns
+        -------
+        DatetimeIndex
+        """
+        if overwrite_time_of_day is None:
+            return overwrite_time_of_day
+
+        try:
+            old_tz = datetimeindex.tz
+        except:
+            pass
+
+        # If numpy.datetime64 index has been supplied, need to wrap it up into Pandas Datetimeindex
+        try:
+            datetimeindex = pd.to_datetime(datetimeindex)
+            datetimeindex = datetimeindex.tz_localize(old_tz)
+        except:
+            pass
+
+        convert_timezone = False
+
+        # Only deal with timezone if both datetimeindex and the time timezone are not naive
+        if old_tz is not None and overwrite_timezone is not None:
+            convert_timezone = True
+
+        datetimeindex = datetimeindex.copy()
+
+        # Convert into the specified timezone
+        if convert_timezone:
+            datetimeindex = datetimeindex.tz_convert(overwrite_timezone)
+
+        datetimeindex = pd.to_datetime(datetimeindex.date) + self.get_time_delta(overwrite_time_of_day)
+
+        if convert_timezone:
+            datetimeindex = datetimeindex.tz_localize(overwrite_timezone)
+
+            # Convert back into previous
+            datetimeindex = datetimeindex.tz_convert(old_tz)
+
+        return datetimeindex
 
     def resample_time_series(self, df, resample_amount=1, how='mean', unit='milliseconds', field=None):
         """Resamples a DataFrame to a particular unit (eg. 'milliseconds'). We can specify resampling by for the example

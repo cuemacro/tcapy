@@ -15,6 +15,8 @@ jupyter nbextension enable execute_time/ExecuteTime
 jupyter-nbextension install rise --py --sys-prefix
 jupyter nbextension enable rise --py --sys-prefix
 jupyter nbextension enable toc2/main --sys-prefix
+jupyter nbextension install --sys-prefix --symlink --py jupyter_dash
+jupyter nbextension enable --py jupyter_dash
 
 jupyter labextension install @jupyter-widgets/jupyterlab-manager@2.0.0 --no-build
 jupyter labextension install plotlywidget@1.5.4 --no-build

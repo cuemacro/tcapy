@@ -135,6 +135,9 @@ populate your trade/order (MySQL/SQLite/Microsoft SQL Server) and market data da
 * [Excel/xlwings with tcapy](tcapy_notebooks/excel_xlwings_with_tcapy.ipynb) - how to run tcapy from Excel
 with xlwings, with a demo spreadsheet
 ([nbviewer](https://nbviewer.jupyter.org/github/cuemacro/tcapy/blob/master/tcapy_notebooks/excel_xlwings_with_tcapy.ipynb))
+* [Additional benchmark and metrics for tcapy](tcapy_notebooks/additional_benchmarks_metrics_for_tcapy.ipynb) - we go through some of the
+benchmarks and metrics available in tcapy in more detail
+([nbviewer](https://nbviewer.jupyter.org/github/cuemacro/tcapy/blob/master/tcapy_notebooks/additional_benchmarks_metrics_for_tcapy.ipynb))
 
 A few things to note:
 

@@ -6,6 +6,19 @@
 
 ## Coding log
 
+* 01 Jun 2020
+    * Aggregation of metrics by hour of day in London/New York timezone (and by max/min)
+    * Fixed tick count calculation on resample script
+    * Upgraded Plotly dependencies
+    * Added benchmarks for
+        * Median price for order (or a window around trade)
+        * Best/worst price for order (or a window around trade)
+    * Refactored VWAP/TWAP benchmark code
+    * For benchmarks, allowed adjustment for window for
+        * Time of day
+        * Before/after time of day
+    * Made market charts more customizable to add user defined benchmarks
+    * Added Jupyter notebook for additional benchmarks and metrics
 * 06 May 2020
     * Change default Windows path to `e:\cuemacro\tcapy` from `e:\Remote\tcapy` to 
     make it more similar to Linux default
@@ -66,8 +79,10 @@
 
 * 30 Apr 2020
     * ISSUE: web GUI times out after a while, requiring user to refresh web page
+    
 * 24 Apr 2020
     * BUG: On the very first run of web GUI (after running restart_tcapy.sh), it doesn't display results (but computation 
     works in backend)
+    * FIXED: 06 May 2020 - seems fixed by updating Dash dependencies
 * 23 Apr 2020
     * PERFORMANCE: Speed up Dukascopy downloading, to reduce initialization time

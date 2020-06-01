@@ -26,8 +26,8 @@ if [ $TCAPY_PYTHON_ENV_TYPE == "virtualenv" ]; then
         pyodbc==4.0.23 \
         pytest==5.1.0 pytest-cov==2.5.1 \
         mysql-connector-python==8.0.19 \
-        IPython==7.13.0 chartpy==0.1.5 findatapy==0.1.11 dash-auth==1.3.2 cufflinks==0.17.3 plotly_express==0.4.1 \
-        dash==1.11.0 dash-html-components==1.0.3 dash-core-components==1.9.1 plotly==4.6.0 dash-table==4.6.2 dtale==1.8.1 \
+        IPython==7.13.0 chartpy==0.1.5 findatapy==0.1.11 dash-auth==1.3.2 cufflinks==0.17.3 plotly==4.8.0 \
+        dash==1.12.0 dash-html-components==1.0.3 dash-core-components==1.10.0 dash-table==4.7.0 jupyter-dash==0.2.1 dtale==1.8.1 dtale==1.8.1 \
         qpython==2.0.0 influxdb==5.2.3 \
         Flask-Session==0.3.1 \
         celery==4.4.0 pytest-tap kombu==4.6.7 python-memcached==1.59 numba==0.48.0 vispy==0.6.4 jinja2==2.11.1 \
@@ -57,8 +57,8 @@ elif [ $TCAPY_PYTHON_ENV_TYPE == "conda" ] && [ $CONDA_FROM_YAML == 0 ]; then
     # Install charting libraries
     # for flash recording of session variables
     # to allow celery to use Redis
-    pip install mysql-connector-python==8.0.19 chartpy==0.1.5 findatapy==0.1.11 dash-auth==1.3.2 cufflinks==0.17.3 plotly_express==0.4.1 \
-        dash==1.11.0 dash-html-components==1.0.3 dash-core-components==1.9.1 plotly==4.6.0 dash-table==4.6.2 dtale==1.8.1 \
+    pip install mysql-connector-python==8.0.19 chartpy==0.1.5 findatapy==0.1.11 dash-auth==1.3.2 cufflinks==0.17.3 plotly==4.8.0 \
+        dash==1.12.0 dash-html-components==1.0.3 dash-core-components==1.10.0 dash-table==4.7.0 jupyter-dash==0.2.1 dtale==1.8.1 \
         qpython==2.0.0 influxdb==5.2.3 \
         Flask-Session==0.3.1 \
         celery==4.4.0 pytest-tap kombu==4.6.7 python-memcached==1.59 WeasyPrint==51 pystore==0.1.15

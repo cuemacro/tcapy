@@ -342,7 +342,9 @@ class TCARequest(TradeRequest, ComputationRequest):
                  tca_request=None, reload=False, instrument=constants.default_instrument, asset_class=constants.default_asset_class,
                  event_type='trade', trade_order_mapping=None, trade_order_filter=[],
                  benchmark_calcs=[],
-                 metric_calcs=[], results_form=[], metric_display=[], join_tables=[], tca_type='detailed',
+                 metric_calcs=[], results_form=[], metric_display=[], join_tables=[],
+                 extra_lines_to_plot=[],
+                 tca_type='detailed',
                  reporting_currency=constants.reporting_currency, dummy_market=False, summary_display=None, access_control=None,
                  use_multithreading=constants.use_multithreading, multithreading_params=constants.multithreading_params, data_norm=None,
                  tca_provider=constants.tcapy_provider):
@@ -375,6 +377,8 @@ class TCARequest(TradeRequest, ComputationRequest):
             results_form = tca_request.results_form
             metric_display = tca_request.metric_display
             join_tables = tca_request.join_tables
+            extra_lines_to_plot = tca_request.extra_lines_to_plot
+            
             tca_type = tca_request.tca_type
             reporting_currency = tca_request.reporting_currency
             dummy_market = tca_request.dummy_market
@@ -424,9 +428,12 @@ class TCARequest(TradeRequest, ComputationRequest):
         self.trade_order_filter = trade_order_filter
         self.benchmark_calcs = benchmark_calcs
         self.metric_calcs = metric_calcs
+        
         self.metric_display = metric_display
         self.results_form = results_form
         self.join_tables = join_tables
+        self.extra_lines_to_plot = extra_lines_to_plot
+        
         self.tca_type = tca_type
         self.reporting_currency = reporting_currency
         self.dummy_market = dummy_market
@@ -560,6 +567,14 @@ class TCARequest(TradeRequest, ComputationRequest):
     @join_tables.setter
     def join_tables(self, join_tables):
         self.__join_tables = self._listify(join_tables)
+        
+    @property
+    def extra_lines_to_plot(self):
+        return self.__extra_lines_to_plot
+
+    @extra_lines_to_plot.setter
+    def extra_lines_to_plot(self, extra_lines_to_plot):
+        self.__extra_lines_to_plot = self._listify(extra_lines_to_plot)
 
     @property
     def tca_type(self):

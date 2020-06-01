@@ -57,7 +57,7 @@ start_filter_date = '00:00:00 03 May 2017'
 finish_filter_date = '23:59:59 03 May 2017'
 
 # Current data vendors are 'ncfx' or 'dukascopy'
-data_source = 'ncfx'
+data_source = 'dukascopy'
 trade_data_store = 'ms_sql_server'
 market_data_store = 'arctic-' + data_source
 
@@ -298,7 +298,7 @@ def test_benchmark_calculation():
 
             market_prices = market_df[order_df.iloc[i]['benchmark_date_start']:order_df.iloc[i]['benchmark_date_end']]['mid']
 
-            dt = market_prices.index.to_series().diff().values / np.timedelta64(1, 's')
+            dt = market_prices.index.tz_convert(None).to_series().diff().values / np.timedelta64(1, 's')
             dt[0] = 0
 
             twap_price_comparison = (market_prices * dt).sum() / dt.sum()
@@ -306,7 +306,7 @@ def test_benchmark_calculation():
             assert abs(twap_price - twap_price_comparison) < eps
 
     #### VWAP calculation
-    order_df, _ = BenchmarkVWAP().calculate_benchmark(trade_order_df=order_df, market_df=market_df, volume_field='volume')
+    order_df, _ = BenchmarkVWAP().calculate_benchmark(trade_order_df=order_df, market_df=market_df, weighting_field='volume')
 
     for i in ind_list:
         if order_df.ix[i, 'notional'] > 1:

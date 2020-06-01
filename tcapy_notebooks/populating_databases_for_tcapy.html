@@ -13109,9 +13109,9 @@ div#notebook {
 <div class=" highlight hl-ipython3"><pre><span></span><span class="kn">import</span> <span class="nn">sys</span>
 <span class="kn">import</span> <span class="nn">os</span>
 
-<span class="n">windows_tcapy_path</span> <span class="o">=</span> <span class="s1">&#39;e:/Remote/tcapy/&#39;</span> <span class="c1"># Windows platform</span>
+<span class="n">windows_tcapy_path</span> <span class="o">=</span> <span class="s1">&#39;e:/cuemacro/tcapy/&#39;</span> <span class="c1"># Windows platform</span>
 <span class="n">linux_tcapy_path</span> <span class="o">=</span> <span class="s1">&#39;/home/tcapyuser/cuemacro/tcapy&#39;</span> <span class="c1"># Linux platform</span>
-<span class="n">local_test_data_path</span> <span class="o">=</span> <span class="s2">&quot;e:/Remote/tcapy/tests_harness_data/&quot;</span> <span class="c1"># Windows platform</span>
+<span class="n">local_test_data_path</span> <span class="o">=</span> <span class="s2">&quot;e:/cuemacro/tcapy/tests_harness_data/&quot;</span> <span class="c1"># Windows platform</span>
 <span class="n">remote_test_data_path</span> <span class="o">=</span> <span class="s1">&#39;/home/tcapyuser/cuemacro/tcapy/tests_harness_data/&#39;</span> <span class="c1"># WSL drive</span>
 
 <span class="c1"># For dumping market data files</span>
@@ -13120,7 +13120,7 @@ div#notebook {
 <span class="c1"># Make sure whatever paths you add exist!</span>
 <span class="n">csv_folder</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="se">\\\\</span><span class="s1">wsl$</span><span class="se">\\</span><span class="s1">Ubuntu</span><span class="se">\\</span><span class="s1">home</span><span class="se">\\</span><span class="s1">tcapyuser</span><span class="se">\\</span><span class="s1">csv_dump</span><span class="se">\\</span><span class="s1">&#39;</span>
 <span class="n">temp_data_folder</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\\\\</span><span class="s2">wsl$</span><span class="se">\\</span><span class="s2">Ubuntu</span><span class="se">\\</span><span class="s2">home</span><span class="se">\\</span><span class="s2">tcapyuser</span><span class="se">\\</span><span class="s2">csv_dump</span><span class="se">\\</span><span class="s2">temp</span><span class="se">\\</span><span class="s2">&quot;</span>
-<span class="n">temp_large_data_folder</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\\\\</span><span class="s2">wsl$</span><span class="se">\\</span><span class="s2">Ubuntu/home</span><span class="se">\\</span><span class="s2">tcapyuser</span><span class="se">\\</span><span class="s2">csv_dump</span><span class="se">\\</span><span class="s2">large</span><span class="se">\\</span><span class="s2">&quot;</span>
+<span class="n">temp_large_data_folder</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\\\\</span><span class="s2">wsl$</span><span class="se">\\</span><span class="s2">Ubuntu</span><span class="se">\\</span><span class="s2">home</span><span class="se">\\</span><span class="s2">tcapyuser</span><span class="se">\\</span><span class="s2">csv_dump</span><span class="se">\\</span><span class="s2">large</span><span class="se">\\</span><span class="s2">&quot;</span>
 
 <span class="c1"># Assuming the front end is on Windows</span>
 <span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">windows_tcapy_path</span><span class="p">)</span>

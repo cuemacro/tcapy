@@ -276,6 +276,9 @@ class TCATickerLoaderImpl(TCATickerLoader):
                       'arrival', 'buy_trade', 'sell_trade', 'notional', 'executed_notional', 'executed_price',
                       'side']
 
+            for f in tca_request.extra_lines_to_plot:
+                fields.append(f)
+
             # create a sparse representation of the trades/orders which can later be displayed to users
             for trade_order in trade_order_list:
                 if trade_order in trade_order_df_dict:

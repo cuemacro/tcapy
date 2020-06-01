@@ -892,7 +892,7 @@ class PlotRender(object):
 
         for k in lines_to_plot:
 
-            if k not in sparse_market_trade_df.columns and k != 'candlestick':
+            if k not in sparse_market_trade_df.columns and k != 'candlestick' and k != 'other':
                 if k in lines_dict.keys():
                     lines_dict.pop(k)
 
@@ -920,6 +920,9 @@ class PlotRender(object):
 
             lines_to_plot.remove('candlestick')
 
+        if 'other' in lines_to_plot:
+            lines_to_plot.remove('other')
+
         sparse_market_trade_df = sparse_market_trade_df[lines_to_plot]
 
         color_list = []
@@ -927,18 +930,36 @@ class PlotRender(object):
         chart_type_list = []
         line_shape_list = []
 
+        other_line = -1
+
+        def grab_line_property(e_dict, property_name, index):
+            prop = e_dict[property_name]
+
+            if isinstance(prop, list):
+                return prop[index % len(prop)]
+
+            return prop
+
         for i in range(0, len(lines_to_plot)):
-            if lines_to_plot[i] in self._util_func.dict_key_list(lines_dict.keys()):
-                e = lines_dict[lines_to_plot[i]]
 
-                color_list.append(e['color'])
-                linewidth_list.append(e['linewidth'])
-                chart_type_list.append(e['chart_type'])
+            line_key = lines_to_plot[i]
 
-                try:
-                    line_shape_list.append(e['line_shape'])
-                except:
-                    line_shape_list.append(None)
+            # For user defined lines, we often won't have specific properties, so utilize the "other" line
+            if line_key not in self._util_func.dict_key_list(lines_dict.keys()):
+                line_key = 'other'
+
+                other_line = other_line + 1
+
+            e = lines_dict[line_key]
+
+            color_list.append(grab_line_property(e, 'color', other_line))
+            linewidth_list.append(grab_line_property(e, 'linewidth', other_line))
+            chart_type_list.append(grab_line_property(e, 'chart_type', other_line))
+
+            try:
+                line_shape_list.append(grab_line_property(e, 'line_shape', other_line))
+            except:
+                line_shape_list.append(None)
 
         style = Style(title=title,
                       subplots=False,
@@ -979,7 +1000,8 @@ class PlotRender(object):
         # Return a plotly.Fig object, which can be displayed by dash
         return plot
 
-    def plot_timeline(self, timeline_df=None, title=None, width=constants.chart_width, height=constants.chart_height):
+    def plot_timeline(self, timeline_df=None, title=None, width=constants.chart_width, height=constants.chart_height,
+                      x_title=None, y_title=None):
         """Renders a time series into a plotly Fig object, which can be displayed.
 
         Parameters
@@ -1012,13 +1034,14 @@ class PlotRender(object):
                 timeline_df = timeline_df.interpolate(method=constants.timeline_fillna)
 
         return self._chart.plot(timeline_df, style=Style(title=title, chart_type=constants.timeline_line_type,
-                                                         plotly_plot_mode=constants.plotly_plot_mode,
-                                                         line_shape=constants.timeline_lineshape,
-                                                         connect_line_gaps=constants.timeline_connect_line_gaps,
-                                                         width=width,
-                                                         height=height, scale_factor=final_scale_factor, plotly_webgl=constants.plotly_webgl))
+            plotly_plot_mode=constants.plotly_plot_mode,
+            line_shape=constants.timeline_lineshape,
+            connect_line_gaps=constants.timeline_connect_line_gaps,
+            width=width, height=height, scale_factor=final_scale_factor, plotly_webgl=constants.plotly_webgl,
+            x_title=x_title, y_title=y_title))
 
-    def plot_bar(self, bar_df=None, title=None, width=constants.chart_width, height=constants.chart_height):
+    def plot_bar(self, bar_df=None, title=None, width=constants.chart_width, height=constants.chart_height,
+                 x_title=None, y_title=None):
         """Plots a bar chart as a plotly Fig object
 
         Parameters
@@ -1044,7 +1067,8 @@ class PlotRender(object):
 
         style = Style(title=title, chart_type='bar',
                       plotly_plot_mode=constants.plotly_plot_mode, width=width,
-                      height=height, scale_factor=final_scale_factor, plotly_webgl=constants.plotly_webgl)
+                      height=height, scale_factor=final_scale_factor, plotly_webgl=constants.plotly_webgl,
+                      x_title=x_title, y_title=y_title)
 
         return self._chart.plot(bar_df, style=style)
 

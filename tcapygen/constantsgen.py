@@ -50,14 +50,16 @@ class ConstantsGen(object):
     detailed_timeline_plot_lines = {'mid': {'color': 'blue', 'linewidth': 3, 'chart_type': 'line'},
                                     'bid': {'color': 'black', 'linewidth': 0.5, 'chart_type': 'line'},
                                     'ask': {'color': 'black', 'linewidth': 0.5, 'chart_type': 'line'},
-                                    'arrival': {'color': 'green', 'linewidth': 3, 'chart_type': 'dot',
+                                    'arrival': {'color': 'green', 'linewidth': 3, 'chart_type': 'dash',
                                                 'line_shape': 'hv'},
                                     'twap': {'color': 'grey', 'linewidth': 0.5, 'chart_type': 'dash',
                                              'line_shape': 'hv'},
                                     'vwap': {'color': 'blue', 'linewidth': 0.5, 'chart_type': 'dot',
                                              'line_shape': 'hv'},
                                     'buy trade': {'color': 'green', 'linewidth': 1, 'chart_type': 'bubble'},
-                                    'sell trade': {'color': 'red', 'linewidth': 1, 'chart_type': 'bubble'}}
+                                    'sell trade': {'color': 'red', 'linewidth': 1, 'chart_type': 'bubble'},
+                                    'other' : {'color': ['grey', 'orange', 'red'], 'linewidth': 0.5, 'chart_type': 'dash',
+                                             'line_shape': 'hv'}}
 
     # Max number of days lookback window for any TCA calculation versus today
     gui_lookback_window = 3*365

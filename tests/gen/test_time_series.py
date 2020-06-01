@@ -136,6 +136,30 @@ def test_ohlc():
     assert all(df_ohlc['high'] >= df_ohlc['low'])
 
 
+def test_time_delta():
+    """Tests time delta function works for a number of different times"""
+    td = TimeSeriesOps().get_time_delta("12:30")
+
+    assert (td.seconds == 45000)
+
+    td = TimeSeriesOps().get_time_delta("12:30:35")
+
+    assert (td.seconds == 45035)
+
+    print(td)
+
+def test_overwrite_time_in_datetimeindex():
+    """Tests that overwriting the time with a specific time of day works
+    """
+    # Clocks went forward in London on 00:00 31 Mar 2020
+    datetimeindex = pd.date_range('28 Mar 2020', '05 Apr 2020', freq='h')
+    datetimeindex = datetimeindex.tz_localize("utc")
+
+    datetimeindex = TimeSeriesOps().overwrite_time_of_day_in_datetimeindex(datetimeindex, "16:00", overwrite_timezone="Europe/London")
+
+    # Back in UTC time 16:00 LDN is 15:00 UTC after DST changes (and is 16:00 UTC beforehand)
+    assert datetimeindex[0].hour == 16 and datetimeindex[-1].hour == 15
+
 def test_chunk():
     """Tests the chunking of dataframes works
     """
@@ -198,11 +222,16 @@ def test_data_frame_holder():
 
     assert_frame_equal(df, df_final)
 
+
+
 if __name__ == '__main__':
     test_vlookup()
     test_filter_between_days_times()
     test_remove_consecutive_duplicates()
     test_ohlc()
+    test_time_delta()
+    test_overwrite_time_in_datetimeindex()
+
     test_chunk()
     test_cache_handle()
     test_data_frame_holder()

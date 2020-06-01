@@ -119,7 +119,6 @@ def example_calculate_spread_to_mid_benchmark():
 
     print(trade_df)
 
-
 if __name__ == '__main__':
     import time
 

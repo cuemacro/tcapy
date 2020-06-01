@@ -305,6 +305,12 @@ class ResultsSummary(object):
             elif by_date == 'timenyc':
                 group = [trade_df.index.copy().tz_convert('America/New_York').time]
 
+            elif by_date == 'hourldn':
+                group = [trade_df.index.copy().tz_convert('Europe/London').hour]
+
+            elif by_date == 'hournyc':
+                group = [trade_df.index.copy().tz_convert('America/New_York').hour]
+
             if aggregate_by_field is not None:
                 group.append(aggregate_by_field)
 
@@ -346,6 +352,13 @@ class ResultsSummary(object):
 
         elif aggregation_metric == 'count':
             agg = agg.count()
+
+        elif aggregation_metric == 'max':
+            agg = agg.max()
+
+        elif aggregation_metric == 'min':
+            agg = agg.min()
+
 
         else:
             return Exception(aggregation_metric + " is not a valid aggregation, must be one of mean, sum or count.")

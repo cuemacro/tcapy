@@ -19,7 +19,7 @@ from tcapy.conf.constants import Constants
 
 from tcapy.util.loggermanager import LoggerManager
 
-# compatible with Python 2 *and* 3:
+# Compatible with Python 2 *and* 3:
 ABC = abc.ABCMeta('ABC', (object,), {'__slots__': ()})
 
 # from tcapy.util.loggermanager import LoggerManager
@@ -58,12 +58,12 @@ class Metric(ABC):
         if benchmark in market_df.columns:
             return benchmark
 
-        # if we ask for bid or ask (but they don't exist) return 'mid'
+        # If we ask for bid or ask (but they don't exist) return 'mid'
         if benchmark == 'bid' or benchmark == 'ask':
             # default to returning the 'mid'
             return 'mid'
 
-        # otherwise the benchmark has been precalculated in the trade order?
+        # Otherwise the benchmark has been precalculated in the trade order?
         return benchmark
 
     def _check_calculate_metric(self, trade_order_name):
@@ -151,14 +151,14 @@ class Metric(ABC):
 
             dt = None
 
-            # first check if the benchmark label is in the market data (eg. for bid/mid/ask), in which grab from there
+            # First check if the benchmark label is in the market data (eg. for bid/mid/ask), in which grab from there
             if benchmark_label_ in market_df.columns:
 
                 benchmark, dt = self._time_series_ops.vlookup_style_data_frame(side_dt, market_df, benchmark_label_,
                                                                               timedelta_amount=timedelta_amount,
                                                                               just_before_point=just_before_point)
 
-            # otherwise it could be a column in the trade data (eg. VWAP, TWAP etc. which need to calculated for each
+            # Otherwise it could be a column in the trade data (eg. VWAP, TWAP etc. which need to calculated for each
             # trade individually beforehand)
             else:
                 benchmark = trade_df[benchmark_label_]
@@ -195,7 +195,8 @@ class MetricSlippage(MetricCalc):
     """
 
     def __init__(self, trade_order_list=None, executed_price='executed_price', bid_benchmark='mid',
-                 ask_benchmark='mid', bid_mid_spread='bid_mid_spread', ask_mid_spread='ask_mid_spread'):
+                 ask_benchmark='mid', bid_mid_spread='bid_mid_spread', ask_mid_spread='ask_mid_spread',
+                 metric_post_fix=''):
         super(MetricSlippage, self).__init__(trade_order_list=trade_order_list)
 
         self._executed_price = executed_price  # field for executed price of trade
@@ -204,7 +205,7 @@ class MetricSlippage(MetricCalc):
         self._bid_mid_spread = bid_mid_spread  # size of the spread between bid and mid
         self._ask_mid_spread = ask_mid_spread  # size of the spread between ask and mid
 
-        self._metric_name = 'slippage'
+        self._metric_name = 'slippage' + metric_post_fix
 
     def calculate_metric(self, trade_order_df=None, market_df=None, trade_order_name=None, executed_price=None,
                          mid_benchmark=None, bid_benchmark=None, ask_benchmark=None, bid_mid_spread=None,
@@ -319,12 +320,12 @@ class MetricSlippage(MetricCalc):
 class MetricImpShortfall(MetricSlippage):
     def __init__(self, trade_order_list=None, executed_price='executed_price',
                  bid_benchmark='arrival', ask_benchmark='arrival',
-                 bid_mid_spread='bid_mid_spread', ask_mid_spread='ask_mid_spread'):
+                 bid_mid_spread='bid_mid_spread', ask_mid_spread='ask_mid_spread', metric_post_fix=''):
         super(MetricImpShortfall, self).__init__(trade_order_list=trade_order_list, executed_price=executed_price,
                                                  bid_benchmark=bid_benchmark, ask_benchmark=ask_benchmark,
                                                  bid_mid_spread=bid_mid_spread, ask_mid_spread=ask_mid_spread)
 
-        self._metric_name = 'impshortfall'
+        self._metric_name = 'impshortfall' + metric_post_fix
 
 ########################################################################################################################
 
@@ -341,16 +342,6 @@ class MetricMarketImpact(MetricCalc):
         self._executed_price = executed_price
         self._bid_benchmark = bid_benchmark
         self._ask_benchmark = ask_benchmark
-
-    def _time_delta(self):
-        if 'ms' in self._market_impact_gap:
-            return timedelta(milliseconds=self._market_impact_gap['ms'])
-        elif 's' in self._market_impact_gap:
-            return timedelta(seconds=self._market_impact_gap['s'])
-        elif 'm' in self._market_impact_gap:
-            return timedelta(minutes=self._market_impact_gap['m'])
-        elif 'h' in self._market_impact_gap:
-            return timedelta(hours=self._market_impact_gap['h'])
 
     def calculate_metric(self, trade_order_df=None, market_df=None, trade_order_name=None, executed_price=None,
                          bid_benchmark=None, ask_benchmark=None):
@@ -384,7 +375,7 @@ class MetricMarketImpact(MetricCalc):
         metric_df[executed_price] = trade_order_df[executed_price]
 
         # Market impact
-        time_delta = self._time_delta()
+        time_delta = self._time_series_ops.get_time_delta(self._market_impact_gap)
         metric_df = self._get_benchmark_time_points(trade_order_df, market_df, metric_df, is_sell, bid_benchmark,
                                                     self._metric_name + '_benchmark', timedelta_amount=time_delta,
                                                     just_before_point=False)
@@ -414,24 +405,24 @@ class MetricMarketImpact(MetricCalc):
 
 class MetricTransientMarketImpact(MetricMarketImpact):
     def __init__(self, trade_order_list=None, executed_price='executed_price', bid_benchmark='bid', ask_benchmark='ask',
-                 transient_market_impact_gap=constants.transient_market_impact_gap):
+                 transient_market_impact_gap=constants.transient_market_impact_gap, metric_post_fix=''):
         super(MetricTransientMarketImpact, self).__init__(trade_order_list=trade_order_list,
                                                           executed_price=executed_price,
                                                           bid_benchmark=bid_benchmark, ask_benchmark=ask_benchmark)
 
         self._market_impact_gap = transient_market_impact_gap
-        self._metric_name = 'transient_market_impact'
+        self._metric_name = 'transient_market_impact' + metric_post_fix
 
 
 class MetricPermanentMarketImpact(MetricMarketImpact):
     def __init__(self, trade_order_list=None, executed_price='executed_price', bid_benchmark='bid', ask_benchmark='ask',
-                 permanent_market_impact_gap=constants.permanent_market_impact_gap):
+                 permanent_market_impact_gap=constants.permanent_market_impact_gap, metric_post_fix=''):
         super(MetricPermanentMarketImpact, self).__init__(trade_order_list=trade_order_list,
                                                           executed_price=executed_price,
                                                           bid_benchmark=bid_benchmark, ask_benchmark=ask_benchmark)
 
         self._market_impact_gap = permanent_market_impact_gap
-        self._metric_name = 'permanent_market_impact'
+        self._metric_name = 'permanent_market_impact' + metric_post_fix
 
 
 ########################################################################################################################

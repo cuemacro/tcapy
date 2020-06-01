@@ -211,6 +211,53 @@ def simplest_tca_single_ticker_example():
 
     print(metric_df.head(500))
 
+def single_ticker_tca_example_1600LDN_benchmark():
+    tca_engine = TCAEngineImpl(version=tca_version)
+
+    trade_order_type = 'trade_df'
+    trade_order_list = ['trade_df', 'order_df']
+
+    # specify the TCA request
+    tca_request = TCARequest(start_date=start_date, finish_date=finish_date, ticker=ticker,
+                             tca_type='detailed',
+                             dummy_market=False,
+                             trade_data_store=trade_data_store, market_data_store=market_data_store,
+                             metric_calcs=[  # Calculate the slippage for trades/order
+                                 MetricSlippage(trade_order_list=trade_order_list,
+                                     bid_benchmark='twap1600LDN', ask_benchmark='twap1600LDN', metric_post_fix='twap1600LDN')],
+                             results_form=[  # Aggregate the slippage average by date and hour
+                                 TimelineResultsForm(metric_name='slippagetwap1600LDN', by_date='date', scalar=10000.0)],
+
+                             benchmark_calcs=[  # At the arrival price for every trade/order
+                                 BenchmarkArrival(),
+
+                                 # Calculate TWAP over 16:00 LDN
+                                 BenchmarkTWAP(start_time_before_offset={'m': 2},
+                                               finish_time_after_offset={'s': 30},
+                                               overwrite_time_of_day='16:00',
+                                               overwrite_timezone='Europe/London',
+                                               benchmark_post_fix="1600LDN"),
+
+                                 # At the spread at the time of every trade/order
+                                 BenchmarkSpreadToMid()],
+
+                             extra_lines_to_plot='twap1600LDN',
+                             trade_order_mapping=trade_order_list, use_multithreading=True)
+
+    # Dictionary of dataframes as output from TCA calculation
+    dict_of_df = tca_engine.calculate_tca(tca_request)
+
+    print(dict_of_df['trade_df'].head(5))
+
+    tca_results = TCAResults(dict_of_df, tca_request)
+    tca_results.render_computation_charts()
+
+    from tcapy.vis.report.computationreport import JinjaRenderer
+
+    tca_report = TCAReport(tca_results, renderer=JinjaRenderer())
+
+    tca_report.create_report(output_filename='test_tca_twap_report.htm', output_format='html', offline_js=False)
+
 def multiple_ticker_tca_aggregated_example():
     """Example of how to do TCa analysis on multiple tickers
     """
@@ -344,12 +391,13 @@ if __name__ == '__main__':
 
     Mediator.get_volatile_cache().clear_cache()
 
-    single_ticker_tca_example()
-    simplest_tca_single_ticker_example()
-    multiple_ticker_tca_aggregated_example()
-    venue_tca_aggregated_example()
-    compare_multithreading_type()
-    multiple_ticker_tca_aggregated_with_results_example()
+    #single_ticker_tca_example()
+    #simplest_tca_single_ticker_example()
+    single_ticker_tca_example_1600LDN_benchmark()
+    #multiple_ticker_tca_aggregated_example()
+    #venue_tca_aggregated_example()
+    #compare_multithreading_type()
+    #multiple_ticker_tca_aggregated_with_results_example()
 
     finish = time.time()
     print('Status: calculated ' + str(round(finish - start, 3)) + "s")

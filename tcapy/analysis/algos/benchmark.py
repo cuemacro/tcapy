@@ -228,25 +228,33 @@ class BenchmarkTrade(Benchmark):
 ########################################################################################################################
 
 class BenchmarkArrival(BenchmarkTrade):
-    """For each trade dataframe, find the associated price associated with each trade arrival time in a market dataframe.
-    Add as an 'arrival' column in the trade dataframe
+    """For each trade/order DataFrame, finds the associated price associated with each trade arrival time in a market dataframe.
+    Adds as an 'arrival' column in the trade/order DataFrame
 
     """
 
-    def __init__(self, trade_order_list=None, bid_benchmark='mid', ask_benchmark='mid', benchmark_post_fix=''):
+    def __init__(self, trade_order_list=None, bid_benchmark='mid', ask_benchmark='mid', benchmark_post_fix='',
+                 start_time_before_offset=None,
+                 overwrite_time_of_day=None, overwrite_timezone=None):
         super(BenchmarkArrival, self).__init__(trade_order_list=trade_order_list)
 
         self._bid_benchmark = bid_benchmark
         self._ask_benchmark = ask_benchmark
         self._time_series_ops = TimeSeriesOps()
         self._benchmark_name = 'arrival' + benchmark_post_fix
+        self._start_time_before_offset = start_time_before_offset
+        self._overwrite_time_of_day = overwrite_time_of_day
+        self._overwrite_timezone = overwrite_timezone
 
     def calculate_benchmark(self, trade_order_df=None, market_df=None, trade_order_name=None, bid_benchmark=None,
-                            ask_benchmark=None):
+                            ask_benchmark=None, start_time_before_offset=None, overwrite_time_of_day=None, overtime_zone=None):
         if not (self._check_calculate_benchmark(trade_order_name=trade_order_name)): return trade_order_df, market_df
 
         if bid_benchmark is None: bid_benchmark = self._bid_benchmark
         if ask_benchmark is None: ask_benchmark = self._ask_benchmark
+        if start_time_before_offset is None: start_time_before_offset = self._start_time_before_offset
+        if overwrite_time_of_day is None: overwrite_time_of_day = self._overwrite_time_of_day
+        if overtime_zone is None: overtime_zone = self._overwrite_time_of_day
 
         if bid_benchmark in market_df.columns and ask_benchmark in market_df.columns:
             trade_order_df[self._benchmark_name] = np.nan
@@ -255,6 +263,13 @@ class BenchmarkArrival(BenchmarkTrade):
             is_side = trade_order_df['side'] == 1
             side_dt = trade_order_df.index[is_side]
 
+            if start_time_before_offset is not None:
+                side_dt = side_dt - self._time_series_ops.get_time_delta(start_time_before_offset)
+
+            if overwrite_time_of_day is not None:
+                side_dt = self._time_series_ops.overwrite_time_of_day_in_datetimeindex(side_dt, overwrite_time_of_day,
+                            old_tz=trade_order_df.index.tz, overwrite_timezone=overtime_zone)
+
             # TODO work on actual rather than copy
             benchmark, actual_dt = self._time_series_ops.vlookup_style_data_frame(side_dt, market_df, ask_benchmark)
             trade_order_df[self._benchmark_name][is_side] = benchmark
@@ -262,6 +277,14 @@ class BenchmarkArrival(BenchmarkTrade):
             # Now, do all the sell trades (ie. selling at the bid!)
             is_side = trade_order_df['side'] == -1
             side_dt = trade_order_df.index[is_side]
+
+            # Offset time and then overwrite if specified by user
+            if start_time_before_offset is not None:
+                side_dt = side_dt - self._time_series_ops.get_time_delta(start_time_before_offset)
+
+            if overwrite_time_of_day is not None:
+                side_dt = self._time_series_ops.overwrite_time_of_day_in_datetimeindex(side_dt, overwrite_time_of_day,
+                            old_tz=trade_order_df.index.tz, overwrite_timezone=overtime_zone)
 
             benchmark, actual_dt = self._time_series_ops.vlookup_style_data_frame(side_dt, market_df, bid_benchmark)
             trade_order_df[self._benchmark_name][is_side] = benchmark
@@ -275,154 +298,305 @@ class BenchmarkArrival(BenchmarkTrade):
 
 ########################################################################################################################
 
-class BenchmarkVWAP(BenchmarkTrade):
-    def __init__(self, trade_order_list=None, bid_benchmark='mid', ask_benchmark='mid', volume_field='volume',
-                 benchmark_date_start_field='benchmark_date_start',
-                 benchmark_date_end_field='benchmark_date_end', benchmark_post_fix=''):
-
-        super(BenchmarkVWAP, self).__init__(trade_order_list=trade_order_list)
-
-        self._bid_benchmark = bid_benchmark
-        self._ask_benchmark = ask_benchmark
-        self._volume_field = volume_field
-        self._benchmark_date_start_field = benchmark_date_start_field
-        self._benchmark_date_end_field = benchmark_date_end_field
-        self._benchmark_name = 'vwap' + benchmark_post_fix
-
-    """Calculates VWAP (volume weighted average price) for individual orders.
+class BenchmarkWeighted(BenchmarkTrade):
+    """Calculates weighted benchmark price (based on any field) for individual orders or (trades over a window)
 
     """
 
+    def __init__(self, trade_order_list=None, bid_benchmark='mid', ask_benchmark='mid', weighting_field='weighted',
+                 benchmark_date_start_field='benchmark_date_start',
+                 benchmark_date_end_field='benchmark_date_end', benchmark_post_fix='',
+                 start_time_before_offset=None, finish_time_after_offset=None,
+                 overwrite_time_of_day=None, overwrite_timezone=None):
+
+        super(BenchmarkTrade, self).__init__(trade_order_list=trade_order_list)
+
+        self._bid_benchmark = bid_benchmark
+        self._ask_benchmark = ask_benchmark
+        self._weighting_field = weighting_field
+        self._benchmark_date_start_field = benchmark_date_start_field
+        self._benchmark_date_end_field = benchmark_date_end_field
+        self._benchmark_name = 'weighted' + benchmark_post_fix
+
+        self._start_time_before_offset = start_time_before_offset
+        self._finish_time_after_offset = finish_time_after_offset
+
+        self._overwrite_time_of_day = overwrite_time_of_day
+        self._overwrite_timezone = overwrite_timezone
+
     def calculate_benchmark(self, trade_order_df=None, market_df=None, trade_order_name=None, bid_benchmark=None,
                             ask_benchmark=None,
-                            volume_field=None,
+                            weighting_field=None,
                             benchmark_date_start_field=None,
-                            benchmark_date_end_field=None):
+                            benchmark_date_end_field=None, start_time_before_offset=None, finish_time_after_offset=None,
+                            overwrite_time_of_day=None, overwrite_timezone=None):
 
         if not (self._check_calculate_benchmark(trade_order_name=trade_order_name)): return trade_order_df, market_df
 
-        # if fields have not been specified, then take them from the field variables
+        # If fields have not been specified, then take them from the field variables
         if bid_benchmark is None: bid_benchmark = self._bid_benchmark
         if ask_benchmark is None: ask_benchmark = self._ask_benchmark
-        if volume_field is None: volume_field = self._volume_field
+        if weighting_field is None: weighting_field = self._weighting_field
         if benchmark_date_start_field is None: benchmark_date_start_field = self._benchmark_date_start_field
         if benchmark_date_end_field is None: benchmark_date_end_field = self._benchmark_date_end_field
+        if start_time_before_offset is None: start_time_before_offset = self._start_time_before_offset
+        if finish_time_after_offset is None: finish_time_after_offset = self._finish_time_after_offset
+        if overwrite_time_of_day is None: overwrite_time_of_day = self._overwrite_time_of_day
+        if overwrite_timezone is None: overwrite_timezone = self._overwrite_timezone
 
-        if bid_benchmark in market_df.columns and ask_benchmark in market_df.columns and volume_field in market_df.columns:
+        if weighting_field is not None:
+            weighting_field_condition = True
+        else:
+            weighting_field_condition = weighting_field in market_df.columns
+
+        if bid_benchmark in market_df.columns and ask_benchmark in market_df.columns and weighting_field_condition:
             trade_order_df[self._benchmark_name] = np.nan
 
-            date_start = trade_order_df[benchmark_date_start_field].values
-            date_end = trade_order_df[benchmark_date_end_field].values
+            if benchmark_date_start_field is not None and benchmark_date_end_field is not None and \
+                    benchmark_date_start_field in trade_order_df.columns and benchmark_date_end_field in trade_order_df.columns:
+                date_start = trade_order_df[benchmark_date_start_field].values
+                date_end = trade_order_df[benchmark_date_end_field].values
+            else:
+                date_start = trade_order_df.index.values
+                date_end = trade_order_df.index.values
+
+            # Overwrite every trade/order start/end time by a specific time of day if this has been specified
+            if overwrite_time_of_day is not None and overwrite_timezone is not None:
+                date_start = self._time_series_ops.overwrite_time_of_day_in_datetimeindex(date_start,
+                                overwrite_time_of_day,
+                                old_tz=trade_order_df.index.tz,
+                                overwrite_timezone=overwrite_timezone)
+                date_end = self._time_series_ops.overwrite_time_of_day_in_datetimeindex(date_end,
+                                overwrite_time_of_day,
+                                old_tz=trade_order_df.index.tz,
+                                overwrite_timezone=overwrite_timezone)
+
+            # Subtract a user defined time from the start time of the order (or point in time for a trade) if specifed
+            if start_time_before_offset is not None:
+                date_start = date_start - self._time_series_ops.get_time_delta(start_time_before_offset)
+
+            # Add a user defined time from the finish time of the order (or point in time for a trade) if specified
+            if finish_time_after_offset is not None:
+                date_end = date_end + self._time_series_ops.get_time_delta(finish_time_after_offset)
 
             date_start = np.searchsorted(market_df.index, date_start)
             date_end = np.searchsorted(market_df.index, date_end)
             bid_price = market_df[bid_benchmark].values
             ask_price = market_df[ask_benchmark].values
-            volume = market_df[volume_field].values
 
-            vwap = []
+            try:
+                trade_order_df[self._benchmark_name] = \
+                    self._benchmark_calculation(trade_order_df, bid_price, ask_price, date_start, date_end,
+                                                weights=self._generate_weights(market_df, weighting_field=weighting_field))
+            except:
+                LoggerManager.getLogger(__name__).warn(
+                    self._benchmark_name + " not calculated (check if has correct input fields)")
 
-            for i in range(0, len(trade_order_df.index)):
-                if trade_order_df['side'][i] == 1:
-                    price = ask_price
-                elif trade_order_df['side'][i] == -1:
-                    price = bid_price
-
-                if date_start[i] == date_end[i]:
-                    vwap.append(price[date_start[i]])
-                else:
-                    try:
-                        vwap.append(
-                            np.average(price[date_start[i]:date_end[i]], weights=volume[date_start[i]:date_end[i]]))
-                    except Exception as e:
-                        err_msg = "VWAP cannot be calculated, given market data does not fully overlap with trade data: " \
-                                  + str(e)
-
-                        LoggerManager.getLogger(__name__).error(err_msg)
-
-                        raise TradeMarketNonOverlapException(err_msg)
-
-            trade_order_df[self._benchmark_name] = vwap
         else:
             LoggerManager.getLogger(__name__).warn(
-                bid_benchmark + ", " + ask_benchmark + " " + volume_field + " may not be in market data")
+                bid_benchmark + ", " + ask_benchmark + " " + weighting_field + " may not be in market data")
 
         return trade_order_df, market_df
 
-########################################################################################################################
+    def _generate_weights(self, market_df, weighting_field=None):
+        if weighting_field is not None and weighting_field in market_df.columns:
+            return market_df[weighting_field].values
 
-class BenchmarkTWAP(BenchmarkTrade):
-    def __init__(self, trade_order_list=None, bid_benchmark='mid', ask_benchmark='mid',
-                 benchmark_date_start_field='benchmark_date_start',
-                 benchmark_date_end_field='benchmark_date_end', benchmark_post_fix=''):
+        return None
 
-        super(BenchmarkTWAP, self).__init__(trade_order_list=trade_order_list)
+    def _benchmark_calculation(self, trade_order_df, bid_price, ask_price, date_start, date_end, weights=None):
 
-        self._bid_benchmark = bid_benchmark
-        self._ask_benchmark = ask_benchmark
-        self._benchmark_date_start_field = benchmark_date_start_field
-        self._benchmark_date_end_field = benchmark_date_end_field
-        self._benchmark_name = 'twap' + benchmark_post_fix
+        benchmark = []
 
-    """Calculates TWAP (time weighted average price) for individual orders.
+        for i in range(0, len(trade_order_df.index)):
+            # If the trade is a buy
+            if trade_order_df['side'][i] == 1:
+                price = ask_price
 
-    """
+            # If the trade is a sell
+            elif trade_order_df['side'][i] == -1:
+                price = bid_price
 
-    def calculate_benchmark(self, trade_order_df=None, market_df=None, trade_order_name=None, bid_benchmark=None,
-                            ask_benchmark=None,
-                            benchmark_date_start_field=None,
-                            benchmark_date_end_field=None):
-        if not (self._check_calculate_benchmark(trade_order_name=trade_order_name)): return trade_order_df, market_df
-
-        # for the specified field (usually 'mid' field) calculate the time weighted average price, which is the simple
-        # average
-        if bid_benchmark is None: bid_benchmark = self._bid_benchmark
-        if ask_benchmark is None: ask_benchmark = self._ask_benchmark
-        if benchmark_date_start_field is None: benchmark_date_start_field = self._benchmark_date_start_field
-        if benchmark_date_end_field is None: benchmark_date_end_field = self._benchmark_date_end_field
-
-        if bid_benchmark in market_df.columns and ask_benchmark in market_df:
-            trade_order_df[self._benchmark_name] = np.nan
-
-            date_start = trade_order_df[benchmark_date_start_field].values
-            date_end = trade_order_df[benchmark_date_end_field].values
-
-            date_start = np.searchsorted(market_df.index, date_start)
-            date_end = np.searchsorted(market_df.index, date_end)
-            bid_price = market_df[bid_benchmark].values
-            ask_price = market_df[ask_benchmark].values
-            dt = market_df.index.to_series(keep_tz=False).diff().values / np.timedelta64(1, 's')
-            dt[0] = 0  # first point should be weighted zero (since don't know how long it's been there)
-
-            twap = []
-
-            for i in range(0, len(trade_order_df.index)):
-
-                if trade_order_df['side'][i] == 1:
-                    price = ask_price
-                elif trade_order_df['side'][i] == -1:
-                    price = bid_price
-
+            if date_start[i] == date_end[i]:
+                benchmark.append(price[date_start[i]])
+            else:
                 try:
-                    if date_start[i] == date_end[i]:
-                        twap.append(price[date_start[i]])
-                    else:
-                        twap_val = np.average(price[date_start[i]:date_end[i]], weights=dt[date_start[i]:date_end[i]])
-
-                        twap.append(twap_val)
+                    benchmark.append(
+                        np.average(price[date_start[i]:date_end[i]], weights=weights[date_start[i]:date_end[i]]))
                 except Exception as e:
-                    err_msg = "TWAP cannot be calculated, given market data does not fully overlap with trade data: " \
+                    err_msg = self._benchmark_name + " cannot be calculated, given market data does not fully overlap with trade data: " \
                               + str(e)
 
                     LoggerManager.getLogger(__name__).error(err_msg)
 
                     raise TradeMarketNonOverlapException(err_msg)
 
-            trade_order_df[self._benchmark_name] = twap
-        else:
-            LoggerManager.getLogger(__name__).warn(bid_benchmark + " and " + ask_benchmark + " may not be in market data.")
+        return benchmark
 
-        return trade_order_df, market_df
+########################################################################################################################
+
+class BenchmarkVWAP(BenchmarkWeighted):
+    """Calculates VWAP price for individual orders or (trades over a window)
+    """
+
+    def __init__(self, trade_order_list=None, bid_benchmark='mid', ask_benchmark='mid', weighting_field='volume',
+                 benchmark_date_start_field='benchmark_date_start',
+                 benchmark_date_end_field='benchmark_date_end', benchmark_post_fix='',
+                 start_time_before_offset=None, finish_time_after_offset=None,
+                 overwrite_time_of_day=None, overwrite_timezone=None):
+
+        super(BenchmarkVWAP, self).__init__(trade_order_list=trade_order_list,
+                                            bid_benchmark=bid_benchmark, ask_benchmark=ask_benchmark,
+                                            weighting_field=weighting_field,
+                                            benchmark_date_start_field=benchmark_date_start_field,
+                                            benchmark_date_end_field=benchmark_date_end_field,
+                                            benchmark_post_fix=benchmark_post_fix,
+                                            start_time_before_offset=start_time_before_offset, finish_time_after_offset=finish_time_after_offset,
+                                            overwrite_time_of_day=overwrite_time_of_day, overwrite_timezone=overwrite_timezone)
+
+        self._benchmark_name = 'vwap' + benchmark_post_fix
+
+########################################################################################################################
+
+class BenchmarkTWAP(BenchmarkWeighted):
+    """Calculates TWAP price for individual orders or (trades over a window)
+    """
+
+    def __init__(self, trade_order_list=None, bid_benchmark='mid', ask_benchmark='mid',
+                 benchmark_date_start_field='benchmark_date_start',
+                 benchmark_date_end_field='benchmark_date_end', benchmark_post_fix='',
+                 start_time_before_offset=None, finish_time_after_offset=None,
+                 overwrite_time_of_day=None, overwrite_timezone=None):
+
+        super(BenchmarkTWAP, self).__init__(trade_order_list=trade_order_list,
+                                            bid_benchmark=bid_benchmark, ask_benchmark=ask_benchmark,
+                                            benchmark_date_start_field=benchmark_date_start_field,
+                                            benchmark_date_end_field=benchmark_date_end_field,
+                                            benchmark_post_fix=benchmark_post_fix,
+                                            start_time_before_offset=start_time_before_offset, finish_time_after_offset=finish_time_after_offset,
+                                            overwrite_time_of_day=overwrite_time_of_day, overwrite_timezone=overwrite_timezone)
+
+        self._benchmark_name = 'twap' + benchmark_post_fix
+
+    def _generate_weights(self, market_df, weighting_field=None):
+        weights = market_df.index.tz_convert(None).to_series().diff().values / np.timedelta64(1, 's')
+        weights[0] = 0  # first point should be weighted zero (since don't know how long it's been there)
+
+        return weights
+
+########################################################################################################################
+
+class BenchmarkMedian(BenchmarkWeighted):
+    """Calculates median price for individual orders or (trades over a window)
+    """
+    def __init__(self, trade_order_list=None, bid_benchmark='mid', ask_benchmark='mid',
+                 benchmark_date_start_field='benchmark_date_start',
+                 benchmark_date_end_field='benchmark_date_end', benchmark_post_fix='',
+                 start_time_before_offset=None, finish_time_after_offset=None,
+                 overwrite_time_of_day=None, overwrite_timezone=None):
+
+        super(BenchmarkMedian, self).__init__(trade_order_list=trade_order_list,
+                                            bid_benchmark=bid_benchmark, ask_benchmark=ask_benchmark,
+                                            benchmark_date_start_field=benchmark_date_start_field,
+                                            benchmark_date_end_field=benchmark_date_end_field,
+                                            benchmark_post_fix=benchmark_post_fix,
+                                            start_time_before_offset=start_time_before_offset, finish_time_after_offset=finish_time_after_offset,
+                                            overwrite_time_of_day=overwrite_time_of_day, overwrite_timezone=overwrite_timezone)
+
+        self._benchmark_name = 'median' + benchmark_post_fix
+
+    def _benchmark_calculation(self, trade_order_df, bid_price, ask_price, date_start, date_end, weights=None):
+
+        benchmark = []
+
+        for i in range(0, len(trade_order_df.index)):
+            # If the trade is a buy
+            if trade_order_df['side'][i] == 1:
+                price = ask_price
+
+            # If the trade is a sell
+            elif trade_order_df['side'][i] == -1:
+                price = bid_price
+
+            if date_start[i] == date_end[i]:
+                benchmark.append(price[date_start[i]])
+            else:
+                try:
+                    benchmark.append(self._get_price(price[date_start[i]:date_end[i]], side=trade_order_df['side'][i]))
+                except Exception as e:
+                    err_msg = self._benchmark_name + " cannot be calculated, given market data does not fully overlap with trade data: " \
+                              + str(e)
+
+                    LoggerManager.getLogger(__name__).error(err_msg)
+
+                    raise TradeMarketNonOverlapException(err_msg)
+
+        return benchmark
+
+    def _get_price(self, price, side=None):
+        return np.median(price)
+
+    def _generate_weights(self, market_df, weighting_field=None):
+        return None
+
+########################################################################################################################
+
+class BenchmarkBest(BenchmarkMedian):
+    """Calculates the benchmark as the best price during an order (or within a window), ie. for a buy trade, it'll take
+    the lowest price during the window, for a sell trade it'll take the highest price during the window
+    """
+
+    def __init__(self, trade_order_list=None, bid_benchmark='mid', ask_benchmark='mid',
+                 benchmark_date_start_field='benchmark_date_start',
+                 benchmark_date_end_field='benchmark_date_end', benchmark_post_fix='',
+                 start_time_before_offset=None, finish_time_after_offset=None,
+                 overwrite_time_of_day=None, overwrite_timezone=None):
+
+        super(BenchmarkBest, self).__init__(trade_order_list=trade_order_list,
+                                            bid_benchmark=bid_benchmark, ask_benchmark=ask_benchmark,
+                                            benchmark_date_start_field=benchmark_date_start_field,
+                                            benchmark_date_end_field=benchmark_date_end_field,
+                                            benchmark_post_fix=benchmark_post_fix,
+                                            start_time_before_offset=start_time_before_offset, finish_time_after_offset=finish_time_after_offset,
+                                            overwrite_time_of_day=overwrite_time_of_day, overwrite_timezone=overwrite_timezone)
+
+        self._benchmark_name = 'best' + benchmark_post_fix
+
+    def _get_price(self, price, side=None):
+        if side == 1:
+            return np.min(price)
+        elif side == -1:
+            return np.max(price)
+
+
+########################################################################################################################
+
+class BenchmarkWorst(BenchmarkMedian):
+    """Calculates the benchmark as the worst price during an order (or within a window), ie. for a buy trade, it'll take
+    the highest price during the window, for a sell trade it'll take the lowest price during the window
+    """
+
+    def __init__(self, trade_order_list=None, bid_benchmark='mid', ask_benchmark='mid',
+                 benchmark_date_start_field='benchmark_date_start',
+                 benchmark_date_end_field='benchmark_date_end', benchmark_post_fix='',
+                 start_time_before_offset=None, finish_time_after_offset=None,
+                 overwrite_time_of_day=None, overwrite_timezone=None):
+
+        super(BenchmarkWorst, self).__init__(trade_order_list=trade_order_list,
+                                            bid_benchmark=bid_benchmark, ask_benchmark=ask_benchmark,
+                                            benchmark_date_start_field=benchmark_date_start_field,
+                                            benchmark_date_end_field=benchmark_date_end_field,
+                                            benchmark_post_fix=benchmark_post_fix,
+                                            start_time_before_offset=start_time_before_offset, finish_time_after_offset=finish_time_after_offset,
+                                            overwrite_time_of_day=overwrite_time_of_day, overwrite_timezone=overwrite_timezone)
+
+        self._benchmark_name = 'best' + benchmark_post_fix
+
+    def _get_price(self, price, side=None):
+        if side == 1:
+            return np.max(price)
+        elif side == -1:
+            return np.min(price)
 
 ########################################################################################################################
 
@@ -436,7 +610,6 @@ class BenchmarkTradeOffset(BenchmarkTrade):
 
         self._trade_offset_ms = trade_offset_ms
         self._date_columns = date_columns
-
 
     def calculate_benchmark(self, trade_order_df=None, market_df=None, trade_order_name=None, trade_offset_ms=None, date_columns=None):
 

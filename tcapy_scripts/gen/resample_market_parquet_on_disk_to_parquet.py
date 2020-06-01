@@ -58,7 +58,7 @@ def create_resampled_spot_data():
 
         logger.info("About to resample count for " + ticker)
         df_dd_count = df_dd.resample(resample_freq).count()
-        df_dd_count.columns = ['tickcount']
+        df_dd_count.name = 'tickcount'
 
         df_dd = df_dd_ohlc.join(df_dd_count)
         df_dd.columns = [ticker + '.' + x for x in df_dd.columns]
@@ -89,6 +89,8 @@ def combine_resampled_spot_data_into_single_dataframe_usd_base():
             df_invert[terms + base + '.low'] = 1.0 / df[ticker + '.high']
 
             df_invert[terms + base + '.close'] = 1.0 / df[ticker + '.close']
+
+            df_invert[terms + base + '.tickcount'] = df[ticker + '.tickcount']
 
             df = df_invert
 

@@ -31,6 +31,13 @@ class TCAResults(ComputationResults):
             ticker = [ticker]
 
         self.ticker = ticker
+        extra_lines_to_plot = computation_request.extra_lines_to_plot
+
+        if not (isinstance(extra_lines_to_plot, list)):
+            extra_lines_to_plot = [extra_lines_to_plot]
+
+        self._extra_lines_to_plot = extra_lines_to_plot
+
         self.trade_order_list = self._util_func.dict_key_list(computation_request.trade_order_mapping.keys())
         
         self.dict_of_df = dict_of_df
@@ -49,6 +56,7 @@ class TCAResults(ComputationResults):
             heatmap_charts = {}
             styled_tables = {}
             styled_join_tables = {}
+            extra_lines_to_plot = self._extra_lines_to_plot
 
             # timeline charts
             for t in self._util_func.dict_key_list(self.timeline.keys()):
@@ -57,6 +65,11 @@ class TCAResults(ComputationResults):
                                                                      width=self._chart_width, height=self._chart_height)
 
             lines_to_plot = self._util_func.dict_key_list(constants.detailed_timeline_plot_lines.keys())
+
+            # add any additional line to plot on the sparse market charts
+            for line in extra_lines_to_plot:
+                lines_to_plot.append(line)
+
             lines_to_plot.append('candlestick')
 
             # sparse market charts

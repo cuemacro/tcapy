@@ -8,4 +8,4 @@ call %SCRIPT_FOLDER%\activate_python_environment
 echo 'Export conda environment'
 
 call conda update -n base conda --yes
-call conda env export > %TCAPY_CUEMACRO%\batch_scripts\windows\installation\environment_windows_tcapy.yml
+call conda env export > %TCAPY_CUEMACRO%\batch_scripts\windows\installation\environment_windows_py36tcapy.yml
