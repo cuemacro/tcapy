@@ -667,7 +667,7 @@ class ValidateRequest(object):
                         self._raise_validation_error("Venue " + str(v) + " is not in the available list of venues!")
 
         if isinstance(request, TCARequest):
-            if request.tca_type not in ['detailed', 'aggregated', 'compliance']:
+            if request.tca_type not in ['detailed', 'aggregated', 'compliance', 'market-analysis']:
                 self._raise_validation_error(str(request.tca_type) + " is not a valid TCA type.")
         elif isinstance(request, TradeRequest):
             pass
