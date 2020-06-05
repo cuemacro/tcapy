@@ -120,3 +120,24 @@ def calculate_metrics_single_ticker_via_celery(tuple, tca_request, dummy_market)
     """
 
     return tca_ticker_loader.calculate_metrics_single_ticker(tuple, tca_request, dummy_market)
+
+@app.task(name='get_market_trade_holder_and_calculate_metrics_single_ticker_via_celery')
+def get_market_trade_holder_and_calculate_metrics_single_ticker_via_celery(tca_request, dummy_market):
+    """Gets the both the market data and trade/order data associated with a TCA calculation as a tuple of
+    (DataFrame, DataFrameHolder)
+
+    Parameters
+    ----------
+    tca_request : TCARequest
+        Parameters for a TCA calculation
+
+    Returns
+    ------
+    DataFrame, DataFrameHolder
+    """
+
+    #from celery import group
+
+    #return group(get_market_trade_holder_via_celery(tca_request), get_trade_order_holder_via_celery(tca_request))
+    return tca_ticker_loader.calculate_metrics_single_ticker(tca_ticker_loader.get_market_trade_order_holder(tca_request),
+        tca_request, dummy_market)

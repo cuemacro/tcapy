@@ -13095,7 +13095,7 @@ div#notebook {
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="Benchmarks">Benchmarks<a class="anchor-link" href="#Benchmarks">&#182;</a></h2><p>Here we'll go through some of the benchmarks available in tcapy, which can be used for trades/orders (although some are more appropriate for orders). The abstract class <code>Benchmark</code> in tcapy can be extended to create your own customised benchmarks. The most common one is for the mid price (<code>BenchmarkMid</code>). However, there are many others including the below.</p>
+<h2 id="Benchmarks">Benchmarks<a class="anchor-link" href="#Benchmarks">&#182;</a></h2><p>Here we'll go through some of the benchmarks available in tcapy, which can be used for trades/orders (although some are more appropriate for orders). The abstract class <code>Benchmark</code> in tcapy can be extended to create your own customised benchmarks. The most common one is for the mid price (<code>BenchmarkMarketMid</code>). However, there are many others including the below.</p>
 <ul>
 <li>Arrival price (<code>BenchmarkArrival</code>) - <ul>
 <li>arrival price at start of order/trade fill</li>
@@ -13253,7 +13253,7 @@ div#notebook {
 
 
 <div class="output_subarea output_stream output_stderr output_text">
-<pre>2020-06-01 15:15:05,890; INFO:tcapy.analysis.tcaengine: Init TCAEngine version: pro - Env: desktop_laptop_linux (tcaengine.py:53)
+<pre>2020-06-05 12:39:40,928; INFO:tcapy.analysis.tcaengine: Init TCAEngine version: pro - Env: desktop_laptop_linux (tcaengine.py:53)
 </pre>
 </div>
 </div>
@@ -13304,7 +13304,7 @@ div#notebook {
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="n">benchmark_calcs</span> <span class="o">=</span> <span class="p">[</span>
     <span class="c1"># Calculate mid as a benchmark</span>
-    <span class="n">BenchmarkMid</span><span class="p">(),</span>
+    <span class="n">BenchmarkMarketMid</span><span class="p">(),</span>
     
     <span class="c1"># Calculate TWAP around 1600 LDN as a benchmark for every trade/order</span>
     <span class="n">BenchmarkTWAP</span><span class="p">(</span><span class="n">start_time_before_offset</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;m&#39;</span> <span class="p">:</span> <span class="mi">2</span><span class="p">},</span> 
@@ -13428,78 +13428,52 @@ div#notebook {
 
 
 <div class="output_subarea output_stream output_stderr output_text">
-<pre>2020-06-01 15:15:05,950; DEBUG:tcapy.analysis.tcamarkettradeloader: Start loading trade/data/computation (tcamarkettradeloader.py:240)
-2020-06-01 15:15:05,953; DEBUG:tcapy.analysis.tcatickerloaderimpl: Get market and trade/order data for EURUSD from 2017-05-07 00:00:00+00:00 - 2017-05-15 00:00:00+00:00 (tcatickerloaderimpl.py:80)
-2020-06-01 15:15:05,955; DEBUG:tcapy.data.volatilecache: Attempting to get list from cache: [&#39;dukascopy_EURUSD_2017-05-07 00:00:00+00:00_2017-05-15 00:00:00+00:00_market_df_None_comp&#39;] (volatilecache.py:697)
-2020-06-01 15:15:06,059; DEBUG:tcapy.analysis.tcatickerloader: Get trade order holder for EURUSD from 2017-05-07 00:00:00+00:00 - 2017-05-15 00:00:00+00:00 (tcatickerloader.py:379)
-2020-06-01 15:15:06,109; WARNING:tcapy.data.datafactory: Dataframe empty for ticker USDEUR (datafactory.py:95)
-2020-06-01 15:15:06,110; DEBUG:tcapy.data.volatilecache: Attempting to get list from cache: [&#39;dukascopy_EURUSD_2017-05-07 00:00:00+00:00_2017-05-15 00:00:00+00:00_market_df_None_comp&#39;] (volatilecache.py:697)
-2020-06-01 15:15:06,206; DEBUG:tcapy.data.volatilecache: Attempting to push [&#39;2020-06-01 14:15:06.205809__df_comp_91951_expiry_&#39;] to cache (volatilecache.py:429)
-2020-06-01 15:15:06,209; DEBUG:tcapy.data.volatilecache: Pandas dataframe of size: ----------- 0.029 MB ----------- in 1 chunk(s) (volatilecache.py:541)
-2020-06-01 15:15:06,212; DEBUG:tcapy.data.volatilecache: Now pushing [&#39;2020-06-01 14:15:06.205809__df_comp_91951_expiry_&#39;] to cache (volatilecache.py:442)
-2020-06-01 15:15:06,213; DEBUG:tcapy.data.volatilecache: Pushed [&#39;2020-06-01 14:15:06.205809__df_comp_91951_expiry_&#39;] to cache (volatilecache.py:460)
-2020-06-01 15:15:06,246; WARNING:tcapy.data.datafactory: Dataframe empty for ticker USDEUR (datafactory.py:95)
-2020-06-01 15:15:06,248; DEBUG:tcapy.data.volatilecache: Attempting to get list from cache: [&#39;dukascopy_EURUSD_2017-05-07 00:00:00+00:00_2017-05-15 00:00:00+00:00_market_df_None_comp&#39;] (volatilecache.py:697)
-2020-06-01 15:15:06,339; DEBUG:tcapy.data.volatilecache: Attempting to push [&#39;2020-06-01 14:15:06.339624__df_comp_98280_expiry_&#39;] to cache (volatilecache.py:429)
-2020-06-01 15:15:06,342; DEBUG:tcapy.data.volatilecache: Pandas dataframe of size: ----------- 0.011 MB ----------- in 1 chunk(s) (volatilecache.py:541)
-2020-06-01 15:15:06,345; DEBUG:tcapy.data.volatilecache: Now pushing [&#39;2020-06-01 14:15:06.339624__df_comp_98280_expiry_&#39;] to cache (volatilecache.py:442)
-2020-06-01 15:15:06,346; DEBUG:tcapy.data.volatilecache: Pushed [&#39;2020-06-01 14:15:06.339624__df_comp_98280_expiry_&#39;] to cache (volatilecache.py:460)
-2020-06-01 15:15:06,347; DEBUG:tcapy.data.volatilecache: Attempting to get list from cache: [&#39;dukascopy_EURUSD_2017-05-07 00:00:00+00:00_2017-05-15 00:00:00+00:00_market_df_None_comp&#39;] (volatilecache.py:697)
-2020-06-01 15:15:06,428; DEBUG:tcapy.analysis.tcatickerloader: Filter the market date by start/finish date (tcatickerloader.py:738)
-2020-06-01 15:15:06,442; DEBUG:tcapy.analysis.tcatickerloader: Combine trade/order data (tcatickerloader.py:759)
-2020-06-01 15:15:06,444; DEBUG:tcapy.data.volatilecache: Attempting to get list from cache: [&#39;2020-06-01 14:15:06.205809__df_comp_91951_expiry_&#39;] (volatilecache.py:697)
-2020-06-01 15:15:06,445; DEBUG:tcapy.data.volatilecache: Deleted 1 keys (volatilecache.py:733)
-2020-06-01 15:15:06,449; DEBUG:tcapy.data.volatilecache: Attempting to get list from cache: [&#39;2020-06-01 14:15:06.339624__df_comp_98280_expiry_&#39;] (volatilecache.py:697)
-2020-06-01 15:15:06,451; DEBUG:tcapy.data.volatilecache: Deleted 1 keys (volatilecache.py:733)
-2020-06-01 15:15:06,460; DEBUG:tcapy.analysis.tcatickerloader: Filter trades by venue (tcatickerloader.py:455)
-2020-06-01 15:15:06,461; DEBUG:tcapy.analysis.tcatickerloader: Calculating derived fields and benchmarks (tcatickerloader.py:505)
-2020-06-01 15:15:06,462; DEBUG:tcapy.analysis.tcatickerloader: Calculating execution fields (tcatickerloader.py:507)
-2020-06-01 15:15:06,471; DEBUG:tcapy.analysis.tcatickerloader: Calculating benchmarks (tcatickerloader.py:533)
-2020-06-01 15:15:06,472; DEBUG:tcapy.analysis.tcatickerloader: Calculating BenchmarkMid for market data (tcatickerloader.py:541)
-2020-06-01 15:15:06,474; WARNING:tcapy.analysis.algos.benchmark: mid not in market data (benchmark.py:107)
-2020-06-01 15:15:06,475; DEBUG:tcapy.analysis.tcatickerloader: Calculating BenchmarkTWAP for trade_df (tcatickerloader.py:549)
-2020-06-01 15:15:06,494; DEBUG:tcapy.analysis.tcatickerloader: Calculating BenchmarkArrival for trade_df (tcatickerloader.py:549)
-2020-06-01 15:15:06,499; DEBUG:tcapy.analysis.tcatickerloader: Calculating BenchmarkTWAP for order_df (tcatickerloader.py:549)
-2020-06-01 15:15:06,516; DEBUG:tcapy.analysis.tcatickerloader: Calculating BenchmarkArrival for order_df (tcatickerloader.py:549)
-2020-06-01 15:15:06,522; DEBUG:tcapy.analysis.tcatickerloader: Calculating metrics (tcatickerloader.py:558)
-2020-06-01 15:15:06,523; DEBUG:tcapy.analysis.tcatickerloader: Calculating MetricSlippage for trade_df (tcatickerloader.py:564)
-2020-06-01 15:15:06,534; DEBUG:tcapy.analysis.tcatickerloader: Calculating MetricSlippage for trade_df (tcatickerloader.py:564)
-2020-06-01 15:15:06,549; DEBUG:tcapy.analysis.tcatickerloader: Calculating MetricSlippage for order_df (tcatickerloader.py:564)
-2020-06-01 15:15:06,559; DEBUG:tcapy.analysis.tcatickerloader: Calculating MetricSlippage for order_df (tcatickerloader.py:564)
-2020-06-01 15:15:06,574; DEBUG:tcapy.analysis.tcatickerloader: Completed derived field calculations for EURUSD (tcatickerloader.py:572)
-2020-06-01 15:15:06,575; DEBUG:tcapy.analysis.tcatickerloaderimpl: Generating downsampled market data for potentional display (tcatickerloaderimpl.py:270)
-2020-06-01 15:15:06,625; DEBUG:tcapy.analysis.tcatickerloaderimpl: About to join (tcatickerloaderimpl.py:335)
-2020-06-01 15:15:06,629; DEBUG:tcapy.analysis.tcatickerloaderimpl: Finished joining (tcatickerloaderimpl.py:351)
-2020-06-01 15:15:06,631; DEBUG:tcapy.analysis.tcatickerloaderimpl: About to join (tcatickerloaderimpl.py:335)
-2020-06-01 15:15:06,634; DEBUG:tcapy.analysis.tcatickerloaderimpl: Finished joining (tcatickerloaderimpl.py:351)
-2020-06-01 15:15:06,742; DEBUG:tcapy.data.volatilecache: Attempting to push [&#39;2020-06-01 14:15:06.742522__df_comp_27561_expiry_&#39;] to cache (volatilecache.py:429)
-2020-06-01 15:15:06,894; DEBUG:tcapy.data.volatilecache: Pandas dataframe of size: ----------- 26.054 MB ----------- in 1 chunk(s) (volatilecache.py:541)
-2020-06-01 15:15:06,965; DEBUG:tcapy.data.volatilecache: Now pushing [&#39;2020-06-01 14:15:06.742522__df_comp_27561_expiry_&#39;] to cache (volatilecache.py:442)
-2020-06-01 15:15:06,990; DEBUG:tcapy.data.volatilecache: Pushed [&#39;2020-06-01 14:15:06.742522__df_comp_27561_expiry_&#39;] to cache (volatilecache.py:460)
-2020-06-01 15:15:06,991; DEBUG:tcapy.data.volatilecache: Attempting to push [&#39;2020-06-01 14:15:06.991368__df_comp_71816_expiry_&#39;, &#39;2020-06-01 14:15:06.991368__df_comp_85353_expiry_&#39;, &#39;2020-06-01 14:15:06.991368__df_comp_79087_expiry_&#39;, &#39;2020-06-01 14:15:06.991368__df_comp_79343_expiry_&#39;, &#39;2020-06-01 14:15:06.991368__df_comp_22283_expiry_&#39;, &#39;2020-06-01 14:15:06.991368__fig_comp_43593_expiry_&#39;] to cache (volatilecache.py:429)
-2020-06-01 15:15:06,995; DEBUG:tcapy.data.volatilecache: Pandas dataframe of size: ----------- 0.016 MB ----------- in 1 chunk(s) (volatilecache.py:541)
-2020-06-01 15:15:07,000; DEBUG:tcapy.data.volatilecache: Pandas dataframe of size: ----------- 0.013 MB ----------- in 1 chunk(s) (volatilecache.py:541)
-2020-06-01 15:15:07,003; DEBUG:tcapy.data.volatilecache: Pandas dataframe of size: ----------- 0.034 MB ----------- in 1 chunk(s) (volatilecache.py:541)
-2020-06-01 15:15:07,007; DEBUG:tcapy.data.volatilecache: Pandas dataframe of size: ----------- 0.034 MB ----------- in 1 chunk(s) (volatilecache.py:541)
-2020-06-01 15:15:07,011; DEBUG:tcapy.data.volatilecache: Pandas dataframe of size: ----------- 0.022 MB ----------- in 1 chunk(s) (volatilecache.py:541)
-2020-06-01 15:15:07,031; DEBUG:tcapy.data.volatilecache: Now pushing [&#39;2020-06-01 14:15:06.991368__df_comp_71816_expiry_&#39;, &#39;2020-06-01 14:15:06.991368__df_comp_85353_expiry_&#39;, &#39;2020-06-01 14:15:06.991368__df_comp_79087_expiry_&#39;, &#39;2020-06-01 14:15:06.991368__df_comp_79343_expiry_&#39;, &#39;2020-06-01 14:15:06.991368__df_comp_22283_expiry_&#39;, &#39;2020-06-01 14:15:06.991368__fig_comp_43593_expiry_&#39;] to cache (volatilecache.py:442)
-2020-06-01 15:15:07,033; DEBUG:tcapy.data.volatilecache: Pushed [&#39;2020-06-01 14:15:06.991368__df_comp_71816_expiry_&#39;, &#39;2020-06-01 14:15:06.991368__df_comp_85353_expiry_&#39;, &#39;2020-06-01 14:15:06.991368__df_comp_79087_expiry_&#39;, &#39;2020-06-01 14:15:06.991368__df_comp_79343_expiry_&#39;, &#39;2020-06-01 14:15:06.991368__df_comp_22283_expiry_&#39;, &#39;2020-06-01 14:15:06.991368__fig_comp_43593_expiry_&#39;] to cache (volatilecache.py:460)
-2020-06-01 15:15:07,039; DEBUG:tcapy.data.volatilecache: Attempting to get list from cache: [&#39;2020-06-01 14:15:06.991368__df_comp_71816_expiry_&#39;] (volatilecache.py:697)
-2020-06-01 15:15:07,041; DEBUG:tcapy.data.volatilecache: Deleted 1 keys (volatilecache.py:733)
-2020-06-01 15:15:07,045; DEBUG:tcapy.data.volatilecache: Attempting to get list from cache: [&#39;2020-06-01 14:15:06.991368__df_comp_85353_expiry_&#39;] (volatilecache.py:697)
-2020-06-01 15:15:07,046; DEBUG:tcapy.data.volatilecache: Deleted 1 keys (volatilecache.py:733)
-2020-06-01 15:15:07,050; DEBUG:tcapy.data.volatilecache: Attempting to get list from cache: [&#39;2020-06-01 14:15:06.991368__df_comp_79087_expiry_&#39;] (volatilecache.py:697)
-2020-06-01 15:15:07,052; DEBUG:tcapy.data.volatilecache: Deleted 1 keys (volatilecache.py:733)
-2020-06-01 15:15:07,055; DEBUG:tcapy.data.volatilecache: Attempting to get list from cache: [&#39;2020-06-01 14:15:06.991368__df_comp_79343_expiry_&#39;] (volatilecache.py:697)
-2020-06-01 15:15:07,057; DEBUG:tcapy.data.volatilecache: Deleted 1 keys (volatilecache.py:733)
-2020-06-01 15:15:07,059; DEBUG:tcapy.data.volatilecache: Attempting to get list from cache: [&#39;2020-06-01 14:15:06.991368__df_comp_22283_expiry_&#39;] (volatilecache.py:697)
-2020-06-01 15:15:07,061; DEBUG:tcapy.data.volatilecache: Deleted 1 keys (volatilecache.py:733)
-2020-06-01 15:15:07,064; DEBUG:tcapy.data.volatilecache: Attempting to get list from cache: [&#39;2020-06-01 14:15:06.991368__fig_comp_43593_expiry_&#39;] (volatilecache.py:697)
-2020-06-01 15:15:07,065; DEBUG:tcapy.data.volatilecache: Deleted 1 keys (volatilecache.py:733)
-2020-06-01 15:15:08,597; DEBUG:tcapy.analysis.tcamarkettradeloader: Finished loading data and calculating metrics on individual tickers (tcamarkettradeloader.py:247)
-2020-06-01 15:15:08,599; DEBUG:tcapy.analysis.tcamarkettradeloaderimpl: Constructing results form to summarize analysis... (tcamarkettradeloaderimpl.py:69)
-2020-06-01 15:15:08,657; DEBUG:tcapy.analysis.tcamarkettradeloaderimpl: Now join table results... (tcamarkettradeloaderimpl.py:99)
-2020-06-01 15:15:08,658; DEBUG:tcapy.analysis.tcamarkettradeloaderimpl: Finished calculating results form and join table results! (tcamarkettradeloaderimpl.py:112)
+<pre>2020-06-05 12:39:40,990; DEBUG:tcapy.analysis.tcamarkettradeloader: Start loading trade/data/computation (tcamarkettradeloader.py:241)
+2020-06-05 12:39:40,993; DEBUG:tcapy.analysis.tcatickerloaderimpl: Get market and trade/order data for EURUSD from 2017-05-07 00:00:00+00:00 - 2017-05-15 00:00:00+00:00 (tcatickerloaderimpl.py:80)
+2020-06-05 12:39:40,994; DEBUG:tcapy.data.volatilecache: Attempting to get list from cache: [&#39;dukascopy_EURUSD_2017-05-07 00:00:00+00:00_2017-05-15 00:00:00+00:00_market_df_None_comp&#39;] (volatilecache.py:697)
+2020-06-05 12:39:40,997; DEBUG:tcapy.data.volatilecache: Attempting to get list from cache: [&#39;dukascopy_EURUSD_2017-05-07 00:00:00+00:00_2017-05-15 00:00:00+00:00_market_df_None_comp&#39;] (volatilecache.py:697)
+2020-06-05 12:39:41,199; DEBUG:tcapy.data.databasesource: Downloading 2017-05-07 00:00:00 - 2017-05-15 00:00:00 for EURUSD (databasesource.py:3725)
+2020-06-05 12:39:54,415; WARNING:tcapy.analysis.algos.benchmark: mid not in market data (benchmark.py:107)
+2020-06-05 12:39:54,416; DEBUG:tcapy.data.volatilecache: Attempting to push [&#39;dukascopy_EURUSD_2017-05-07 00:00:00+00:00_2017-05-15 00:00:00+00:00_market_df_None_comp&#39;] to cache (volatilecache.py:429)
+2020-06-05 12:39:54,574; DEBUG:tcapy.data.volatilecache: Pandas dataframe of size: ----------- 26.054 MB ----------- in 1 chunk(s) (volatilecache.py:541)
+2020-06-05 12:39:54,653; DEBUG:tcapy.data.volatilecache: Now pushing [&#39;dukascopy_EURUSD_2017-05-07 00:00:00+00:00_2017-05-15 00:00:00+00:00_market_df_None_comp&#39;] to cache (volatilecache.py:442)
+2020-06-05 12:39:54,677; DEBUG:tcapy.data.volatilecache: Pushed [&#39;dukascopy_EURUSD_2017-05-07 00:00:00+00:00_2017-05-15 00:00:00+00:00_market_df_None_comp&#39;] to cache (volatilecache.py:460)
+2020-06-05 12:39:54,678; DEBUG:tcapy.data.volatilecache: Attempting to push [&#39;dukascopy_EURUSD_2017-05-07 00:00:00+00:00_2017-05-15 00:00:00+00:00_market_df_None_comp&#39;] to cache (volatilecache.py:429)
+2020-06-05 12:39:54,835; DEBUG:tcapy.data.volatilecache: Pandas dataframe of size: ----------- 26.054 MB ----------- in 1 chunk(s) (volatilecache.py:541)
+2020-06-05 12:39:54,905; DEBUG:tcapy.data.volatilecache: Now pushing [&#39;dukascopy_EURUSD_2017-05-07 00:00:00+00:00_2017-05-15 00:00:00+00:00_market_df_None_comp&#39;] to cache (volatilecache.py:442)
+2020-06-05 12:39:54,927; DEBUG:tcapy.data.volatilecache: Pushed [&#39;dukascopy_EURUSD_2017-05-07 00:00:00+00:00_2017-05-15 00:00:00+00:00_market_df_None_comp&#39;] to cache (volatilecache.py:460)
+2020-06-05 12:39:54,929; DEBUG:tcapy.analysis.tcatickerloader: Get trade order holder for EURUSD from 2017-05-07 00:00:00+00:00 - 2017-05-15 00:00:00+00:00 (tcatickerloader.py:384)
+2020-06-05 12:39:54,981; WARNING:tcapy.data.datafactory: Dataframe empty for ticker USDEUR (datafactory.py:95)
+2020-06-05 12:39:54,983; DEBUG:tcapy.data.volatilecache: Attempting to get list from cache: [&#39;dukascopy_EURUSD_2017-05-07 00:00:00+00:00_2017-05-15 00:00:00+00:00_market_df_None_comp&#39;] (volatilecache.py:697)
+2020-06-05 12:39:55,116; WARNING:tcapy.data.datafactory: Dataframe empty for ticker USDEUR (datafactory.py:95)
+2020-06-05 12:39:55,118; DEBUG:tcapy.data.volatilecache: Attempting to get list from cache: [&#39;dukascopy_EURUSD_2017-05-07 00:00:00+00:00_2017-05-15 00:00:00+00:00_market_df_None_comp&#39;] (volatilecache.py:697)
+2020-06-05 12:39:55,211; DEBUG:tcapy.analysis.tcatickerloader: Filter the market date by start/finish date (tcatickerloader.py:745)
+2020-06-05 12:39:55,222; DEBUG:tcapy.analysis.tcatickerloader: Combine trade/order data (tcatickerloader.py:766)
+2020-06-05 12:39:55,232; DEBUG:tcapy.analysis.tcatickerloader: Calculating BenchmarkMarketMid for market data (tcatickerloader.py:458)
+2020-06-05 12:39:55,233; WARNING:tcapy.analysis.algos.benchmark: mid not in market data (benchmark.py:107)
+2020-06-05 12:39:55,234; DEBUG:tcapy.analysis.tcatickerloader: Filter trades by venue (tcatickerloader.py:469)
+2020-06-05 12:39:55,236; DEBUG:tcapy.analysis.tcatickerloader: Calculating derived fields and benchmarks (tcatickerloader.py:519)
+2020-06-05 12:39:55,237; DEBUG:tcapy.analysis.tcatickerloader: Calculating execution fields (tcatickerloader.py:521)
+2020-06-05 12:39:55,246; DEBUG:tcapy.analysis.tcatickerloader: Calculating benchmarks (tcatickerloader.py:547)
+2020-06-05 12:39:55,248; DEBUG:tcapy.analysis.tcatickerloader: Calculating BenchmarkTWAP for trade_df (tcatickerloader.py:556)
+2020-06-05 12:39:55,267; DEBUG:tcapy.analysis.tcatickerloader: Calculating BenchmarkArrival for trade_df (tcatickerloader.py:556)
+2020-06-05 12:39:55,274; DEBUG:tcapy.analysis.tcatickerloader: Calculating BenchmarkTWAP for order_df (tcatickerloader.py:556)
+2020-06-05 12:39:55,291; DEBUG:tcapy.analysis.tcatickerloader: Calculating BenchmarkArrival for order_df (tcatickerloader.py:556)
+2020-06-05 12:39:55,297; DEBUG:tcapy.analysis.tcatickerloader: Calculating metrics (tcatickerloader.py:565)
+2020-06-05 12:39:55,298; DEBUG:tcapy.analysis.tcatickerloader: Calculating MetricSlippage for trade_df (tcatickerloader.py:571)
+2020-06-05 12:39:55,310; DEBUG:tcapy.analysis.tcatickerloader: Calculating MetricSlippage for trade_df (tcatickerloader.py:571)
+2020-06-05 12:39:55,326; DEBUG:tcapy.analysis.tcatickerloader: Calculating MetricSlippage for order_df (tcatickerloader.py:571)
+2020-06-05 12:39:55,336; DEBUG:tcapy.analysis.tcatickerloader: Calculating MetricSlippage for order_df (tcatickerloader.py:571)
+2020-06-05 12:39:55,353; DEBUG:tcapy.analysis.tcatickerloader: Completed derived field calculations for EURUSD (tcatickerloader.py:579)
+2020-06-05 12:39:55,354; DEBUG:tcapy.analysis.tcatickerloaderimpl: Generating downsampled market data for potentional display (tcatickerloaderimpl.py:274)
+2020-06-05 12:39:55,406; DEBUG:tcapy.analysis.tcatickerloaderimpl: About to join (tcatickerloaderimpl.py:339)
+2020-06-05 12:39:55,411; DEBUG:tcapy.analysis.tcatickerloaderimpl: Finished joining (tcatickerloaderimpl.py:355)
+2020-06-05 12:39:55,414; DEBUG:tcapy.analysis.tcatickerloaderimpl: About to join (tcatickerloaderimpl.py:339)
+2020-06-05 12:39:55,418; DEBUG:tcapy.analysis.tcatickerloaderimpl: Finished joining (tcatickerloaderimpl.py:355)
+2020-06-05 12:39:55,581; DEBUG:tcapy.analysis.tcamarkettradeloader: Finished loading data and calculating metrics on individual tickers (tcamarkettradeloader.py:248)
+2020-06-05 12:39:55,583; DEBUG:tcapy.analysis.tcamarkettradeloaderimpl: Constructing results form to summarize analysis... (tcamarkettradeloaderimpl.py:68)
+2020-06-05 12:39:55,641; DEBUG:tcapy.analysis.tcamarkettradeloaderimpl: Now join table results... (tcamarkettradeloaderimpl.py:98)
+2020-06-05 12:39:55,642; DEBUG:tcapy.analysis.tcamarkettradeloaderimpl: Finished calculating results form and join table results! (tcamarkettradeloaderimpl.py:111)
 </pre>
 </div>
 </div>
@@ -13761,10 +13735,10 @@ div#notebook {
 
 
 <div class="output_subarea output_stream output_stderr output_text">
-<pre>2020-06-01 15:15:08,762; DEBUG:tcapy.vis.displaylisteners: Plotting main timeline 2840 (displaylisteners.py:988)
-2020-06-01 15:15:08,815; DEBUG:tcapy.vis.displaylisteners: Rendered plot 2840 and  (displaylisteners.py:998)
-2020-06-01 15:15:08,818; DEBUG:tcapy.vis.displaylisteners: Plotting main timeline 2840 (displaylisteners.py:988)
-2020-06-01 15:15:08,870; DEBUG:tcapy.vis.displaylisteners: Rendered plot 2840 and  (displaylisteners.py:998)
+<pre>2020-06-05 12:39:55,918; DEBUG:tcapy.vis.displaylisteners: Plotting main timeline 2840 (displaylisteners.py:988)
+2020-06-05 12:39:55,978; DEBUG:tcapy.vis.displaylisteners: Rendered plot 2840 and  (displaylisteners.py:998)
+2020-06-05 12:39:55,981; DEBUG:tcapy.vis.displaylisteners: Plotting main timeline 2840 (displaylisteners.py:988)
+2020-06-05 12:39:56,040; DEBUG:tcapy.vis.displaylisteners: Rendered plot 2840 and  (displaylisteners.py:998)
 </pre>
 </div>
 </div>

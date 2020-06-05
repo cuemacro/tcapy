@@ -171,8 +171,9 @@ class TCAMarketTradeLoader(ABC):
         market_df_dict, trade_order_results_df_dict, tca_request_list = \
             self.get_market_trade_metrics(tca_request, dummy_market=dummy_market)
 
-        # If every ticker we have selected doesn't have trades, can't do any TCA at all
-        if len(trade_order_results_df_dict) == 0:
+        # If every ticker we have selected doesn't have trades (and are analysis also requires trades), can't do any TCA at all
+        if len(trade_order_results_df_dict) == 0 and tca_request.trade_data_store is not None \
+                and tca_request.trade_order_mapping is None:
             logger = LoggerManager.getLogger(__name__)
 
             err_msg = "no trade data for specified ticker(s) and time range"

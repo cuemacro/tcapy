@@ -117,7 +117,7 @@ def run_tcapy_computation():
                                  BenchmarkArrival(),
 
                                  # At the spread at the time of every trade/order
-                                 BenchmarkSpreadToMid()],
+                                 BenchmarkMarketSpreadToMid()],
 
                              summary_display='candlestick',
                              use_multithreading=use_multithreading,

@@ -52,7 +52,7 @@ class TCATickerLoader(ABC):
         self._metric_executed_price = MetricExecutedPriceNotional()  # for determining the executed notionals/price of orders
         # from trades
 
-        self._benchmark_mid = BenchmarkMid()  # to calculate mid price from bid/ask quote market data
+        self._benchmark_mid = BenchmarkMarketMid()  # to calculate mid price from bid/ask quote market data
         self._trade_order_tag = TradeOrderFilterTag()  # to filter trade/orders according to the values of certain tags
         self._version = version
         self._volatile_cache_engine = volatile_cache_engine
@@ -374,15 +374,15 @@ class TCATickerLoader(ABC):
     def get_trade_order_holder(self, tca_request):
         logger = LoggerManager.getLogger(__name__)
 
-        logger.debug(
-            "Get trade order holder for " + str(tca_request.ticker) + " from " + str(tca_request.start_date)
-            + " - " + str(tca_request.finish_date))
-
         # Get all the trade/orders which have been requested, eg. trade_df and order_df
         # do separate calls given they are assumed to be stored in different database tables
         trade_order_holder = DataFrameHolder()
 
         if tca_request.trade_order_mapping is not None:
+            logger.debug(
+                "Get trade order holder for " + str(tca_request.ticker) + " from " + str(tca_request.start_date)
+                + " - " + str(tca_request.finish_date))
+
             for trade_order_type in tca_request.trade_order_mapping:
                 trade_order_df = self.get_trade_order_data(tca_request, trade_order_type)
 
@@ -449,6 +449,20 @@ class TCATickerLoader(ABC):
             if not(market_df.empty):
                 valid_market = True
 
+        # Calculations on market data only
+        if valid_market:
+            for b in benchmark_calcs:
+
+                # For benchmarks which only modify market data (and don't need trade specific information)
+                if isinstance(b, BenchmarkMarket):
+                    logger.debug("Calculating " + type(b).__name__ + " for market data")
+
+                    _, market_df = b.calculate_benchmark(market_df=market_df)
+
+        trade_order_df_values = []
+        trade_order_df_keys = []
+
+        # Calculations on trades with market data
         if len(trade_order_df_dict.keys()) > 0 and valid_market:
 
             # NOTE: this will not filter orders, only TRADES (as orders do not have venue parameters)
@@ -534,13 +548,6 @@ class TCATickerLoader(ABC):
 
                 # Calculate user specified benchmarks for each trade order (which has been selected)
                 if benchmark_calcs is not None:
-                    for b in benchmark_calcs:
-
-                        # For benchmarks which only modify market data (and don't need trade specific information)
-                        if isinstance(b, BenchmarkMarket):
-                            logger.debug("Calculating " + type(b).__name__ + " for market data")
-
-                            _, market_df = b.calculate_benchmark(market_df=market_df)
 
                     for i in range(0, len(trade_order_df_dict)):
                         for b in benchmark_calcs:
@@ -576,11 +583,11 @@ class TCATickerLoader(ABC):
             if dummy_market:
                 market_df = None
 
-        trade_order_df_keys = self._util_func.dict_key_list(trade_order_df_dict.keys())
-        trade_order_df_values = []
+            trade_order_df_keys = self._util_func.dict_key_list(trade_order_df_dict.keys())
+            trade_order_df_values = []
 
-        for k in trade_order_df_keys:
-            trade_order_df_values.append(trade_order_df_dict[k])
+            for k in trade_order_df_keys:
+                trade_order_df_values.append(trade_order_df_dict[k])
 
         # print("--- dataframes/keys ---")
         # print(trade_order_df_values)

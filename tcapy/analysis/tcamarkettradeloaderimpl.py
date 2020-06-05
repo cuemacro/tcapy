@@ -27,8 +27,8 @@ import traceback
 constants = Constants()
 
 from tcapy.conf.celery_calls import calculate_metrics_single_ticker_via_celery, \
-    get_market_trade_holder_via_celery
-from celery import chord
+    get_market_trade_holder_via_celery, get_market_trade_holder_and_calculate_metrics_single_ticker_via_celery
+from celery import chord, group
 
 class TCAMarketTradeLoaderImpl(TCAMarketTradeLoader):
     """This allows the parallel fetching of market/trade data across different tickers
@@ -49,7 +49,6 @@ class TCAMarketTradeLoaderImpl(TCAMarketTradeLoader):
         if tca_request_list[0].use_multithreading:
             market_df_dict, trade_order_results_df_dict = self._parallel_get_market_trade_metrics(
                 tca_request_list, dummy_market)
-
         else:
             return super(TCAMarketTradeLoaderImpl, self)._get_market_trade_metrics(tca_request_list, dummy_market)
 
@@ -122,13 +121,14 @@ class TCAMarketTradeLoaderImpl(TCAMarketTradeLoader):
         # For each currency pair select collect the trades and market data, then calculate benchmarks and slippage
         result = []
 
-
-
         keep_looping = True
 
-        trade_order_list = self._util_func.dict_key_list(tca_request_list[0].trade_order_mapping)
-
-        point_in_time_executions_only = trade_order_list == ['trade_df']
+        # If we have also asked for trades/order
+        if tca_request_list[0].trade_order_mapping is not None:
+            point_in_time_executions_only = \
+                self._util_func.dict_key_list(tca_request_list[0].trade_order_mapping) == ['trade_df']
+        else:
+            point_in_time_executions_only = True
 
         parallel_library = tca_request_list[0].multithreading_params['parallel_library']
 
@@ -160,8 +160,8 @@ class TCAMarketTradeLoaderImpl(TCAMarketTradeLoader):
                                 or tca_request_list[0].summary_display == 'candlestick'\
                                 or not(point_in_time_executions_only):
 
-                        if parallel_library == 'celery':
-                            # Load all the data and THEN calculate the metrics on it
+                        if 'celery' in parallel_library:
+                            # Load all the data for this ticker and THEN calculate the metrics on it
                             result.append(chord((get_market_trade_holder_via_celery.s(tca_request_data)
                                                  for tca_request_data in tca_request_date_split),
                                                 calculate_metrics_single_ticker_via_celery.s(tca_request_single_ticker,
@@ -190,16 +190,20 @@ class TCAMarketTradeLoaderImpl(TCAMarketTradeLoader):
                         # but should work with points in time
                         #
                         # In practice, it's not really much faster than the above code
-                        if parallel_library == 'celery':
-                            for tca_request_data in tca_request_date_split:
-                                result.append(chord(get_market_trade_holder_via_celery.s(tca_request_data),
-                                                    calculate_metrics_single_ticker_via_celery.s(tca_request_data,
-                                                    dummy_market)).apply_async())
+                        if 'celery' == parallel_library:
+
+                            # For each ticker/date combination load data and process chunk (so can do fully in parallel)
+                            result.append(group(get_market_trade_holder_and_calculate_metrics_single_ticker_via_celery.s(
+                                         tca_request_data,
+                                         dummy_market) for tca_request_data in tca_request_date_split).apply_async())
 
                 # Now combine the results from the parallel operations
-                if parallel_library == 'celery':
+                if 'celery' in parallel_library:
 
                     output = [p.get(timeout=constants.celery_timeout_seconds) for p in result]
+
+                    # If pipelined/splice_request_by_dates will have two lists so flatten it into one
+                    output = self._util_func.flatten_list_of_lists(output)
 
                     for market_df, trade_order_df_list, ticker, trade_order_keys in output:
                         market_holder_list.add_dataframe(market_df, ticker)
@@ -295,7 +299,7 @@ class TCAMarketTradeLoaderImpl(TCAMarketTradeLoader):
         # Jan 8th - Jan 31st 23:59:59.999, Feb 1st 00:00:00.000 - Feb 28th 23:59:59.999 etc
         if len(dates) > 0:
 
-            # for the very first chunk in our series
+            # For the very first chunk in our series
             if tca_request.start_date < dates[0]:
                 tca_request_temp = TCARequest(tca_request=tca_request)
                 tca_request_temp.ticker = tick

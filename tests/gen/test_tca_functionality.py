@@ -114,7 +114,7 @@ def get_sample_data(ticker_spec=None):
                              reporting_currency=reporting_currency,
                              market_data_store=market_data_store,
                              trade_order_mapping=trade_order_mapping,
-                             tca_type=tca_type, benchmark_calcs=BenchmarkMid())
+                             tca_type=tca_type, benchmark_calcs=BenchmarkMarketMid())
 
     tca_engine = TCAEngineImpl(version=tcapy_version)
 
@@ -195,7 +195,7 @@ def test_metric_calculation():
     market_df.index = market_df.index + timedelta(milliseconds=5)
 
     # Add a mid point (in case it doesn't exist)
-    _, market_df = BenchmarkSpreadToMid().calculate_benchmark(market_df=market_df)
+    _, market_df = BenchmarkMarketSpreadToMid().calculate_benchmark(market_df=market_df)
 
     trade_df, _ = MetricSlippage().calculate_metric(trade_order_df=trade_df, market_df=market_df, bid_benchmark='mid',
                                                     ask_benchmark='mid')
@@ -230,9 +230,9 @@ def test_metric_calculation():
     # Force spread to mid to be 0.25bp
     anomalous_spread_to_mid_bp = 0.25
 
-    _, market_df = BenchmarkSpreadToMid().calculate_benchmark(trade_order_df=trade_df, market_df=market_df,
-                                                bid_mid_bp=anomalous_spread_to_mid_bp,
-                                                ask_mid_bp=anomalous_spread_to_mid_bp, overwrite_bid_ask=True)
+    _, market_df = BenchmarkMarketSpreadToMid().calculate_benchmark(trade_order_df=trade_df, market_df=market_df,
+                                                                    bid_mid_bp=anomalous_spread_to_mid_bp,
+                                                                    ask_mid_bp=anomalous_spread_to_mid_bp, overwrite_bid_ask=True)
 
     trade_df, _ = MetricSlippage().calculate_metric(trade_order_df=trade_df, market_df=market_df)
 

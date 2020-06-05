@@ -110,11 +110,11 @@ def example_calculate_arrival_benchmark():
 def example_calculate_spread_to_mid_benchmark():
     """Example on how to add spread to the benchmark
     """
-    from tcapy.analysis.algos.benchmark import BenchmarkSpreadToMid
+    from tcapy.analysis.algos.benchmark import BenchmarkMarketSpreadToMid
 
     market_df, trade_df, order_df = get_sample_data()
 
-    benchmark_spread_to_mid = BenchmarkSpreadToMid()
+    benchmark_spread_to_mid = BenchmarkMarketSpreadToMid()
     trade_df, market_df = benchmark_spread_to_mid.calculate_benchmark(trade_order_df=trade_df, market_df=market_df)
 
     print(trade_df)

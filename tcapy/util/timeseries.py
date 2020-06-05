@@ -641,7 +641,8 @@ class TimeSeriesOps(object):
 
         return datetimeindex
 
-    def resample_time_series(self, df, resample_amount=1, how='mean', unit='milliseconds', field=None):
+    def resample_time_series(self, df, resample_amount=1, how='mean', unit='milliseconds', field=None, volume_field=None,
+                             price_field=None, custom_func=None):
         """Resamples a DataFrame to a particular unit (eg. 'milliseconds'). We can specify resampling by for the example
         the first or last in each unit. Uses underlying resampling calls in pd.
 
@@ -665,7 +666,11 @@ class TimeSeriesOps(object):
         unit : str
             Which unit to use ('milliseconds', 'seconds', 'minutes' or 'hours')
 
-        field
+        field : str
+            Filter by a specific field
+
+        custom_func : func
+            User defined function to be run on the resampled buckets
 
         Returns
         -------
@@ -710,7 +715,9 @@ class TimeSeriesOps(object):
 
         resample_func = df.resample(str(resample_amount) + unit_r)
 
-        if how == 'mean':
+        if not(isinstance(how, str)):
+            return resample_func.apply(how)
+        elif how == 'mean':
             return resample_func.mean()
         elif how == 'last':
             return resample_func.last()
@@ -728,6 +735,34 @@ class TimeSeriesOps(object):
             #                     'high': 'max',
             #                     'low': 'min',
             #                     'close': 'last'})
+        elif how == 'vwap':
+
+            def vwap(bucket):
+                try:
+                    return np.average(bucket[price_field], weights=bucket['volume'])
+                except ZeroDivisionError:
+                    return np.nan
+
+            df = pd.DataFrame(resample_func.apply(vwap))
+            df.columns = ['vwap']
+
+        elif how == 'twap':
+
+            df['twap_temp'] = df.index.tz_convert(None).to_series().diff().values / np.timedelta64(1, 's')
+
+            resample_func = df.resample(str(resample_amount) + unit_r)
+
+            def twap(bucket):
+                try:
+                    return np.average(bucket[price_field], weights=bucket['twap_temp'])
+                except ZeroDivisionError:
+                    return np.nan
+
+            df = pd.DataFrame(resample_func.apply(twap))
+            df.columns = ['twap']
+
+            return df
+
 
     def localize_as_UTC(self, df, convert=False):
         """Localizes the the times in a DataFrame to UTC format (overwrites the previous timezone whatever it is)
@@ -941,10 +976,10 @@ class TimeSeriesOps(object):
         timestamps = np.array(df.index)
 
         upper_index = bisect(timestamps, np_dt64,
-                             hi=len(timestamps) - 1)  # find the upper index of the closest time stamp
+                             hi=len(timestamps) - 1)  # Find the upper index of the closest time stamp
 
         return df.index.get_loc(min(timestamps[upper_index], timestamps[upper_index - 1], key=lambda x: abs(
-            x - np_dt64)))  # find the closest between upper and lower timestamp
+            x - np_dt64)))  # Find the closest between upper and lower timestamp
 
     def weighted_average_by_agg(self, df, data_col, weight_col, by_col_agg, unweighted_data_col=None,
                                 unweighted_agg='sum'):

@@ -79,7 +79,7 @@ def dataframe_tca_example():
                                                                        trade_order_list=trade_order_list)],
                              results_form=[TimelineResultsForm(metric_name='slippage', by_date='date'),
                                            BarResultsForm(metric_name='slippage', aggregate_by_field='venue')],
-                             benchmark_calcs=[BenchmarkArrival(), BenchmarkSpreadToMid()],
+                             benchmark_calcs=[BenchmarkArrival(), BenchmarkMarketSpreadToMid()],
                              trade_order_mapping=data_frame_trade_order_mapping, use_multithreading=False)
 
     # Dictionary of dataframes as output from TCA calculation
@@ -132,7 +132,7 @@ def dataframe_compliance_tca_example():
                                                                        trade_order_list=trade_order_list)],
 
                              benchmark_calcs=[  # add spread to mid fields for every market data spot
-                                 BenchmarkSpreadToMid(bid_mid_bp=spread_to_mid_bp, ask_mid_bp=spread_to_mid_bp),
+                                 BenchmarkMarketSpreadToMid(bid_mid_bp=spread_to_mid_bp, ask_mid_bp=spread_to_mid_bp),
                              ],
 
                              results_form=[

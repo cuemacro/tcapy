@@ -5,7 +5,12 @@
 * No official releases yet
 
 ## Coding log
-
+* 05 Jun 2020
+    * Speeded up non-multithreaded version, by removing some CacheHandles
+    * Speeded up date split parallelization
+    * Added support to do pure market analysis (without trade data), eg. calculate & return market mid only
+    * Added real world case study Jupyter notebook using Swedish asset manager trade data
+    * Various bug fixes for combining DataFrame output
 * 01 Jun 2020
     * Aggregation of metrics by hour of day in London/New York timezone (and by max/min)
     * Fixed tick count calculation on resample script
@@ -66,7 +71,7 @@
         * Additional examples
     * Added Jupyter notebook - compliance_tca_calculations.ipynb
         * Show how to flag outlier trades and compute notional totals/slippage average per broker
-    * Using pd.eval in BenchmarkSpreadToMid to speed up calculation
+    * Using pd.eval in BenchmarkMarketSpreadToMid to speed up calculation
     * TCAResults can now parse the output from JoinTables
 * 26 March 2020
     * Added Windows installation instructions for tcapy

@@ -138,6 +138,10 @@ with xlwings, with a demo spreadsheet
 * [Additional benchmark and metrics for tcapy](tcapy_notebooks/additional_benchmarks_metrics_for_tcapy.ipynb) - we go through some of the
 benchmarks and metrics available in tcapy in more detail
 ([nbviewer](https://nbviewer.jupyter.org/github/cuemacro/tcapy/blob/master/tcapy_notebooks/additional_benchmarks_metrics_for_tcapy.ipynb))
+* [Real life tcapy case study on an asset manager's trade data](tcapy_notebooks/real_life_tcapy_case_study.ipynb) - we do a real life
+TCA case study on the FX trade data of a Swedish asset manager
+([nbviewer](https://nbviewer.jupyter.org/github/cuemacro/tcapy/blob/master/tcapy_notebooks/real_life_tcapy_case_study.ipynb))
+
 
 A few things to note:
 

@@ -46,11 +46,12 @@ class DataFrameHolder(object):
 
         """
 
-        # if we haven't already added this trade/order type, create a new key, otherwise append it to existing list
+        # If we haven't already added this trade/order type, create a new key, otherwise append it to existing list
         if name not in self._df_dict.keys():
             self._df_dict[name] = [df]
         else:
-            self._df_dict[name] = [self._df_dict[name], df]
+            # self._df_dict[name] = [self._df_dict[name], df]
+            self._df_dict[name].append(df)
 
     def replace_dataframe(self, df, name):
         """Replaces any existing market data or trade/order with the same name
@@ -122,7 +123,24 @@ class DataFrameHolder(object):
         if key in self._df_dict.keys():
             dataframe_key_list = self._df_dict[key]
 
+            logger = LoggerManager().getLogger(__name__)
+
+            is_data_frame_key = None
+
+            # Special cases if 'df' in key
             if 'df' in key:
+                is_data_frame_key = True
+
+            # Plotly Figures
+            if 'fig' in key:
+                is_data_frame_key = False
+
+            if is_data_frame_key is None:
+                logger.warn('Cannot guess key type for ' + key + ', assuming DataFrame')
+
+                is_data_frame_key = True
+
+            if is_data_frame_key:
 
                 try:
                     df = Mediator.get_volatile_cache().get_dataframe_handle(
@@ -183,7 +201,7 @@ class DataFrameHolder(object):
             #
             #         return fig
             else:
-                # otherwise different type of metadata (don't attempt to combine it)
+                # Otherwise different type of metadata (don't attempt to combine it) - eg. Plotly Fig
                 try:
                     df = Mediator.get_volatile_cache().get_dataframe_handle(
                         Mediator.get_util_func().flatten_list_of_lists(dataframe_key_list), burn_after_reading=True)

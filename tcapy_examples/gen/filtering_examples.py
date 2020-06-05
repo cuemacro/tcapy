@@ -15,7 +15,7 @@ from tcapy.util.loggermanager import LoggerManager
 from tcapy.analysis.tcaengine import TCAEngineImpl
 from tcapy.analysis.tcarequest import TCARequest
 
-from tcapy.analysis.algos.benchmark import BenchmarkMid
+from tcapy.analysis.algos.benchmark import BenchmarkMarketMid
 
 from tcapy.data.databasesource import *
 
@@ -49,14 +49,14 @@ def get_sample_data():
                                  market_data_store=os.path.join(folder, 'small_test_market_df.csv.gz'),
                                  trade_order_mapping={'trade_df': os.path.join(folder, 'small_test_trade_df.csv'),
                                                       'order_df': os.path.join(folder, 'small_test_order_df.csv')},
-                                 tca_type=tca_type, benchmark_calcs=BenchmarkMid())
+                                 tca_type=tca_type, benchmark_calcs=BenchmarkMarketMid())
     else:
         tca_request = TCARequest(start_date=start_date, finish_date=finish_date, ticker=ticker,
                                  trade_data_store=trade_data_source,
                                  reporting_currency='EUR',
                                  market_data_store=market_data_store,
                                  trade_order_mapping=['trade_df', 'order_df'],
-                                 tca_type=tca_type, benchmark_calcs=BenchmarkMid())
+                                 tca_type=tca_type, benchmark_calcs=BenchmarkMarketMid())
 
     tca_engine = TCAEngineImpl()
 

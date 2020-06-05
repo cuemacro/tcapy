@@ -335,8 +335,8 @@ class TCACallerImplGen(TCACaller):
 
                         benchmark_calcs = [
                             # Generate the spread to mid for market data (in certain case artificially create a spread)
-                            BenchmarkSpreadToMid(bid_mid_bp=slippage_bounds, ask_mid_bp=slippage_bounds,
-                                                 overwrite_bid_ask=overwrite_bid_ask)]
+                            BenchmarkMarketSpreadToMid(bid_mid_bp=slippage_bounds, ask_mid_bp=slippage_bounds,
+                                                       overwrite_bid_ask=overwrite_bid_ask)]
 
                         results_form = [
                             # Display a table of all the anomalous trades by slippage (ie. outside bid/ask)

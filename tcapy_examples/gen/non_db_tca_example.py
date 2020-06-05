@@ -33,7 +33,7 @@ def tca_example_csv_trade_data_dukascopy():
     from tcapy.analysis.tcaengine import TCAEngineImpl
     from tcapy.analysis.tcarequest import TCARequest
 
-    from tcapy.analysis.algos.benchmark import BenchmarkArrival, BenchmarkSpreadToMid
+    from tcapy.analysis.algos.benchmark import BenchmarkArrival, BenchmarkMarketSpreadToMid
     from tcapy.analysis.algos.metric import MetricSlippage
 
     from tcapy.analysis.algos.resultsform import TimelineResultsForm
@@ -61,7 +61,7 @@ def tca_example_csv_trade_data_dukascopy():
                              trade_order_mapping=csv_trade_order_mapping,
                              metric_calcs=[MetricSlippage()],
                              results_form=[TimelineResultsForm(metric_name='slippage', by_date='datehour', scalar=10000.0)],
-                             benchmark_calcs=[BenchmarkArrival(), BenchmarkSpreadToMid()],
+                             benchmark_calcs=[BenchmarkArrival(), BenchmarkMarketSpreadToMid()],
                              use_multithreading=False)
 
     # Dictionary of dataframes as output from TCA calculation
@@ -79,7 +79,7 @@ def tca_example_csv_trade_data_dukascopy_no_redis():
     from tcapy.analysis.tcaengine import TCAEngineImpl
     from tcapy.analysis.tcarequest import TCARequest
 
-    from tcapy.analysis.algos.benchmark import BenchmarkArrival, BenchmarkSpreadToMid
+    from tcapy.analysis.algos.benchmark import BenchmarkArrival, BenchmarkMarketSpreadToMid
     from tcapy.analysis.algos.metric import MetricSlippage
 
     from tcapy.analysis.algos.resultsform import TimelineResultsForm
@@ -108,7 +108,7 @@ def tca_example_csv_trade_data_dukascopy_no_redis():
                              metric_calcs=[MetricSlippage()],
                              results_form=[
                                  TimelineResultsForm(metric_name='slippage', by_date='datehour', scalar=10000.0)],
-                             benchmark_calcs=[BenchmarkArrival(), BenchmarkSpreadToMid()],
+                             benchmark_calcs=[BenchmarkArrival(), BenchmarkMarketSpreadToMid()],
                              use_multithreading=False)
 
     tca_request.multithreading_params = {'splice_request_by_dates': False,  # True or False

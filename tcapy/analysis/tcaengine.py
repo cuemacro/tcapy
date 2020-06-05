@@ -134,7 +134,8 @@ class TCAEngineImpl(TCAEngine):
 
             # If we want aggregated TCA analysis, typically to later calculate many metrics across many trades and tickers,
             # as opposed to one specific currency pair
-            elif tca_request.tca_type == 'aggregated' or tca_request.tca_type == 'compliance':
+            # Or for market-analysis (which involves purely calculations on market data WITHOUT any trade/order data)
+            elif tca_request.tca_type == 'aggregated' or tca_request.tca_type == 'compliance' or tca_request.tca_type == 'market-analysis':
                 tca_request.ticker = self._util_func.populate_field(tca_request.ticker, constants.available_tickers_dictionary)
                 tca_request.venue = self._util_func.populate_field(tca_request.venue, constants.available_venues_dictionary,
                                                                    exception_fields='All')

@@ -407,22 +407,24 @@ class TCARequest(TradeRequest, ComputationRequest):
         self.asset_class = asset_class
         self.event_type = event_type  # is it a trade or cancellation 'trade', 'placement', cancellation', 'cancel/replace'
 
-        if trade_order_mapping is None and 'csv' not in self.trade_data_store and 'h5' not in self.trade_data_store:
-            trade_order_mapping = constants.trade_order_mapping[self.trade_data_store]
+        # If we are doing pure market analysis (without trades), we should not specify a trade_data_store
+        if self.trade_data_store is not None:
+            if trade_order_mapping is None and 'csv' not in self.trade_data_store and 'h5' not in self.trade_data_store:
+                trade_order_mapping = constants.trade_order_mapping[self.trade_data_store]
 
-        if isinstance(trade_order_mapping, str):
-            trade_order_mapping = [trade_order_mapping]
+            if isinstance(trade_order_mapping, str):
+                trade_order_mapping = [trade_order_mapping]
 
-        # flesh out the trade_order_mapping if specified by a list
-        if isinstance(trade_order_mapping, list):
+            # Flesh out the trade_order_mapping if specified by a list
+            if isinstance(trade_order_mapping, list):
 
-            trade_order_mapping_dict = OrderedDict()
-            saved_trade_order_mapping = constants.trade_order_mapping[self.trade_data_store]
+                trade_order_mapping_dict = OrderedDict()
+                saved_trade_order_mapping = constants.trade_order_mapping[self.trade_data_store]
 
-            for t in trade_order_mapping:
-                trade_order_mapping_dict[t] = saved_trade_order_mapping[t]
+                for t in trade_order_mapping:
+                    trade_order_mapping_dict[t] = saved_trade_order_mapping[t]
 
-            trade_order_mapping = trade_order_mapping_dict
+                trade_order_mapping = trade_order_mapping_dict
 
         self.trade_order_mapping = trade_order_mapping
         self.trade_order_filter = trade_order_filter
@@ -444,6 +446,11 @@ class TCARequest(TradeRequest, ComputationRequest):
         self.data_norm = data_norm
         
         self.tca_provider = tca_provider
+
+        # For market analysis we don't want to load any trade data at all
+        if self.tca_type == 'market-analysis':
+            self.trade_data_store = None
+            self.trade_order_mapping = None
 
     def _listify(self, prop):
         if not (isinstance(prop, list)) and prop is not None:

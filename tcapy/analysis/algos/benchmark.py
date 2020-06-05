@@ -78,13 +78,13 @@ class BenchmarkMarket(Benchmark):
     pass
 
 
-class BenchmarkMid(BenchmarkMarket):
+class BenchmarkMarketMid(BenchmarkMarket):
     """Calculates the mid-point for every time point of market data from the underlying bid/ask prices.
 
     """
     def __init__(self, trade_order_list=None, field='mid', bid='bid', ask='ask'):
 
-        super(BenchmarkMid, self).__init__(trade_order_list=trade_order_list)
+        super(BenchmarkMarketMid, self).__init__(trade_order_list=trade_order_list)
 
         self._field = field
         self._bid = bid
@@ -108,14 +108,14 @@ class BenchmarkMid(BenchmarkMarket):
 
         return trade_order_df, market_df
 
-class BenchmarkSpreadToMid(BenchmarkMarket):
+class BenchmarkMarketSpreadToMid(BenchmarkMarket):
     """Calculates the spread for each mid point
 
     """
     def __init__(self, trade_order_list=None, mid='mid', bid='bid', ask='ask', bid_mid_bp=1, ask_mid_bp=1,
                  overwrite_bid_ask=False):
 
-        super(BenchmarkSpreadToMid, self).__init__(trade_order_list=trade_order_list)
+        super(BenchmarkMarketSpreadToMid, self).__init__(trade_order_list=trade_order_list)
 
         self._mid = mid
         self._bid = bid
@@ -181,23 +181,28 @@ class BenchmarkSpreadToMid(BenchmarkMarket):
 
         return trade_order_df, market_df
 
-class BenchmarkResampleOffset(BenchmarkMarket):
+class BenchmarkMarketResampleOffset(BenchmarkMarket):
     """Resamples market data to the chosen frequency and/or offsets the time by a specified amount. Can be used to
     reduce data size or fix issues associated with misalignment of venue clocks.
 
     """
-    def __init__(self, trade_order_list=None, market_resample_freq=None, market_resample_unit='s', market_offset_ms=None, resample_how='last'):
+    def __init__(self, trade_order_list=None, market_resample_freq=None, market_resample_unit='s', market_offset_ms=None, resample_how='last',
+                 price_field=None, volume_field=None):
 
-        super(BenchmarkMid, self).__init__(trade_order_list=trade_order_list)
+        super(BenchmarkMarketResampleOffset, self).__init__(trade_order_list=trade_order_list)
 
         self._market_resample_freq = market_resample_freq
         self._market_resample_unit = market_resample_unit
         self._market_offset_ms = market_offset_ms
         self._resample_how = resample_how
 
+        self._price_field = price_field
+        self._volume_field = volume_field
+
 
     def calculate_benchmark(self, trade_order_df=None, market_df=None, trade_order_name=None, market_resample_freq=None,
-                            market_resample_unit=None, market_offset_ms=None, resample_how=None):
+                            market_resample_unit=None, market_offset_ms=None, resample_how=None,
+                            price_field=None, volume_field=None):
 
         # if not (self._check_calculate_benchmark(trade_order_name=trade_order_name)): return trade_order_df, market_df
 
@@ -205,13 +210,24 @@ class BenchmarkResampleOffset(BenchmarkMarket):
         if market_resample_unit is None: market_resample_unit = self._market_resample_unit
         if market_offset_ms is None: market_offset_ms = self._market_offset_ms
         if resample_how is None: resample_how = self._resample_how
+        if price_field is None: price_field = self._price_field
+        if volume_field is None: volume_field = self._volume_field
 
         if market_offset_ms is not None:
             market_df.index = market_df.index + timedelta(milliseconds=market_offset_ms)
 
         if market_resample_freq is not None and market_resample_unit is not None:
-            market_df = Mediator.get_time_series_ops().resample_time_series(market_df,
-                resample_amount=market_resample_freq, how=resample_how, unit=market_resample_unit)
+            if not(isinstance(resample_how, list)):
+                resample_how = [resample_how]
+
+            market_df_list = []
+
+            for how in resample_how:
+                market_df_list.append(Mediator.get_time_series_ops().resample_time_series(market_df,
+                    resample_amount=market_resample_freq, how=how, unit=market_resample_unit,
+                    price_field=price_field, volume_field=volume_field))
+
+            market_df = Mediator.get_time_series_ops().outer_join(market_df_list)
 
         return trade_order_df, market_df
 
@@ -480,7 +496,11 @@ class BenchmarkTWAP(BenchmarkWeighted):
 
     def _generate_weights(self, market_df, weighting_field=None):
         weights = market_df.index.tz_convert(None).to_series().diff().values / np.timedelta64(1, 's')
-        weights[0] = 0  # first point should be weighted zero (since don't know how long it's been there)
+
+        if len(weights) == 0:
+            weights = np.array(1)
+        else:
+            weights[0] = 0  # first point should be weighted zero (since don't know how long it's been there)
 
         return weights
 

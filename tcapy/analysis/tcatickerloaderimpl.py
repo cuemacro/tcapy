@@ -137,7 +137,8 @@ class TCATickerLoaderImpl(TCATickerLoader):
             market_df = super(TCATickerLoaderImpl, self).get_market_data(market_request)
 
         # Return as a cache handle (which can be easily passed across Celery for example)
-        if return_cache_handles:
+        # Only if multithreading
+        if return_cache_handles and market_request.use_multithreading:
             return volatile_cache.put_dataframe_handle(market_df,
                 use_cache_handles=market_request.multithreading_params['cache_period_market_data'])
 
@@ -201,7 +202,7 @@ class TCATickerLoaderImpl(TCATickerLoader):
                                                                              start_date=start_date,
                                                                              finish_date=finish_date)
 
-        if return_cache_handles:
+        if return_cache_handles and tca_request.use_multithreading:
             # Return as a cache handle (which can be easily passed across Celery for example)
             return volatile_cache.put_dataframe_handle(trade_df,
                                                        use_cache_handles=tca_request.multithreading_params['cache_period_trade_data'])
@@ -214,11 +215,15 @@ class TCATickerLoaderImpl(TCATickerLoader):
         market_df, trade_order_df_values, ticker, trade_order_df_keys \
             = super(TCATickerLoaderImpl, self).calculate_metrics_single_ticker(market_trade_order_combo, tca_request, dummy_market)
 
-        # Return as a cache handle (which can be easily passed across Celery for example) or not for the market
-        # and trade/order data
-        return volatile_cache.put_dataframe_handle(market_df, tca_request.multithreading_params['return_cache_handles_market_data']), \
-                volatile_cache.put_dataframe_handle(trade_order_df_values, tca_request.multithreading_params['return_cache_handles_trade_data']), \
-                ticker, trade_order_df_keys
+        if tca_request.use_multithreading:
+            # Return as a cache handle (which can be easily passed across Celery for example) or not for the market
+            # and trade/order data
+            return volatile_cache.put_dataframe_handle(market_df, tca_request.multithreading_params['return_cache_handles_market_data']), \
+                    volatile_cache.put_dataframe_handle(trade_order_df_values, tca_request.multithreading_params['return_cache_handles_trade_data']), \
+                    ticker, trade_order_df_keys
+        else:
+            # For single threading, don't use cache handles (no point, because sharing in the same memory space)
+            return market_df, trade_order_df_values, ticker, trade_order_df_keys
 
     def _get_correct_convention_market_data(self, market_request, start_date=None, finish_date=None):
         # Check that cross is in correct convention
@@ -242,16 +247,15 @@ class TCATickerLoaderImpl(TCATickerLoader):
 
                 volatile_cache.put_data_request_cache(market_request, market_key, market_df)
 
-            market_df = self._strip_start_finish_dataframe(market_df, start_date, finish_date, market_request)
+            return self._strip_start_finish_dataframe(market_df, start_date, finish_date, market_request)
         else:
             if start_date is None or finish_date is None:
                 start_date = market_request.start_date
                 finish_date = market_request.finish_date
 
-            market_df = super(TCATickerLoaderImpl, self)._get_underlying_market_data(start_date, finish_date,
+            return super(TCATickerLoaderImpl, self)._get_underlying_market_data(start_date, finish_date,
                                                                                      market_request)
 
-        return market_df
 
     def _calculate_additional_metrics(self, market_df, trade_order_df_dict, tca_request):
         logger = LoggerManager.getLogger(__name__)

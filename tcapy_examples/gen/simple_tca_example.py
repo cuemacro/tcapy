@@ -124,7 +124,7 @@ def single_ticker_tca_example():
                                               BenchmarkArrival(),
 
                                               # At the spread at the time of every trade/order
-                                              BenchmarkSpreadToMid()],
+                                              BenchmarkMarketSpreadToMid()],
                              trade_order_mapping=trade_order_list, use_multithreading=True)
 
     # Dictionary of dataframes as output from TCA calculation
@@ -199,7 +199,7 @@ def simplest_tca_single_ticker_example():
                              trade_data_store='ms_sql_server', market_data_store='arctic-ncfx',
                              metric_calcs=[MetricSlippage(trade_order_list=['trade_df', 'order_df'])],
                              results_form=[TimelineResultsForm(metric_name='slippage', by_date='date', scalar=10000.0)],
-                             benchmark_calcs=[BenchmarkArrival(), BenchmarkSpreadToMid()],
+                             benchmark_calcs=[BenchmarkArrival(), BenchmarkMarketSpreadToMid()],
                              trade_order_mapping=['trade_df', 'order_df'])
 
     # Dictionary of dataframes as output from TCA calculation
@@ -239,7 +239,7 @@ def single_ticker_tca_example_1600LDN_benchmark():
                                                benchmark_post_fix="1600LDN"),
 
                                  # At the spread at the time of every trade/order
-                                 BenchmarkSpreadToMid()],
+                                 BenchmarkMarketSpreadToMid()],
 
                              extra_lines_to_plot='twap1600LDN',
                              trade_order_mapping=trade_order_list, use_multithreading=True)
@@ -348,7 +348,7 @@ def compare_multithreading_type():
                                                    MetricPermanentMarketImpact(permanent_market_impact_gap={'h': 1},
                                                                                trade_order_list=trade_order_list)],
                                      results_form=[TimelineResultsForm(metric_name='slippage', by_date='datehour', scalar=10000.0)],
-                                     benchmark_calcs=[BenchmarkArrival(), BenchmarkSpreadToMid()],
+                                     benchmark_calcs=[BenchmarkArrival(), BenchmarkMarketSpreadToMid()],
                                      trade_order_mapping=trade_order_list, use_multithreading=use_multithreading,
                                      multithreading_params=multithreading_params)
 
