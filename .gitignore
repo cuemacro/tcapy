@@ -17,6 +17,7 @@ orca-1.2.1-x86_64.AppImage
 .idea/
 .pytest_cache
 .Python
+.ipynb_*
 env/
 build/
 develop-eggs/
