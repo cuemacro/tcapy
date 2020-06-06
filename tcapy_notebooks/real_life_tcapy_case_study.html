@@ -14585,7 +14585,7 @@ Name: ticker, dtype: object</pre>
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <p>Lastly, we plot the average slippage by side of the trade, to understand whether we have done better on buys or sells. We see that on average, the slippage on selling EURSEK (lablled as -1 on the x-axis) is around -5 basis points (compared to the mid price). In other words, we are paying 5 basis point on average per EURSEK trade in terms of slippage costs.</p>
-<p>This contrasts to buying EURSEK (labelled as +1 on the x-axis), where the slippage for the client is around +1.5 basis points. So when the client buys EURSEK, the client is actually doing better than mid. One possible explanation is that liquidity providers for the client were on average short EURSEK in their inventory during this sample period. Hence, they may skew their spread to encourage buyers of EURSEK to flatten their exposure.</p>
+<p>This contrasts to buying EURSEK (labelled as +1 on the x-axis), where the slippage for the client is around +1.5 basis points. So when the client buys EURSEK, the client is actually doing better than mid. One possible explanation is that liquidity providers for the client were on average long EURSEK in their inventory during this sample period. Hence, they may skew their spread to encourage buyers of EURSEK to flatten their exposure.</p>
 
 </div>
 </div>
@@ -14914,7 +14914,7 @@ Name: ticker, dtype: object</pre>
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <p>We can also plot the distribution of the trades we've done only with <code>broker_id</code> of <code>2</code>. We see the distribution of the slippage of the sell EURSEK trades in red, and buy EURSEK trades in green.</p>
-<p>We see that for the buy trades, slippage is skewed in our favour, unlike the buy trades. We dug down into the trades further above, and the large trade in June, which we flagged above, was a buy trade, where we bought slightly below the mid. Hence, it does indeed appear that a single trade has skewed our result. We could simply exclude this trade from our analysis to confirm this.</p>
+<p>We see that for the buy trades, slippage is skewed in our favour, unlike the sell trades. We dug down into the trades further above, and the large trade in June, which we flagged above, was a buy trade, where we bought slightly below the mid. Hence, it does indeed appear that a single trade has skewed our result. We could simply exclude this trade from our analysis to confirm this.</p>
 
 </div>
 </div>
