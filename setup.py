@@ -6,7 +6,8 @@ from tcapy import __version__ as version
 with open('README.md') as f:
     long_description = f.read()
 
-#long_description = """tcapy is a transaction cost analysis library for determining calculating your trading costs"""
+with open('requirements.txt') as f:
+    install_requires = f.read()
 
 setup(name='tcapy',
       version=version,
@@ -20,5 +21,5 @@ setup(name='tcapy',
       #packages=find_packages(),
       packages=find_packages(include=["tcapy*"]),
       include_package_data=True,
-      install_requires=['pandas>=0.25.3','arctic','scipy','plotly','numba','sqlalchemy','statsmodels','flask','pystore', 'dask[dataframe]','fsspec>=0.3.3','influxdb','qpython','findatapy'],
+      install_requires=install_requires,
       zip_safe=False)

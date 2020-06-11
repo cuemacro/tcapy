@@ -267,10 +267,15 @@ def test_stress_tca():
 
     result = []
 
+    # TODO: Bad Python
     for i in range(0, len(tca_request_list)):
         result.append(
             pool.apply_async(tca_engine.calculate_tca,
                              args=(tca_request_list[i],)))
+
+    # Better Python
+    for item in tca_request_list:
+        result.append(pool.apply_async(tca_engine.calculate_tca, args=(item,)))
 
     output = [p.get() for p in result]
 

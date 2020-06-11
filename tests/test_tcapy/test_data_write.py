@@ -34,6 +34,7 @@ import datetime
 from collections import OrderedDict
 
 from tcapy.util.customexceptions import *
+from tests.config import resource
 
 logger = LoggerManager().getLogger(__name__)
 
@@ -112,6 +113,7 @@ eps = 10 ** -5
 invalid_start_date = '01 Jan 1999'
 invalid_finish_date = '01 Feb 1999'
 
+# todo: WHERE ARE THOSE FILES?
 if use_parquet_market_files:
     csv_market_data_store = os.path.join(folder, 'small_test_market_df.parquet')
     csv_reverse_market_data_store = os.path.join(folder, 'small_test_market_df_reverse.parquet')
@@ -119,8 +121,8 @@ else:
     csv_market_data_store = os.path.join(folder, 'small_test_market_df.csv.gz')
     csv_reverse_market_data_store = os.path.join(folder, 'small_test_market_df_reverse.csv.gz')
 
-csv_trade_order_mapping = OrderedDict([('trade_df', os.path.join(folder, 'small_test_trade_df.csv')),
-                                       ('order_df', os.path.join(folder, 'small_test_order_df.csv'))])
+csv_trade_order_mapping = OrderedDict([('trade_df', resource('small_test_trade_df.csv')),
+                                       ('order_df', resource('small_test_order_df.csv'))])
 
 use_multithreading = False
 

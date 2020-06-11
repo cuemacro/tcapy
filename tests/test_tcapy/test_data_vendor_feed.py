@@ -28,6 +28,8 @@ from tcapy.data.databasesource import DatabaseSourceNCFX, DatabaseSourceDukascop
 
 from collections import OrderedDict
 
+from tests.config import resource
+
 logger = LoggerManager().getLogger(__name__)
 
 constants = Constants()
@@ -100,8 +102,8 @@ else:
     csv_market_data_store = os.path.join(folder, 'small_test_market_df.csv.gz')
     csv_reverse_market_data_store = os.path.join(folder, 'small_test_market_df_reverse.csv.gz')
 
-csv_trade_order_mapping = OrderedDict([('trade_df', os.path.join(folder, 'small_test_trade_df.csv')),
-                                       ('order_df', os.path.join(folder, 'small_test_order_df.csv'))])
+csv_trade_order_mapping = OrderedDict([('trade_df', resource('small_test_trade_df.csv')),
+                                       ('order_df', resource('small_test_order_df.csv'))])
 
 use_multithreading = False
 
