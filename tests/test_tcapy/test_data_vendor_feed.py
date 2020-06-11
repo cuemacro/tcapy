@@ -13,10 +13,8 @@ import pytz
 
 import pandas as pd
 
-try:
-    from pandas.testing import assert_frame_equal
-except:
-    from pandas.util.testing import assert_frame_equal
+from pandas.testing import assert_frame_equal
+
 
 import glob
 import os
@@ -267,13 +265,3 @@ def test_weekend_download_boundary_from_data_vendor():
 
         # note: this will exclude data when FX market is not trading, eg. Saturday
         assert util_func.check_data_frame_points_in_every_hour(df['EURUSD'], start_date, finish_date)
-
-if __name__ == '__main__':
-
-    # test_write_csv_from_data_vendor()
-    # test_fetch_market_data_from_data_vendor()
-
-    test_daily_download_boundary_from_data_vendor()
-    test_weekend_download_boundary_from_data_vendor()
-
-    # import pytest; pytest.main()

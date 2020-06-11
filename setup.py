@@ -20,5 +20,5 @@ setup(name='tcapy',
       #packages=find_packages(),
       packages=find_packages(include=["tcapy*"]),
       include_package_data=True,
-      install_requires=['pandas>=0.25.3','arctic','scipy','plotly','numba','sqlalchemy','statsmodels','flask','pystore', 'dask[dataframe]','fsspec>=0.3.3','influxdb'],
+      install_requires=['pandas>=0.25.3','arctic','scipy','plotly','numba','sqlalchemy','statsmodels','flask','pystore', 'dask[dataframe]','fsspec>=0.3.3','influxdb','qpython','findatapy'],
       zip_safe=False)

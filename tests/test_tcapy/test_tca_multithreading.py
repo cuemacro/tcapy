@@ -17,12 +17,6 @@ __author__ = 'saeedamen'  # Saeed Amen / saeed@cuemacro.com
 #
 # See the License for the specific language governing permissions and limitations under the License.
 #
-
-try:
-    from pandas.testing import assert_frame_equal
-except:
-    from pandas.util.testing import assert_frame_equal
-
 import pandas as pd
 import os
 
@@ -287,11 +281,3 @@ def test_stress_tca():
     # Check that several DataFrames exist in the results
     for trade_order_results_df_dict in output:
         assert 'trade_df' in trade_order_results_df_dict.keys()
-
-if __name__ == '__main__':
-    test_multithreading_full_basic_tca()
-    test_invalid_dates_missing_data_tca()
-
-    test_stress_tca()
-
-    # import pytest; pytest.main()

@@ -9,11 +9,6 @@ __author__ = 'saeedamen'  # Saeed Amen / saeed@cuemacro.com
 # See the License for the specific language governing permissions and limitations under the License.
 #
 
-try:
-    from pandas.testing import assert_frame_equal
-except:
-    from pandas.util.testing import assert_frame_equal
-
 from tcapy.conf.constants import Constants
 from tcapy.util.timeseries import RandomiseTimeSeries
 from tcapy.util.loggermanager import LoggerManager
@@ -79,11 +74,3 @@ def test_field_bucketing():
     # Check the averages match
     assert df_fields['Col']['something-else'] - df['price'][0] < eps
     assert df_fields['Col']['something'] - df['price'][1:].mean() < eps
-
-if __name__ == '__main__':
-    test_histogram_generator()
-    test_field_bucketing()
-
-    # import pytest; pytest.main()
-
-

@@ -10,14 +10,10 @@ __author__ = 'saeedamen'  # Saeed Amen / saeed@cuemacro.com
 #
 
 import pandas as pd
-import pandas
 import numpy as np
 from datetime import timedelta
+from pandas.testing import assert_frame_equal
 
-try:
-    from pandas.testing import assert_frame_equal
-except:
-    from pandas.util.testing import assert_frame_equal
 
 from tcapy.util.timeseries import TimeSeriesOps
 
@@ -221,19 +217,3 @@ def test_data_frame_holder():
         df_final = df_dict['EURUSD_df' + i]
 
     assert_frame_equal(df, df_final)
-
-
-
-if __name__ == '__main__':
-    test_vlookup()
-    test_filter_between_days_times()
-    test_remove_consecutive_duplicates()
-    test_ohlc()
-    test_time_delta()
-    test_overwrite_time_in_datetimeindex()
-
-    test_chunk()
-    test_cache_handle()
-    test_data_frame_holder()
-
-    # import pytest; pytest.main()

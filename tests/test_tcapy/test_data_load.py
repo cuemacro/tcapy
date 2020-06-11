@@ -14,12 +14,6 @@ __author__ = 'saeedamen'  # Saeed Amen / saeed@cuemacro.com
 #
 
 import pandas as pd
-
-try:
-    from pandas.testing import assert_frame_equal
-except:
-    from pandas.util.testing import assert_frame_equal
-
 import os
 
 from tcapy.conf.constants import Constants
@@ -345,12 +339,3 @@ def test_fetch_market_data_db():
             pass
 
         assert market_empty_df.empty
-
-if __name__ == '__main__':
-    test_fetch_market_trade_data_csv()
-
-    test_sql_server_connection()
-    test_fetch_trade_data_ms_sql_server()
-    test_fetch_market_trade_data_dataframe()
-
-    # import pytest; pytest.main()

@@ -4,7 +4,7 @@ PROJECT_VERSION := $(shell python setup.py --version)
 SHELL := /bin/bash
 PACKAGE := tcapy
 
-.PHONY: help build test doc tag 
+.PHONY: help build jupyter test doc tag
 
 
 .DEFAULT: help
@@ -23,10 +23,10 @@ help:
 
 build:
 	docker-compose build tcapy
-#
-#jupyter:
-#	docker-compose build jupyter
-#
+
+jupyter:
+	docker-compose build jupyter
+
 
 test:
 	docker-compose -f docker-compose.test.yml run sut

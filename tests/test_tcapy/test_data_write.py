@@ -12,11 +12,8 @@ __author__ = 'saeedamen'  # Saeed Amen / saeed@cuemacro.com
 #
 
 import pandas as pd
+from pandas.testing import assert_frame_equal
 
-try:
-    from pandas.testing import assert_frame_equal
-except:
-    from pandas.util.testing import assert_frame_equal
 
 import os
 
@@ -621,23 +618,3 @@ def test_delete_market_data_db():
 
         # Both pandas and KDB/InfluxDB implementation should be the same
         assert_frame_equal(market_df_old, market_df_new)
-
-###
-if __name__ == '__main__':
-
-    # Arctic (tests multiple stores - VERSION_STORE and TICK_STORE)
-    test_write_market_data_arctic()
-    test_append_market_data_arctic()
-    test_delete_market_data_arctic()
-    test_write_chunked_market_data_arctic()
-    test_write_multiple_wildcard_market_data_csvs_arctic()
-
-    # SQL dialects
-    test_write_trade_data_sql()
-
-    # for PyStore/KDB/InfluxDB
-    test_write_market_data_db()
-    test_append_market_data_db()
-    test_delete_market_data_db()
-
-    # import pytest; pytest.main()
