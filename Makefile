@@ -14,8 +14,8 @@ help:
 	@echo "       Build the docker image."
 	@echo "make test"
 	@echo "       Build the docker image for testing and run them."
-#	@echo "make doc"
-#	@echo "       Construct the documentation."
+	@echo "make doc"
+	@echo "       Construct the documentation."
 	@echo "make tag"
 	@echo "       Make a tag on Github."
 
@@ -30,9 +30,9 @@ jupyter:
 
 test:
 	docker-compose -f docker-compose.test.yml run sut
-#
-#doc:
-#	docker-compose -f docker-compose.test.yml run sut sphinx-build /source artifacts/build
+
+doc:
+	docker-compose -f docker-compose.test.yml run sut sphinx-build /source artifacts/build
 
 tag:
 	git tag -a ${PROJECT_VERSION} -m "new tag"
