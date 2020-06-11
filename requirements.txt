@@ -1,1 +1,12 @@
-# TODO
+pandas==0.25.3
+plotly
+sqlalchemy
+scipy
+arctic
+numba
+statsmodels
+flask
+pystore
+dask[dataframe]
+fsspec==0.3.3
+influxdb

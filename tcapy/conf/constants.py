@@ -37,7 +37,7 @@ class Constants(object):
 
     env = 'default'
 
-    tcapy_version = 'gen'  # 'user' for user specific or 'gen' for generic version
+    tcapy_version = 'test_tcapy'  # 'user' for user specific or 'test_tcapy' for generic version
 
     tcapy_provider = 'internal_tcapy' # Will add external providers
 
@@ -578,7 +578,7 @@ class Constants(object):
     # Overwrite field variables with those listed in ConstantsOverride
     def __init__(self):
 
-        # Which backend have you used 'user' or 'gen'
+        # Which backend have you used 'user' or 'test_tcapy'
         if Constants.tcapy_version == 'user':
             # override fields related to assets etc. which are proprietary to each client
             try:
@@ -602,7 +602,7 @@ class Constants(object):
             except:
                 pass
 
-        elif Constants.tcapy_version == 'gen':
+        elif Constants.tcapy_version == 'test_tcapy':
             # Override fields related to assets etc. which are proprietary to each client
             try:
                 from tcapygen.constantsgen import ConstantsGen

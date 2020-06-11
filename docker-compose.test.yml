@@ -1,0 +1,18 @@
+version: '3.6'
+services:
+  sut:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: test
+
+    volumes:
+      - ./tcapy:/tcapy/tcapy:ro
+      - ./tests:/tcapy/test:ro
+      - ./artifacts:/antarctic/artifacts
+      - ./source:/source:ro
+    environment:
+      - Maffay = 1
+
+
+

@@ -15,4 +15,4 @@ py.test --cov-report term-missing --cov tcapy --verbose | tee pytest.log
 # | tee pytest.log
 
 # if we want to run tests for a particular file we can do this
-# pytest -v /home/redhat/cuemacro/tcapy/tests/gen/test_tca_functionality.py
+# pytest -v /home/redhat/cuemacro/tcapy/tests/test_tcapy/test_tca_functionality.py

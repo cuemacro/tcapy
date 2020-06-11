@@ -100,8 +100,8 @@ else:
     # define your own trade order mapping
     pass
 
-# Test will only succeed if the gen specific version is set
-assert constants.tcapy_version == 'gen'
+# Test will only succeed if the test_tcapy specific version is set
+assert constants.tcapy_version == 'test_tcapy'
 
 def test_multithreading_full_basic_tca():
     """Tests if the trade/order and market data is identical for multithreading versus singlethreading for detailed,

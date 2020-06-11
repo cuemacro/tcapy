@@ -71,7 +71,7 @@ if constants.tcapy_version == 'user':
     from tcapyuser.tcacalleruser import TCACallerImplUser as TCACaller
 
 # this loads up a generic version of the layout and TCA application
-elif constants.tcapy_version == 'gen':
+elif constants.tcapy_version == 'test_tcapy':
     from tcapygen.layoutgen import *; layout = LayoutImplGen(url_prefix=url_prefix)
     from tcapygen.tcacallergen import TCACallerImplGen as TCACaller
 
