@@ -17,3 +17,5 @@ USER $NB_UID
 
 RUN pip install --no-cache-dir /tmp/tcapy && \
     rm  -rf /tmp/tcapy
+
+COPY --chown=jovyan:users ./binder/tcapy_notebooks $WORK
