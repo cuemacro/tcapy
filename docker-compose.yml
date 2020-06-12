@@ -1,0 +1,15 @@
+version: '3.6'
+services:
+  tcapy:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: builder
+
+  jupyter:
+    build:
+      context: .
+      dockerfile: binder/Dockerfile
+      target: builder
+    ports:
+      - 8888:8888

@@ -72,7 +72,7 @@ if False:
     from tcapyuser.tcacallerboarduser import TCACallerImplBoardUser as TCACaller
 
 # this loads up a generic version of the layout and TCA application
-elif constants.tcapy_version == 'gen' or constants.tcapy_version == 'user':
+elif constants.tcapy_version == 'test_tcapy' or constants.tcapy_version == 'user':
     from tcapygen.layoutboardgen import *;
 
     layout = LayoutImplBoardGen(url_prefix=url_prefix)

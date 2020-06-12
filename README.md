@@ -121,24 +121,24 @@ Given we can call tcapy programmatically, if you are doing a more customized sor
 to use Jupyter notebooks to mix code and results in one place.
 
 Sometimes GitHub might not render the Jupyter notebooks, in which case you can use the nbviewer link. Also see
-[here](tcapy_notebooks/jupyter_notebooks_description.md), which lists all the notebooks
+[here](binder/tcapy_notebooks/jupyter_notebooks_description.md), which lists all the notebooks
 
-* [Introducing tcapy and explaining TCA](tcapy_notebooks/introducing_tcapy.ipynb) - how to use tcapy in more detail 
+* [Introducing tcapy and explaining TCA](binder/tcapy_notebooks/introducing_tcapy.ipynb) - how to use tcapy in more detail 
 and gives many examples of how to call it programmatically 
 ([nbviewer](https://nbviewer.jupyter.org/github/cuemacro/tcapy/blob/master/tcapy_notebooks/introducing_tcapy.ipynb))
-* [Compliance and other more involved TCA calculations](tcapy_notebooks/compliance_tca_calculations) - how to do 
+* [Compliance and other more involved TCA calculations](binder/tcapy_notebooks/compliance_tca_calculations) - how to do 
 TCA calculations for compliance and other more involved use cases
 ([nbviewer](https://nbviewer.jupyter.org/github/cuemacro/tcapy/blob/master/tcapy_notebooks/compliance_tca_calculations))
-* [Populating databases for tcapy](tcapy_notebooks/populating_databases_for_tcapy.ipynb) - how to 
+* [Populating databases for tcapy](binder/tcapy_notebooks/populating_databases_for_tcapy.ipynb) - how to 
 populate your trade/order (MySQL/SQLite/Microsoft SQL Server) and market data databases (Arctic/MongoDB/PyStore)
 ([nbviewer](https://nbviewer.jupyter.org/github/cuemacro/tcapy/blob/master/tcapy_notebooks/populating_databases_for_tcapy.ipynb))
-* [Excel/xlwings with tcapy](tcapy_notebooks/excel_xlwings_with_tcapy.ipynb) - how to run tcapy from Excel
+* [Excel/xlwings with tcapy](binder/tcapy_notebooks/excel_xlwings_with_tcapy.ipynb) - how to run tcapy from Excel
 with xlwings, with a demo spreadsheet
 ([nbviewer](https://nbviewer.jupyter.org/github/cuemacro/tcapy/blob/master/tcapy_notebooks/excel_xlwings_with_tcapy.ipynb))
-* [Additional benchmark and metrics for tcapy](tcapy_notebooks/additional_benchmarks_metrics_for_tcapy.ipynb) - we go through some of the
+* [Additional benchmark and metrics for tcapy](binder/tcapy_notebooks/additional_benchmarks_metrics_for_tcapy.ipynb) - we go through some of the
 benchmarks and metrics available in tcapy in more detail
 ([nbviewer](https://nbviewer.jupyter.org/github/cuemacro/tcapy/blob/master/tcapy_notebooks/additional_benchmarks_metrics_for_tcapy.ipynb))
-* [Real life tcapy case study on an asset manager's trade data](tcapy_notebooks/real_life_tcapy_case_study.ipynb) - we do a real life
+* [Real life tcapy case study on an asset manager's trade data](binder/tcapy_notebooks/real_life_tcapy_case_study.ipynb) - we do a real life
 TCA case study on the FX trade data of a Swedish asset manager
 ([nbviewer](https://nbviewer.jupyter.org/github/cuemacro/tcapy/blob/master/tcapy_notebooks/real_life_tcapy_case_study.ipynb))
 
@@ -205,7 +205,7 @@ For detailed installation instructions for tcapy and its associated Python libra
 # tcapy examples
 
 In tcapy/tcapy_examples you will find several example scripts to demonstrate how to run tcapy, as well as in the 
-[introductory Jupyter notebook](tcapy_notebooks/introducing_tcapy.ipynb) 
+[introductory Jupyter notebook](binder/tcapy_notebooks/introducing_tcapy.ipynb) 
 
 # Support and sponsorship for new features
 

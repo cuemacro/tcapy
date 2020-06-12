@@ -14,12 +14,6 @@ __author__ = 'saeedamen'  # Saeed Amen / saeed@cuemacro.com
 #
 
 import pandas as pd
-
-try:
-    from pandas.testing import assert_frame_equal
-except:
-    from pandas.util.testing import assert_frame_equal
-
 import os
 
 from tcapy.conf.constants import Constants
@@ -30,6 +24,7 @@ from tcapy.data.datafactory import MarketRequest, TradeRequest
 
 from collections import OrderedDict
 from tcapy.util.mediator import Mediator
+from tests.config import resource
 
 logger = LoggerManager().getLogger(__name__)
 
@@ -81,11 +76,12 @@ eps = 10 ** -5
 invalid_start_date = '01 Jan 1999'
 invalid_finish_date = '01 Feb 1999'
 
+# todo: WHERE ARE THOSE FILES?
 csv_market_data_store = os.path.join(folder, 'small_test_market_df.csv.gz')
 csv_reverse_market_data_store = os.path.join(folder, 'small_test_market_df_reverse.csv.gz')
 
-csv_trade_order_mapping = OrderedDict([('trade_df', os.path.join(folder, 'small_test_trade_df.csv')),
-                                       ('order_df', os.path.join(folder, 'small_test_order_df.csv'))])
+csv_trade_order_mapping = OrderedDict([('trade_df', resource('small_test_trade_df.csv')),
+                                       ('order_df', resource('small_test_order_df.csv'))])
 
 use_multithreading = False
 
@@ -345,12 +341,3 @@ def test_fetch_market_data_db():
             pass
 
         assert market_empty_df.empty
-
-if __name__ == '__main__':
-    test_fetch_market_trade_data_csv()
-
-    test_sql_server_connection()
-    test_fetch_trade_data_ms_sql_server()
-    test_fetch_market_trade_data_dataframe()
-
-    # import pytest; pytest.main()

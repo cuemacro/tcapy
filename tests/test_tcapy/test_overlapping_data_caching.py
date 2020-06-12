@@ -10,18 +10,8 @@ __author__ = 'saeedamen'  # Saeed Amen / saeed@cuemacro.com
 #
 # See the License for the specific language governing permissions and limitations under the License.
 #
-
-try:
-    from pandas.testing import assert_frame_equal
-    from pandas.testing import assert_series_equal
-except:
-    from pandas.util.testing import assert_frame_equal
-    from pandas.util.testing import assert_series_equal
-
 import pandas as pd
 import os
-
-from tcapy.util.fxconv import FXConv
 
 from tcapy.analysis.tcaengine import TCAEngineImpl
 
@@ -32,10 +22,11 @@ from tcapy.analysis.algos.resultsform import *
 
 from collections import OrderedDict
 
+from tests.config import resource
+
 constants = Constants()
 logger = LoggerManager().getLogger(__name__)
 
-from tcapy.util.mediator import Mediator
 
 tcapy_version = constants.tcapy_version
 
@@ -78,6 +69,7 @@ order_df_name = trade_order_mapping[1] # usually 'order_df'
 if use_market_test_csv:
 
     # Only contains limited amount of EURUSD and USDJPY in Apr/Jun 2017
+    # todo: Where are those files!
     if use_hdf5_market_files:
         market_data_store = os.path.join(folder, 'small_test_market_df.h5')
     else:
@@ -85,9 +77,9 @@ if use_market_test_csv:
 
 if use_trade_test_csv:
     trade_data_store = 'csv'
-
-    trade_order_mapping = OrderedDict([(trade_df_name, os.path.join(folder, 'small_test_trade_df.csv')),
-                                       (order_df_name, os.path.join(folder, 'small_test_order_df.csv'))])
+    # todo: better with resource function
+    trade_order_mapping = OrderedDict([(trade_df_name, resource('small_test_trade_df.csv')),
+                                       (order_df_name, resource('small_test_order_df.csv'))])
     venue_filter = 'venue1'
 else:
     # Define your own trade order mapping
@@ -97,7 +89,7 @@ def test_overlapping_full_detailed_tca_calculation():
     """Tests a detailed TCA calculation works with caching and overlapping dates, checking that it has the right tables returned.
     """
 
-    logger = LoggerManager.getLogger(__name__)
+    #logger = LoggerManager.getLogger(__name__)
 
     tca_request = TCARequest(start_date=start_date, finish_date=finish_date, ticker=ticker,
                              tca_type='detailed',
@@ -107,11 +99,11 @@ def test_overlapping_full_detailed_tca_calculation():
 
     tca_engine = TCAEngineImpl(version=tcapy_version)
 
-    dict_of_df = tca_engine.calculate_tca(tca_request=tca_request)
+    #dict_of_df = tca_engine.calculate_tca(tca_request=tca_request)
 
-    sparse_market_trade_df = dict_of_df['sparse_market_' + trade_df_name]
+    #sparse_market_trade_df = dict_of_df['sparse_market_' + trade_df_name]
 
-    logger.info("Running second TCA calculation, extending dates...")
+    #logger.info("Running second TCA calculation, extending dates...")
 
     # Extend sample
     tca_request.start_date = pd.Timestamp(start_date) - timedelta(days=10)
@@ -121,8 +113,3 @@ def test_overlapping_full_detailed_tca_calculation():
     sparse_market_trade_df = dict_of_df['sparse_market_' + trade_df_name]
 
     assert len(sparse_market_trade_df.index[sparse_market_trade_df.index < '01 Feb 2018']) > 0
-
-if __name__ == '__main__':
-    test_overlapping_full_detailed_tca_calculation()
-
-    # import pytest; pytest.main()

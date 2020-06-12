@@ -71,8 +71,3 @@ def test_randomized_trade_data_generation():
 
     # make sure the number of trades > number of orders
     assert (len(trade_order['trade_df'].index) > len(trade_order['order_df'].index))
-
-if __name__ == '__main__':
-    test_randomized_trade_data_generation()
-
-    # import pytest; pytest.main()

@@ -17,12 +17,6 @@ __author__ = 'saeedamen'  # Saeed Amen / saeed@cuemacro.com
 #
 # See the License for the specific language governing permissions and limitations under the License.
 #
-
-try:
-    from pandas.testing import assert_frame_equal
-except:
-    from pandas.util.testing import assert_frame_equal
-
 import pandas as pd
 import os
 
@@ -100,8 +94,8 @@ else:
     # define your own trade order mapping
     pass
 
-# Test will only succeed if the gen specific version is set
-assert constants.tcapy_version == 'gen'
+# Test will only succeed if the test_tcapy specific version is set
+assert constants.tcapy_version == 'test_tcapy'
 
 def test_multithreading_full_basic_tca():
     """Tests if the trade/order and market data is identical for multithreading versus singlethreading for detailed,
@@ -273,10 +267,15 @@ def test_stress_tca():
 
     result = []
 
+    # TODO: Bad Python
     for i in range(0, len(tca_request_list)):
         result.append(
             pool.apply_async(tca_engine.calculate_tca,
                              args=(tca_request_list[i],)))
+
+    # Better Python
+    for item in tca_request_list:
+        result.append(pool.apply_async(tca_engine.calculate_tca, args=(item,)))
 
     output = [p.get() for p in result]
 
@@ -287,11 +286,3 @@ def test_stress_tca():
     # Check that several DataFrames exist in the results
     for trade_order_results_df_dict in output:
         assert 'trade_df' in trade_order_results_df_dict.keys()
-
-if __name__ == '__main__':
-    test_multithreading_full_basic_tca()
-    test_invalid_dates_missing_data_tca()
-
-    test_stress_tca()
-
-    # import pytest; pytest.main()

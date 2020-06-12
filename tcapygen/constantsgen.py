@@ -19,7 +19,7 @@ colors = Colors()
 from collections import OrderedDict
 
 class ConstantsGen(object):
-    """The constants of 'gen' version of tcapy are stored here. They govern behavior such as:
+    """The constants of 'test_tcapy' version of tcapy are stored here. They govern behavior such as:
 
        - GUI listeners and lines
        - we can override any of these settings in constantsgencred.py or constantscred.py

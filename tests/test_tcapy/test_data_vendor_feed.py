@@ -13,10 +13,8 @@ import pytz
 
 import pandas as pd
 
-try:
-    from pandas.testing import assert_frame_equal
-except:
-    from pandas.util.testing import assert_frame_equal
+from pandas.testing import assert_frame_equal
+
 
 import glob
 import os
@@ -29,6 +27,8 @@ from tcapy.data.databasepopulator import DatabasePopulatorNCFX, DatabasePopulato
 from tcapy.data.databasesource import DatabaseSourceNCFX, DatabaseSourceDukascopy
 
 from collections import OrderedDict
+
+from tests.config import resource
 
 logger = LoggerManager().getLogger(__name__)
 
@@ -102,8 +102,8 @@ else:
     csv_market_data_store = os.path.join(folder, 'small_test_market_df.csv.gz')
     csv_reverse_market_data_store = os.path.join(folder, 'small_test_market_df_reverse.csv.gz')
 
-csv_trade_order_mapping = OrderedDict([('trade_df', os.path.join(folder, 'small_test_trade_df.csv')),
-                                       ('order_df', os.path.join(folder, 'small_test_order_df.csv'))])
+csv_trade_order_mapping = OrderedDict([('trade_df', resource('small_test_trade_df.csv')),
+                                       ('order_df', resource('small_test_order_df.csv'))])
 
 use_multithreading = False
 
@@ -267,13 +267,3 @@ def test_weekend_download_boundary_from_data_vendor():
 
         # note: this will exclude data when FX market is not trading, eg. Saturday
         assert util_func.check_data_frame_points_in_every_hour(df['EURUSD'], start_date, finish_date)
-
-if __name__ == '__main__':
-
-    # test_write_csv_from_data_vendor()
-    # test_fetch_market_data_from_data_vendor()
-
-    test_daily_download_boundary_from_data_vendor()
-    test_weekend_download_boundary_from_data_vendor()
-
-    # import pytest; pytest.main()
