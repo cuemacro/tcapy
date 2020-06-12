@@ -1,5 +1,7 @@
 #!/bin/bash
 
+#todo This file should go...
+
 export SCRIPT_FOLDER="$( dirname "$(readlink -f -- "$0")" )"
 export SCRIPT_FOLDER="$( dirname "$(readlink -f -- "$SCRIPT_FOLDER")" )"
 source $SCRIPT_FOLDER/batch_scripts/linux/installation/set_tcapy_env_vars.sh
