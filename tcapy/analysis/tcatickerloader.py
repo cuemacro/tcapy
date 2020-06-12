@@ -443,27 +443,14 @@ class TCATickerLoader(ABC):
         market_df, trade_order_df_dict = self.trim_sort_market_trade_order(
             market_trade_order_combo, tca_request.start_date, tca_request.finish_date, tca_request.ticker)
 
-        valid_market = False
-
-        if market_df is not None:
-            if not(market_df.empty):
-                valid_market = True
-
-        # Calculations on market data only
-        if valid_market:
-            for b in benchmark_calcs:
-
-                # For benchmarks which only modify market data (and don't need trade specific information)
-                if isinstance(b, BenchmarkMarket):
-                    logger.debug("Calculating " + type(b).__name__ + " for market data")
-
-                    _, market_df = b.calculate_benchmark(market_df=market_df)
+        # Calculate BenchmarkMarket's which only require market data and no trade data
+        market_df = self.calculate_benchmark_market(market_df, tca_request)
 
         trade_order_df_values = []
         trade_order_df_keys = []
 
         # Calculations on trades with market data
-        if len(trade_order_df_dict.keys()) > 0 and valid_market:
+        if len(trade_order_df_dict.keys()) > 0 and self._check_valid_market(market_df):
 
             # NOTE: this will not filter orders, only TRADES (as orders do not have venue parameters)
             logger.debug("Filter trades by venue")
@@ -595,6 +582,32 @@ class TCATickerLoader(ABC):
 
         return market_df, trade_order_df_values, ticker, trade_order_df_keys
 
+    def calculate_benchmark_market(self, market_df, tca_request):
+
+        logger = LoggerManager.getLogger(__name__)
+
+        benchmark_calcs = tca_request.benchmark_calcs
+        valid_market = self._check_valid_market(market_df)
+
+        # Calculations on market data only
+        if valid_market:
+            for b in benchmark_calcs:
+
+                # For benchmarks which only modify market data (and don't need trade specific information)
+                if isinstance(b, BenchmarkMarket):
+                    logger.debug("Calculating " + type(b).__name__ + " for market data")
+
+                    market_df = b.calculate_benchmark(market_df=market_df)
+
+        return market_df
+
+    def _check_valid_market(self, market_df):
+        if market_df is not None:
+            if not (market_df.empty):
+                return True
+
+        return False
+
     def _fill_reporting_spot(self, ticker, trade_df, start_date, finish_date, tca_request):
         logger = LoggerManager.getLogger(__name__)
 
@@ -712,7 +725,7 @@ class TCATickerLoader(ABC):
         # Calculate mid market rate, if it doesn't exist
         if market_df is not None:
             if not(market_df.empty):
-                _, market_df = self._benchmark_mid.calculate_benchmark(market_df=market_df)
+                market_df = self._benchmark_mid.calculate_benchmark(market_df=market_df)
 
         return market_df
 
@@ -774,11 +787,9 @@ class TCATickerLoader(ABC):
         for k in self._util_func.dict_key_list(trade_order_df_dict.keys()):
             trade_order_df_dict[k] = self.strip_trade_order_data_to_market(trade_order_df_dict[k], market_df)
 
-        valid_trade_order_data = trade_order_holder.check_empty_combined_dataframe_dict(trade_order_df_dict)
-
         # Note, can sometimes get empty results when doing in parallel (eg. split up into days, and don't
         # get for a particular day, so don't raise an exception)
-        if not(valid_trade_order_data):
+        if not(trade_order_holder.check_empty_combined_dataframe_dict(trade_order_df_dict)):
             err_msg = "No trade/order data between selected dates for " + ticker + " between " + str(start_date) + " - " \
                       + str(finish_date)
 
@@ -822,7 +833,7 @@ class TCATickerLoader(ABC):
 
                         add_cond = (trade_order_df['benchmark_date_start'] >= market_df.index[0]) & (trade_order_df['benchmark_date_end'] <= market_df.index[-1])
 
-                # for trades (ensure that every trade is within the market data start/finish dates)
+                # For trades (ensure that every trade is within the market data start/finish dates)
                 trade_order_df = trade_order_df.loc[(trade_order_df.index >= market_df.index[0]) & (trade_order_df.index <= market_df.index[-1]) & add_cond]
 
         return trade_order_df

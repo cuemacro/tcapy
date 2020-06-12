@@ -65,7 +65,7 @@ class Renderer(object):
             'pdf' - create PDF output
 
         extra_head_code : str
-            HTML code to put into the <head> tag
+            HTML code to put into the <head> _tag
 
         Returns
         -------

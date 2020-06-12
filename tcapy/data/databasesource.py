@@ -429,6 +429,7 @@ class DatabaseSource(ABC):
         DataFrame
         """
 
+        # Do the Date index
         if hasattr(df.index, 'tz'):
             if df.index.tz is None:
                 df.index = pd.to_datetime(df.index, format=date_format).tz_localize(None)
@@ -437,6 +438,7 @@ class DatabaseSource(ABC):
             df.index = pd.to_datetime(df.index, format=date_format).tz_localize(None)
             df.index = df.index.tz_localize(pytz.utc)
 
+        # Go through the date columns (aside from the index)
         for d in constants.date_columns:
             if d in df.columns:
                 if hasattr(df[d], 'tz'):
@@ -477,7 +479,7 @@ class DatabaseSource(ABC):
         if df is None:
             return df
 
-        # make sure we store date/times in appropriate format (NOT as strings) - we don't attempt to store
+        # Make sure we store date/times in appropriate format (NOT as strings) - we don't attempt to store
         # timezones as this can can cause complications
         for d in date_columns:
             if d in df.columns:
@@ -486,10 +488,12 @@ class DatabaseSource(ABC):
                 else:
                     df[d] = pd.to_datetime(df[d], format=date_format)
 
+        # Force conversion for numerical fields (eg. bid price)
         for d in numeric_columns:
             if d in df.columns:
                 df[d] = pd.to_numeric(df[d], errors='coerce')
 
+        # Force conversation for string fields (eg. trade ID)
         for d in string_columns:
             if d in df.columns:
                 df[d] = df[d].astype(str)
@@ -649,8 +653,18 @@ class DatabaseSourceCSV(DatabaseSource):
             except:
                 return None
 
+        # Sometimes flat files may have multiple tickers in them, so filter by that
         if ticker != None:
             try:
+                # Check that the ticker has been defined for every row
+                # If not, likely some problems with the data and warn the user
+                no_nan_ticker_entries = df['ticker'].df.isnull().sum()
+
+                if no_nan_ticker_entries > 0:
+                    LoggerManager.getLogger(__name__).warning(
+                        "For " + ticker + ", " + table_name + " contains " + str(no_nan_ticker_entries) + " entries where ticker is undefined.")
+
+                # Filter entries by the ticker name
                 df = df[df['ticker'] == ticker]
             except:
                 return None
@@ -1989,6 +2003,9 @@ class DatabaseSourceArctic(DatabaseSourceTickData):
         else:
             df = item.data
 
+        if 'ticker' in df.columns:
+            df.drop(['ticker'], axis=1, inplace=True)
+
         try:
             df.index.name = 'Date'
         except:
@@ -2153,6 +2170,11 @@ class DatabaseSourceArctic(DatabaseSourceTickData):
                 # we assume that we are using writing to Arctic in a non-timezone aware way for VERSION_STORE
                 # (we'll reintroduce the timezone for TICK_STORE which *DOES* need it)
                 df = df.tz_localize(None)
+
+                # Remove any ticker column, unnecessary on Arctic, given we are already
+                # storing the DataFrames by ticker names
+                if 'ticker' in df.columns:
+                    df.drop(['ticker'], axis=1, inplace=True)
 
                 # Append data or overwrite the whole ticker
                 # Note: if appending data need to make sure the fields are the same!
@@ -3550,7 +3572,7 @@ class DatabaseSourceNCFX(DatabaseSource):
             logger.info("NCFX allows a maximum download of " + str(self._max_chunk_size()) + " minutes. Will split request.")
 
         # Much faster to parse date/time by position in this way (if somewhat messy!) than using strptime
-        # constructor year, month, day, hour, minutes, seconds, microseconds
+        # constructor _year, month, day, hour, minutes, seconds, microseconds
         # need to multiply by 1000, because one of the arguments is microseconds
         dateparse = lambda x: datetime.datetime(int(x[0:4]), int(x[5:7]), int(x[8:10]),
                                                 int(x[11:13]), int(x[14:16]), int(x[17:19]), int(x[20:23]) * 1000)

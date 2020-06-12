@@ -41,7 +41,7 @@ trade_data_store = 'ms_sql_server'
 tca_version = constants.tcapy_version
 
 start_date = '05 Jan 2016'; finish_date = '31 May 2018'
-#start_date = '01 Jan 2017'; finish_date = '31 May 2017'
+# start_date = '01 Jan 2017'; finish_date = '31 May 2017'
 start_date = '01 Jan 2018'; finish_date = '03 Jul 2018'
 start_date = '15 Jun 2016'; finish_date = '10 Sep 2016' # Jul
 
@@ -105,11 +105,11 @@ def single_ticker_tca_example():
                                            # Aggregate the average slippage on trades by venue
                                            HeatmapResultsForm(metric_name=['slippage', 'transient_market_impact'],
                                                               aggregate_by_field=['venue', 'ticker'], scalar=10000.0,
-                                                              trade_order_list='trade_df'),
+                                                              market_trade_order_list='trade_df'),
 
                                            # Aggregate the average slippage on trades by venue
                                            BarResultsForm(metric_name='slippage', aggregate_by_field='venue', scalar=10000.0,
-                                                          trade_order_list='trade_df'),
+                                                          market_trade_order_list='trade_df'),
 
                                            # Aggregate the average slippage on trades/orders by broker_id
                                            BarResultsForm(metric_name='slippage', aggregate_by_field='broker_id', scalar=10000.0),

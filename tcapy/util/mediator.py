@@ -9,6 +9,7 @@ __author__ = 'saeedamen'  # Saeed Amen / saeed@cuemacro.com
 #
 
 from tcapy.conf.constants import Constants
+from tcapy.util.deltaizeserialize import DeltaizeSerialize
 from tcapy.util.singleton import Singleton
 from tcapy.util.timeseries import TimeSeriesOps
 from tcapy.util.utilfunc import UtilFunc
@@ -27,6 +28,9 @@ class Mediator(object):
 
     _volatile_cache = {}
     _volatile_cache_lock = threading.Lock()
+
+    _deltaize_serialize = None
+    _deltaize_serialize_lock = threading.Lock()
 
     _tca_market_trade_loader = {}
     _tca_market_trade_loader_lock = threading.Lock()
@@ -129,6 +133,16 @@ class Mediator(object):
                 Mediator._time_series_ops = TimeSeriesOps()
 
         return Mediator._time_series_ops
+
+    @staticmethod
+    def get_deltaize_serialize():
+        with Mediator._deltaize_serialize_lock:
+
+            if Mediator._deltaize_serialize is None:
+                Mediator._deltaize_serialize = DeltaizeSerialize()
+
+        return Mediator._deltaize_serialize
+
 
     @staticmethod
     def get_util_func():

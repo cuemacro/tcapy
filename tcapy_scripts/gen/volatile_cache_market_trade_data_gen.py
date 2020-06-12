@@ -1,4 +1,4 @@
-"""Runs an aggregated TCA calculation for all currency pairs for the past year. This will cache all the market and
+"""Runs an aggregated TCA calculation for all currency pairs for the past _year. This will cache all the market and
 trade data on Redis. Hence subsequent calls should mostly be using Redis, when downloading full month (day/week) data
 (and calling the underlying trade/market databases only for smaller portions of data < 1 day, 1 week etc).
 """
@@ -33,7 +33,7 @@ if __name__ == '__main__':
 
     tca_engine = TCAEngineImpl()
 
-    # Do a massive TCA computation for all currency pairs for the past year
+    # Do a massive TCA computation for all currency pairs for the past _year
     # this will cache all the data in Redis, which can be used later
     finish_date = datetime.datetime.utcnow().date() - timedelta(days=1)
     start_date = finish_date - timedelta(days=252)

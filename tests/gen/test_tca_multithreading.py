@@ -134,7 +134,7 @@ def test_multithreading_full_basic_tca():
             tca_request.tca_type = t
             dict_list.append(tca_engine.calculate_tca(tca_request=tca_request))
 
-        print("tca_request " + t)
+        print("_tca_request " + t)
 
         for k in dict_list[0].keys():
             multi_df = dict_list[0][k]

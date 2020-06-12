@@ -87,6 +87,7 @@ logger = LoggerManager.getLogger(__name__)
 logger.info("Platform = " + constants.plat)
 logger.info("Env = " + constants.env)
 logger.info("Python = " + sys.executable)
+logger.info("Debug environment = " + str(constants.debug_start_flask_server_directly))
 
 logger.info("Database host = " + constants.database_host)
 logger.info("Database volatile cache/Redis host = " + constants.volatile_cache_host_redis)

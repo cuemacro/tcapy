@@ -32,40 +32,10 @@ constants = Constants()
 class Benchmark(ABC):
     """Abstract class for calculation of benchmark prices given an input of market data, which will typically be made up
     of bid/ask quotes together with volume data. The supplied trade data will then be populated with
-    that benchmark (typically will be calculated by trade)
+    that benchmark (typically will be calculated by trade). BenchmarkMarket is designed purely for market analysis, whilst
+    BenchmarkTrade classes generally need to have both market and trade data.
 
     """
-
-    def __init__(self, trade_order_list=None, **kwargs):
-        # self.logger = LoggerManager().getLogger(__name__)
-        self._trade_order_list = trade_order_list
-        self._time_series_ops = Mediator.get_time_series_ops()
-
-    def _check_calculate_benchmark(self, trade_order_name):
-        """Should we calculate a benchmark for trade/orders (eg. sometimes we might only wish to calculate benchmarks
-        for orders but not for trades).
-
-        Parameters
-        ----------
-        trade_order_name : str (list)
-            Which trades/orders should we compute these benchmarks for
-
-        Returns
-        -------
-        bool
-        """
-        if trade_order_name is not None and self._trade_order_list is not None:
-            if trade_order_name not in self._trade_order_list:
-                return False
-
-        return True
-
-    @abc.abstractmethod
-    def calculate_benchmark(self, trade_order_df=None, market_df=None, trade_order_name=None, field=None):
-        pass
-
-    def _add_benchmark_to_trade(self, trade_order_df, market_df, field=None):
-        pass
 
 ########################################################################################################################
 
@@ -75,25 +45,38 @@ class BenchmarkMarket(Benchmark):
     to calculate the spread to mid of bid/ask market data.
 
     """
-    pass
+
+    def __init__(self,  **kwargs):
+        # self.logger = LoggerManager().getLogger(__name__)
+        self._time_series_ops = Mediator.get_time_series_ops()
+
+    @abc.abstractmethod
+    def calculate_benchmark(self, market_df=None, field=None):
+        pass
+
+    def _check_empty_benchmark_market_data(self, market_df):
+        if market_df is None: return True
+        if market_df.empty: return True
+
+        return False
 
 
 class BenchmarkMarketMid(BenchmarkMarket):
     """Calculates the mid-point for every time point of market data from the underlying bid/ask prices.
 
     """
-    def __init__(self, trade_order_list=None, field='mid', bid='bid', ask='ask'):
+    def __init__(self, field='mid', bid='bid', ask='ask'):
 
-        super(BenchmarkMarketMid, self).__init__(trade_order_list=trade_order_list)
+        super(BenchmarkMarketMid, self).__init__()
 
         self._field = field
         self._bid = bid
         self._ask = ask
 
 
-    def calculate_benchmark(self, trade_order_df=None, market_df=None, trade_order_name=None, field=None, bid=None,
-                            ask=None):
-        # if not (self._check_calculate_benchmark(trade_order_name=trade_order_name)): return trade_order_df, market_df
+    def calculate_benchmark(self, market_df=None, field=None,
+                            bid=None, ask=None):
+        if self._check_empty_benchmark_market_data(market_df): return market_df
 
         if field is None: field = self._field
         if bid is None: bid = self._bid
@@ -106,16 +89,53 @@ class BenchmarkMarketMid(BenchmarkMarket):
         else:
             LoggerManager().getLogger(__name__).warn(field + " not in market data")
 
-        return trade_order_df, market_df
+        return market_df
+
+class BenchmarkMarketFilter(BenchmarkMarket):
+    """Filters market data by dates etc.
+
+    """
+    def __init__(self, time_of_day=None, day_of_week=None, month_of_year=None, year=None,
+                 specific_dates=None, time_zone=None):
+
+        super(BenchmarkMarketFilter, self).__init__()
+
+        self._time_of_day = time_of_day
+        self._day_of_week = day_of_week
+        self._month_of_year = month_of_year
+        self._year = year
+        self._specific_dates = specific_dates
+        self._time_zone = time_zone
+
+
+    def calculate_benchmark(self, market_df=None, time_of_day=None,
+                 day_of_week=None, month_of_year=None, year=None,
+                 specific_dates=None, time_zone=None):
+
+        if self._check_empty_benchmark_market_data(market_df): return market_df
+
+        if time_of_day is None: time_of_day = self._time_of_day
+        if day_of_week is None: day_of_week = self._day_of_week
+        if month_of_year is None: month_of_year = self._month_of_year
+        if year is None: year = self._year
+        if specific_dates is None: specific_dates = self._specific_dates
+        if time_zone is None: time_zone = self._time_zone
+
+        market_df = TimeSeriesOps().filter_time_series_by_multiple_time_parameters(market_df, time_of_day=time_of_day,
+                 day_of_week=day_of_week, month_of_year=month_of_year, year=year,
+                 specific_dates=specific_dates, time_zone=time_zone)
+
+        return market_df
+
 
 class BenchmarkMarketSpreadToMid(BenchmarkMarket):
     """Calculates the spread for each mid point
 
     """
-    def __init__(self, trade_order_list=None, mid='mid', bid='bid', ask='ask', bid_mid_bp=1, ask_mid_bp=1,
+    def __init__(self, mid='mid', bid='bid', ask='ask', bid_mid_bp=1, ask_mid_bp=1,
                  overwrite_bid_ask=False):
 
-        super(BenchmarkMarketSpreadToMid, self).__init__(trade_order_list=trade_order_list)
+        super(BenchmarkMarketSpreadToMid, self).__init__()
 
         self._mid = mid
         self._bid = bid
@@ -125,10 +145,11 @@ class BenchmarkMarketSpreadToMid(BenchmarkMarket):
         self._ask_mid_bp = ask_mid_bp
         self._overwrite_bid_ask = overwrite_bid_ask
 
-    def calculate_benchmark(self, trade_order_df=None, market_df=None, trade_order_name=None, mid=None, bid=None,
+    def calculate_benchmark(self, market_df=None, mid=None, bid=None,
                             ask=None,
                             bid_mid_bp=None, ask_mid_bp=None, overwrite_bid_ask=None):
-        # if not (self._check_calculate_benchmark(trade_order_name=trade_order_name)): return trade_order_df
+
+        if self._check_empty_benchmark_market_data(market_df): return market_df
 
         if mid is None: mid = self._mid
         if bid is None: bid = self._bid
@@ -179,17 +200,17 @@ class BenchmarkMarketSpreadToMid(BenchmarkMarket):
         else:
             LoggerManager().getLogger(__name__).warn("Couldn't calculate spread from mid, check market data has appropriate fields.")
 
-        return trade_order_df, market_df
+        return market_df
 
 class BenchmarkMarketResampleOffset(BenchmarkMarket):
     """Resamples market data to the chosen frequency and/or offsets the time by a specified amount. Can be used to
     reduce data size or fix issues associated with misalignment of venue clocks.
 
     """
-    def __init__(self, trade_order_list=None, market_resample_freq=None, market_resample_unit='s', market_offset_ms=None, resample_how='last',
-                 price_field=None, volume_field=None):
+    def __init__(self, market_resample_freq=None, market_resample_unit='s', market_offset_ms=None, resample_how='last',
+                 price_field=None, volume_field=None, dropna=False):
 
-        super(BenchmarkMarketResampleOffset, self).__init__(trade_order_list=trade_order_list)
+        super(BenchmarkMarketResampleOffset, self).__init__()
 
         self._market_resample_freq = market_resample_freq
         self._market_resample_unit = market_resample_unit
@@ -199,12 +220,14 @@ class BenchmarkMarketResampleOffset(BenchmarkMarket):
         self._price_field = price_field
         self._volume_field = volume_field
 
+        self._dropna = dropna
 
-    def calculate_benchmark(self, trade_order_df=None, market_df=None, trade_order_name=None, market_resample_freq=None,
+
+    def calculate_benchmark(self, market_df=None, market_resample_freq=None,
                             market_resample_unit=None, market_offset_ms=None, resample_how=None,
-                            price_field=None, volume_field=None):
+                            price_field=None, volume_field=None, dropna=None):
 
-        # if not (self._check_calculate_benchmark(trade_order_name=trade_order_name)): return trade_order_df, market_df
+        if self._check_empty_benchmark_market_data(market_df): return market_df
 
         if market_resample_freq is None: market_resample_freq = self._market_resample_freq
         if market_resample_unit is None: market_resample_unit = self._market_resample_unit
@@ -212,6 +235,7 @@ class BenchmarkMarketResampleOffset(BenchmarkMarket):
         if resample_how is None: resample_how = self._resample_how
         if price_field is None: price_field = self._price_field
         if volume_field is None: volume_field = self._volume_field
+        if dropna is None: dropna = self._dropna
 
         if market_offset_ms is not None:
             market_df.index = market_df.index + timedelta(milliseconds=market_offset_ms)
@@ -223,13 +247,16 @@ class BenchmarkMarketResampleOffset(BenchmarkMarket):
             market_df_list = []
 
             for how in resample_how:
-                market_df_list.append(Mediator.get_time_series_ops().resample_time_series(market_df,
+                market_df_list.append(self._time_series_ops.resample_time_series(market_df,
                     resample_amount=market_resample_freq, how=how, unit=market_resample_unit,
                     price_field=price_field, volume_field=volume_field))
 
-            market_df = Mediator.get_time_series_ops().outer_join(market_df_list)
+            market_df = self._time_series_ops.outer_join(market_df_list)
 
-        return trade_order_df, market_df
+        if dropna:
+            market_df = market_df.dropna()
+
+        return market_df
 
 ########################################################################################################################
 
@@ -239,7 +266,48 @@ class BenchmarkTrade(Benchmark):
     between those points. For an arrival price, we need to know the time of a trade.
 
     """
-    pass
+    def __init__(self, trade_order_list=None, **kwargs):
+        # self.logger = LoggerManager().getLogger(__name__)
+        self._trade_order_list = trade_order_list
+        self._time_series_ops = Mediator.get_time_series_ops()
+
+    @abc.abstractmethod
+    def calculate_benchmark(self, trade_order_df=None, market_df=None, trade_order_name=None, field=None):
+        pass
+
+    def _add_benchmark_to_trade(self, trade_order_df, market_df, field=None):
+        pass
+
+    def _check_empty_benchmark_market_trade_data(self, trade_order_name, trade_order_df, market_df):
+        """Should we calculate a benchmark for trade/orders (eg. sometimes we might only wish to calculate benchmarks
+        for orders but not for trades).
+
+        Parameters
+        ----------
+        trade_order_name : str (list)
+            Which trades/orders should we compute these benchmarks for
+
+        trade_order_df : DataFrame
+            trade/order data
+
+        market_df : DataFrame
+            market data
+
+        Returns
+        -------
+        bool
+        """
+        if trade_order_df is None: return True
+        if trade_order_df.empty: return True
+        if market_df is None: return True
+        if market_df.empty: return True
+
+        if trade_order_name is not None and self._trade_order_list is not None:
+            if trade_order_name not in self._trade_order_list:
+                return True
+
+        return False
+
 
 ########################################################################################################################
 
@@ -264,7 +332,8 @@ class BenchmarkArrival(BenchmarkTrade):
 
     def calculate_benchmark(self, trade_order_df=None, market_df=None, trade_order_name=None, bid_benchmark=None,
                             ask_benchmark=None, start_time_before_offset=None, overwrite_time_of_day=None, overtime_zone=None):
-        if not (self._check_calculate_benchmark(trade_order_name=trade_order_name)): return trade_order_df, market_df
+        if self._check_empty_benchmark_market_trade_data(trade_order_name, trade_order_df, market_df):
+            return trade_order_df, market_df
 
         if bid_benchmark is None: bid_benchmark = self._bid_benchmark
         if ask_benchmark is None: ask_benchmark = self._ask_benchmark
@@ -306,9 +375,9 @@ class BenchmarkArrival(BenchmarkTrade):
             trade_order_df[self._benchmark_name][is_side] = benchmark
 
             # # find the nearest price as arrival
-            # series, dt = self.time_series_ops.vlookup_style_data_frame(trade_order_df.index, market_df, field)
+            # series, dt = self.time_series_ops.vlookup_style_data_frame(market_trade_order_df.index, market_df, field)
             #
-            # trade_order_df['arrival'] = series
+            # market_trade_order_df['arrival'] = series
 
         return trade_order_df, market_df
 
@@ -325,7 +394,7 @@ class BenchmarkWeighted(BenchmarkTrade):
                  start_time_before_offset=None, finish_time_after_offset=None,
                  overwrite_time_of_day=None, overwrite_timezone=None):
 
-        super(BenchmarkTrade, self).__init__(trade_order_list=trade_order_list)
+        super(BenchmarkWeighted, self).__init__(trade_order_list=trade_order_list)
 
         self._bid_benchmark = bid_benchmark
         self._ask_benchmark = ask_benchmark
@@ -347,7 +416,8 @@ class BenchmarkWeighted(BenchmarkTrade):
                             benchmark_date_end_field=None, start_time_before_offset=None, finish_time_after_offset=None,
                             overwrite_time_of_day=None, overwrite_timezone=None):
 
-        if not (self._check_calculate_benchmark(trade_order_name=trade_order_name)): return trade_order_df, market_df
+        if self._check_empty_benchmark_market_trade_data(trade_order_name, trade_order_df, market_df):
+            return trade_order_df, market_df
 
         # If fields have not been specified, then take them from the field variables
         if bid_benchmark is None: bid_benchmark = self._bid_benchmark
@@ -643,6 +713,7 @@ class BenchmarkTradeOffset(BenchmarkTrade):
                 trade_order_df[d] = trade_order_df[d] + timedelta(milliseconds=trade_offset_ms)
 
         return trade_order_df, market_df
+
 
 
 

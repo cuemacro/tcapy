@@ -518,7 +518,7 @@ class Constants(object):
     # Expiry time for user data (60 minutes)
     volatile_cache_expiry_seconds = 60 * 60
 
-    # note: msgpack is slightly faster, but is not supported in Pandas in later versions
+    # Note: msgpack is slightly faster, but is not supported in Pandas in later versions
     # at current stage arrow is not fully tested
     volatile_cache_redis_format = 'msgpack' # 'msgpack' or 'arrow'
 

@@ -7,4 +7,4 @@ call %SCRIPT_FOLDER%\activate_python_environment
 
 echo 'Create a conda environment from YAML file...'
 
-call conda env create -f %TCAPY_CUEMACRO%\batch_scripts\windows\installation\environment_windows_py36tcapy.yml
+call conda env create -f %TCAPY_CUEMACRO%\batch_scripts\windows\installation\environment_windows_py36tca.yml

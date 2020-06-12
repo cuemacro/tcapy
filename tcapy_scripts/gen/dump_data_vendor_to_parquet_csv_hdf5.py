@@ -18,7 +18,7 @@ if __name__ == '__main__':
 
     from tcapy.conf.constants import Constants
 
-    data_vendor = 'ncfx' # 'ncfx' or 'dukascopy'
+    data_vendor = 'dukascopy' # 'ncfx' or 'dukascopy'
     write_large_csv = False
     write_large_hdf5_parquet = True
     return_df = True # returns the dataframe (DO NOT DO this for large datasets, as it will cause you to run out of memory)
@@ -47,7 +47,7 @@ if __name__ == '__main__':
     temp_large_data_folder = '/home/tcapyuser/csv_dump/temp/large/'
 
     start_date_csv = '01 Apr 2016'; finish_date_csv = '01 May 2020'; split_size = 'monthly' # 'daily' or 'monthly'
-    # start_date_csv = '01 Jan 2005'; finish_date_csv = '01 May 2020';
+    # start_date_csv = '01 Jan 2020'; finish_date_csv = '01 Jun 2020';
 
     if data_vendor == 'ncfx':
         from tcapy.data.databasepopulator import DatabasePopulatorNCFX as DatabasePopulator

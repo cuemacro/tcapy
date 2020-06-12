@@ -79,7 +79,7 @@ class UtilFunc(object):
         # import itertools
         # return list(itertools.chain.from_iterable(itertools.repeat(x, 1) if isinstance(x, str) else x for x in list_of_lists))
 
-    def pretty_str_list(self, list_str):
+    def pretty_str_list(self, list_str, binder=' & '):
         """Makes a string list into pretty human readable list separated by commas and the last element is separated
         by an "and"
 
@@ -105,12 +105,12 @@ class UtilFunc(object):
             return str_pretty
 
         if len(list_str) == 2:
-            return str_pretty + " & "  + list_str[1]
+            return str_pretty + binder  + list_str[1]
 
         for i in range(1, len(list_str) - 1):
             str_pretty = str_pretty + ', ' + list_str[i]
 
-        return str_pretty + " & " + list_str[-1]
+        return str_pretty + binder + list_str[-1]
 
     def pretty_str_within_list(self, list_str):
         """Goes through a str list and makes it pretty removing things like underscores to make it more readable
@@ -289,6 +289,11 @@ class UtilFunc(object):
                     pass
 
             return data_frame
+        else:
+            logger.warning("Cannot read file " + fname + ", invalid format specified")
+
+            return None
+
 
     def write_dataframe_to_binary(self, data_frame, fname, format=constants.binary_default_dump_format):
         """Writes a DataFrame to disk in Parquet, HDF5, CSV or CSV.GZ format

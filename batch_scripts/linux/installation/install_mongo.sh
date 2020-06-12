@@ -19,7 +19,7 @@ if [ $DISTRO == "ubuntu" ]; then
     echo "deb [arch=amd64] http://repo.mongodb.org/apt/ubuntu bionic/mongodb-org/4.2 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-4.2.list
 
     sudo apt-get update
-    sudo apt-get install --yes mongodb-org
+    sudo apt-get install --yes mongodb-org mongodb-org-tools
 
 elif [ $DISTRO == "redhat"  ]; then
     # Red Hat installation

@@ -137,7 +137,7 @@ def dataframe_compliance_tca_example():
 
                              results_form=[
                                  # Display a table of all the anomalous trades by slippage (ie. outside bid/ask)
-                                 TableResultsForm(trade_order_list=['trade_df'],
+                                 TableResultsForm(market_trade_order_list=['trade_df'],
                                                   metric_name='slippage',
                                                   filter_by='worst_all',  # Order by the worst slippage
                                                   tag_value_combinations={'slippage_anomalous': 1.0},
@@ -149,7 +149,7 @@ def dataframe_compliance_tca_example():
                                                   round_figures_by=None),
 
                                  # Get the total notional executed by broker (in reporting currency)
-                                 BarResultsForm(trade_order_list=['trade_df'],  # trade
+                                 BarResultsForm(market_trade_order_list=['trade_df'],  # trade
                                                 aggregate_by_field='broker_id',  # aggregate by broker name
                                                 # keep_fields=['executed_notional_in_reporting_currency', 'executed_notional', 'side'],
                                                 metric_name='executed_notional_in_reporting_currency',
@@ -159,7 +159,7 @@ def dataframe_compliance_tca_example():
                                                 round_figures_by=0),  # round to nearest unit
 
                                  # Get average slippage per broker (weighted by notional)
-                                 BarResultsForm(trade_order_list=['trade_df'],
+                                 BarResultsForm(market_trade_order_list=['trade_df'],
                                                 aggregate_by_field='broker_id',
                                                 metric_name='slippage',
                                                 aggregation_metric='mean',

@@ -13350,7 +13350,7 @@ div#notebook {
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># Display a table of all the anomalous trades by slippage (ie. outside bid/ask)</span>
-<span class="n">table_results_form</span> <span class="o">=</span> <span class="n">TableResultsForm</span><span class="p">(</span><span class="n">trade_order_list</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;trade_df&#39;</span><span class="p">],</span>
+<span class="n">table_results_form</span> <span class="o">=</span> <span class="n">TableResultsForm</span><span class="p">(</span><span class="n">market_trade_order_list</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;trade_df&#39;</span><span class="p">],</span>
     <span class="n">metric_name</span><span class="o">=</span><span class="s1">&#39;slippage&#39;</span><span class="p">,</span>
                                       
     <span class="c1"># Order by the worst slippage</span>
@@ -13385,7 +13385,7 @@ div#notebook {
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span> <span class="c1"># Get the total notional executed by broker (in reporting currency)</span>
-<span class="n">bar_results_form_notional</span> <span class="o">=</span> <span class="n">BarResultsForm</span><span class="p">(</span><span class="n">trade_order_list</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;trade_df&#39;</span><span class="p">],</span>  <span class="c1"># Trade</span>
+<span class="n">bar_results_form_notional</span> <span class="o">=</span> <span class="n">BarResultsForm</span><span class="p">(</span><span class="n">market_trade_order_list</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;trade_df&#39;</span><span class="p">],</span>  <span class="c1"># Trade</span>
     <span class="c1"># Aggregate by broker name</span>
     <span class="n">aggregate_by_field</span><span class="o">=</span><span class="s1">&#39;broker_id&#39;</span><span class="p">,</span>  
                                                 
@@ -13421,7 +13421,7 @@ div#notebook {
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># Get average slippage per broker (weighted by notional)</span>
-<span class="n">bar_results_form_slippage</span> <span class="o">=</span> <span class="n">BarResultsForm</span><span class="p">(</span><span class="n">trade_order_list</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;trade_df&#39;</span><span class="p">],</span>
+<span class="n">bar_results_form_slippage</span> <span class="o">=</span> <span class="n">BarResultsForm</span><span class="p">(</span><span class="n">market_trade_order_list</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;trade_df&#39;</span><span class="p">],</span>
                                            
     <span class="c1"># Aggregate the trades by broker_id</span>
     <span class="n">aggregate_by_field</span><span class="o">=</span><span class="s1">&#39;broker_id&#39;</span><span class="p">,</span>

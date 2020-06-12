@@ -201,7 +201,7 @@ class SessionManager(object):
         return username
 
     def set_session_flag(self, tag, value=None):
-        """Sets a value with a specific tag in the session dictionary, which is essentially unique for every user.
+        """Sets a value with a specific _tag in the session dictionary, which is essentially unique for every user.
 
         Parameters
         ----------
@@ -229,7 +229,7 @@ class SessionManager(object):
             session[t] = value
 
     def get_session_flag(self, tag):
-        """Gets the value of a tag in the user's session
+        """Gets the value of a _tag in the user's session
 
         Parameters
         ----------
@@ -253,7 +253,7 @@ class SessionManager(object):
     ##### session object
 
     def check_lines_plotted(self, lines_to_plot, tag):
-        """Checks if the lines have been plotted for a particular user, by checking the plot's tag in their user session
+        """Checks if the lines have been plotted for a particular user, by checking the plot's _tag in their user session
 
         Parameters
         ----------
@@ -299,8 +299,8 @@ class SessionManager(object):
             # if relayoutData is not None:
             #     relayoutDataSet = set(relayoutData)
             #
-            # if session[tag] is not None:
-            #     sessionTagSet = set(session[tag])
+            # if session[_tag] is not None:
+            #     sessionTagSet = set(session[_tag])
             # if relayoutData is None:
             #    return False
 
@@ -310,7 +310,7 @@ class SessionManager(object):
         return False
 
     def set_lines_plotted(self, lines_to_plot, tag):
-        """Sets the lines plotted for a particular chart tag in the user's session
+        """Sets the lines plotted for a particular chart _tag in the user's session
 
         Parameters
         ----------
@@ -349,12 +349,12 @@ class SessionManager(object):
     ##### We identify when a user has "clicked" a button by change in the number of clicks (Dash documentation recommends
     ##### this to handle user clicks)
     def get_session_clicks(self, tag):
-        """Gets the number of clicks for the tag. If doesn't exist, we automatically set the tag as 0.
+        """Gets the number of clicks for the _tag. If doesn't exist, we automatically set the _tag as 0.
 
         Parameters
         ----------
         tag : str
-            The tag for which we want to return the number of clicks
+            The _tag for which we want to return the number of clicks
 
         Returns
         -------
@@ -386,7 +386,7 @@ class SessionManager(object):
             session[tag] = n_clicks
 
     def check_session_tag(self, tag):
-        """Checks if a tag exists in the user's session, and if so returns the value of that tag in the user's session
+        """Checks if a _tag exists in the user's session, and if so returns the value of that _tag in the user's session
 
         Parameters
         ----------
@@ -403,7 +403,7 @@ class SessionManager(object):
         return False
 
     def exists_session_tag(self, tag):
-        """Does a tag exist in the current user session?
+        """Does a _tag exist in the current user session?
 
         Parameters
         ----------
@@ -416,7 +416,7 @@ class SessionManager(object):
         return tag in session
 
     def check_session_reset_tag(self, tag):
-        """Checks if a tag is in session (if that tag exists already and is "True", then we reset it to "False"), otherwise
+        """Checks if a _tag is in session (if that _tag exists already and is "True", then we reset it to "False"), otherwise
         return "False"
 
         Parameters

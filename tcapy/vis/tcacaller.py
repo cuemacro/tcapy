@@ -202,8 +202,8 @@ class TCACaller(ComputationCaller, ABC):
         TCARequest
         """
 
-        if 'tca_request' in kwargs.keys():
-            return kwargs['tca_request']
+        if '_tca_request' in kwargs.keys():
+            return kwargs['_tca_request']
 
         # Convert various string/objects into forms which can be accepted by TCARequest
         kwargs = self.fill_computation_request_kwargs(

@@ -15306,7 +15306,7 @@ events, are points in time. These trades will tag their respective orders.</p>
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <p>Here we create a <code>TCARequest</code> for the same dataset. This time, however, we also calculate the <code>MetricTransientMarketImpact</code>, which we've defined as the 5 second move from a trade or start of an order. We also want to calculate the distribution of the slippage by side (ie. buy/sell) with <code>DistResultsForm</code> and to calculate the average slippage (weighted by the executed notional) with <code>BarResultForm</code>. Note, we've used <code>scalar</code> parameters of <code>10000.0</code> to convert to basis point to ease understanding.</p>
-<p>All these <code>Metric</code> and <code>ResultsForm</code> calculations will be calculated on both trades and orders. However, we can specify for it to be calculated only on for example trades, by instantiating the objects using the <code>trade_order_list</code> parameter eg. <code>MetricSlippage(trade_order_list=['trade_df'])</code></p>
+<p>All these <code>Metric</code> and <code>ResultsForm</code> calculations will be calculated on both trades and orders. However, we can specify for it to be calculated only on for example trades, by instantiating the objects using the <code>market_trade_order_list</code> parameter eg. <code>MetricSlippage(market_trade_order_list=['trade_df'])</code></p>
 
 </div>
 </div>

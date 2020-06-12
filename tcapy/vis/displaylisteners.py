@@ -287,7 +287,7 @@ class DisplayListeners(object):
             Which trade/order to focus on (eg. 'execution-by-ticker)
 
         trade_order_tag : str
-            DataFrame tag to fetch (eg. 'bar_trade_df_by_ticker)
+            DataFrame _tag to fetch (eg. 'bar_trade_df_by_ticker)
 
         tca_type : str
             Type of TCA (eg. 'detailed)
@@ -322,7 +322,7 @@ class DisplayListeners(object):
             Which trade/order to focus on (eg. 'execution-by-ticker)
 
         trade_order_tag : str
-            DataFrame tag to fetch (eg. 'bar_trade_df_by_ticker)
+            DataFrame _tag to fetch (eg. 'bar_trade_df_by_ticker)
 
         tca_type : str
             Type of TCA (eg. 'detailed)
@@ -548,7 +548,7 @@ class DisplayListeners(object):
         return strIO
 
     def _create_df_dictionary_key(self, trade_order_tag):
-        """Breaks down a trade/order tag, into the tag, metric and how it should be partitioned.
+        """Breaks down a trade/order _tag, into the _tag, metric and how it should be partitioned.
 
         Parameters
         ----------

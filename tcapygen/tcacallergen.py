@@ -131,12 +131,12 @@ class TCACallerImplGen(TCACaller):
 
                         results_form = [
                             # Calculate the distribute of the metric for trades/orders, broken down by trade side (buy/sell)
-                            DistResultsForm(trade_order_list=['trade_df', 'order_df'],
+                            DistResultsForm(market_trade_order_list=['trade_df', 'order_df'],
                                             metric_name=metric_val, aggregate_by_field='side', scalar=10000.0,
                                             weighting_field='executed_notional_in_reporting_currency'),
 
                             # Create a table the markout of every trade
-                            TableResultsForm(trade_order_list=['trade_df'], metric_name='markout', filter_by='all',
+                            TableResultsForm(market_trade_order_list=['trade_df'], metric_name='markout', filter_by='all',
                                              replace_text={'markout_': '', 'executed_notional': 'exec not',
                                                            'notional_currency': 'exec not cur'},
                                              keep_fields=['executed_notional', 'side', 'notional_currency'],
@@ -225,12 +225,12 @@ class TCACallerImplGen(TCACaller):
                         results_form = [
                             # Show the distribution of the selected metric for trades weighted by notional
                             # aggregated by ticker and then by venue
-                            DistResultsForm(trade_order_list=['trade_df'], metric_name=metric_val,
+                            DistResultsForm(market_trade_order_list=['trade_df'], metric_name=metric_val,
                                             aggregate_by_field=['ticker', 'venue'],
                                             weighting_field='executed_notional_in_reporting_currency'),
 
                             # Display the timeline of metrics average by day (and weighted by notional)
-                            TimelineResultsForm(trade_order_list=['trade_df'], by_date='date',
+                            TimelineResultsForm(market_trade_order_list=['trade_df'], by_date='date',
                                                 metric_name=metric_val,
                                                 aggregation_metric='mean',
                                                 aggregate_by_field='ticker', scalar=10000.0,
@@ -238,7 +238,7 @@ class TCACallerImplGen(TCACaller):
 
                             # Display a bar chart showing the average metric weighted by notional and aggregated by ticker
                             # venue
-                            BarResultsForm(trade_order_list=['trade_df'],
+                            BarResultsForm(market_trade_order_list=['trade_df'],
                                            metric_name=metric_val,
                                            aggregation_metric='mean',
                                            aggregate_by_field=['ticker', 'venue'], scalar=10000.0,
@@ -342,7 +342,7 @@ class TCACallerImplGen(TCACaller):
                             # Display a table of all the anomalous trades by slippage (ie. outside bid/ask)
                             TableResultsForm(
                                 # Only display for trades
-                                trade_order_list=['trade_df'],
+                                market_trade_order_list=['trade_df'],
 
                                 # Display slippage
                                 metric_name='slippage',
@@ -376,7 +376,7 @@ class TCACallerImplGen(TCACaller):
                             # Get the total notional executed by broker (in reporting currency)
                             BarResultsForm(
                                 # Select child orders
-                                trade_order_list=['trade_df'],
+                                market_trade_order_list=['trade_df'],
 
                                 # Aggregate by broker name
                                 aggregate_by_field='broker_id',

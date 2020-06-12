@@ -208,7 +208,7 @@ and then install tcapy on VirtualBox/Linux
     * some of the Linux distributions that can be installed relatively easily on WSL include Ubuntu
     * instructions are [here](https://docs.microsoft.com/en-us/windows/wsl/install-win10) for WSL 1
     * instructions are [here](https://docs.microsoft.com/en-us/windows/wsl/wsl2-install) for WSL 2
-        * WSL2 is currently in preview, but will be made 
+        * WSL2 is now officially released, and I now use that
         [generally available shortly in the full  Windows 10 version 2004](https://devblogs.microsoft.com/commandline/wsl2-will-be-generally-available-in-windows-10-version-2004/)
         * WSL2 offers better compatibility with Linux and offers much faster IO
     * then follow the instructions earlier ie. *tcapy installation on Linux*
@@ -310,9 +310,9 @@ This will do several things, which includes:
 
 * Change the Python environment to `py36tca` under `conda` (although `virtualenv` environments are also supported)
 * Start server web apps:
-    * http://localhost:9000/tcapy/ - main webapp
-    * http://localhost:9000/tcapyboard/ - simpler webapp where you can upload a trade CSV and get TCA output
-    * http://localhost:9000/tcapyapi/ - RESTful API endpoint
+    * `http://localhost:9000/tcapy/` - main webapp
+    * `http://localhost:9000/tcapyboard/` - simpler webapp where you can upload a trade CSV and get TCA output
+    * `http://localhost:9000/tcapyapi/` - RESTful API endpoint
 * Start Celery for distributed computation, which can also be accessed programmatically
     * If we do TCA on multiple assets, each asset is sent to a different Celery worker for computation
     * Celery also distributes the loading of data from the databases/caches by using different Celery workers

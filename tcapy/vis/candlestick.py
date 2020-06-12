@@ -210,11 +210,11 @@ def create_candlestick(open, high, low, close, dates=None, direction='both',
     # high_data = [33.1, 33.3, 33.6, 33.2, 34.8]
     # low_data = [32.7, 32.7, 32.8, 32.6, 32.8]
     # close_data = [33.0, 32.9, 33.3, 33.1, 33.1]
-    # dates = [datetime(year=2013, month=10, day=10),
-    #          datetime(year=2013, month=11, day=10),
-    #          datetime(year=2013, month=12, day=10),
-    #          datetime(year=2014, month=1, day=10),
-    #          datetime(year=2014, month=2, day=10)]
+    # dates = [datetime(_year=2013, month=10, day=10),
+    #          datetime(_year=2013, month=11, day=10),
+    #          datetime(_year=2013, month=12, day=10),
+    #          datetime(_year=2014, month=1, day=10),
+    #          datetime(_year=2014, month=2, day=10)]
     #
     # # Create ohlc
     # fig = create_candlestick(open_data, high_data,

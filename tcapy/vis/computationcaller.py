@@ -128,7 +128,7 @@ class ComputationCaller(ABC):
                 self.calculate_computation_summary(k))
 
     def add_list_kwargs(self, kwargs, tag, addition):
-        """Adds a value to the kwargs dictionary (or appends it to an existing tag
+        """Adds a value to the kwargs dictionary (or appends it to an existing _tag
 
         Parameters
         ----------

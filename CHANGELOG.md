@@ -5,6 +5,13 @@
 * No official releases yet
 
 ## Coding log
+* 12 Jun 2020
+    * Added parameter to adjust market impact by side of trade
+    * ResultsForm aggregations now work purely for market data (in addition to trade/order data from before)
+        * Can aggregate by multiple dimensions (eg. month & time of day)
+    * Strip ticker column before storing in Arctic
+    * Bug fixes for Benchmark calculations if trade/market data missing
+    * Refactored BenchmarkMarket classes so can't have trade/order data as inputs
 * 05 Jun 2020
     * Speeded up non-multithreaded version, by removing some CacheHandles
     * Speeded up date split parallelization

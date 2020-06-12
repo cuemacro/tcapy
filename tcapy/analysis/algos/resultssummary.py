@@ -268,6 +268,12 @@ class ResultsSummary(object):
             'month' - aggregate by month
             'hour' - aggregate by hour
             'time' - aggregate by time
+            'hourldn' - aggregate by hour (in London timezone)
+            'hournyc' - aggregate by hour (in New York timezone)
+            'hourtok' - aggregate by hour (in Tokyo timezone)
+            'timeldn' - aggregate by time (in London timezone)
+            'timenyc' - aggregate by time (in New York timezone)
+            'timetok' - aggregate by time (in Tokyo timezone)
 
         Returns
         -------
@@ -277,39 +283,49 @@ class ResultsSummary(object):
         # TODO weighting field
 
         # eg. aggregate output by 'vendor' and calculate the average slippage per 'vendor'
-
         group = [aggregate_by_field]
 
         if by_date is not None:
-            if by_date == 'date':
-                group = [trade_df.index.date]
-            elif by_date == 'datehour':
+
+            if not(isinstance(by_date, list)):
+                by_date = [by_date]
+
+            if 'date' in by_date:
+                group.append(trade_df.index.date)
+
+            if 'datehour' in by_date:
                 trade_df.index = trade_df.index.floor('H')
-                group = [trade_df.index]
+                group.append(trade_df.index)
 
-            elif by_date == 'month':
-                group = [trade_df.index.day]
+            if 'month' in by_date:
+                group.append(trade_df.index.month)
 
-            elif by_date == 'day':
-                group = [trade_df.index.day]
+            if 'day' in by_date:
+                group.append(trade_df.index.day)
 
-            elif by_date == 'hour':
-                group = [trade_df.index.hour]
+            if 'hour' in by_date:
+                group.append(trade_df.index.hour)
 
-            elif by_date == 'time':
-                group = [trade_df.index.time]
+            if 'time' in by_date:
+                group.append(trade_df.index.time)
 
-            elif by_date == 'timeldn':
-                group = [trade_df.index.copy().tz_convert('Europe/London').time]
+            if 'timeldn' in by_date:
+                group.append(trade_df.index.copy().tz_convert('Europe/London').time)
 
-            elif by_date == 'timenyc':
-                group = [trade_df.index.copy().tz_convert('America/New_York').time]
+            if 'timenyc' in by_date:
+                group.append(trade_df.index.copy().tz_convert('America/New_York').time)
 
-            elif by_date == 'hourldn':
-                group = [trade_df.index.copy().tz_convert('Europe/London').hour]
+            if 'timetok' in by_date:
+                group.append(trade_df.index.copy().tz_convert('Asia/Tokyo').time)
 
-            elif by_date == 'hournyc':
-                group = [trade_df.index.copy().tz_convert('America/New_York').hour]
+            if 'hourldn' in by_date:
+                group.append(trade_df.index.copy().tz_convert('Europe/London').hour)
+
+            if 'hournyc' in by_date:
+                group.append(trade_df.index.copy().tz_convert('America/New_York').hour)
+
+            if 'hourtok' in by_date:
+                group.append(trade_df.index.copy().tz_convert('Asia/Tokyo').hour)
 
             if aggregate_by_field is not None:
                 group.append(aggregate_by_field)
@@ -324,7 +340,10 @@ class ResultsSummary(object):
 
         group = [x for x in group if x is not None]
 
-        agg = trade_df.groupby(group)[displayed_fields]
+        if group != []:
+            agg = trade_df.groupby(group)[displayed_fields]
+        else:
+            agg = trade_df[displayed_fields]
 
         # def weighted_avg(group, avg_name, weight_name):
         #     """ http://stackoverflow.com/questions/10951341/pd-dataframe-aggregate-function-using-multiple-columns
@@ -342,37 +361,46 @@ class ResultsSummary(object):
         if aggregation_metric == 'mean':
             if weighting_field is None:
                 agg = agg.mean()
-
             else:
                 # Calculate a weighted average of the metric for each group
                 agg = agg.apply(self._time_series_ops.weighted_average_lambda, metric_name, weighting_field)
 
         elif aggregation_metric == 'sum':
             agg = agg.sum()
-
         elif aggregation_metric == 'count':
             agg = agg.count()
-
         elif aggregation_metric == 'max':
             agg = agg.max()
-
         elif aggregation_metric == 'min':
             agg = agg.min()
-
-
         else:
             return Exception(aggregation_metric + " is not a valid aggregation, must be one of mean, sum or count.")
 
         df = pd.DataFrame(agg).transpose()
 
         if (by_date is not None):
-            df = df.melt()
-            df = df.set_index(df[df.columns[0]])
-            df.index.name = 'Date'
-            df = df.drop([df.columns[0]], axis=1)
 
-            df = pd.pivot_table(df, index='Date', columns=aggregate_by_field, values=df.columns[-1])
-        else:
+            if len(group) == 1:
+                df = df.melt()
+                df = df.set_index(df[df.columns[0]])
+                df.index.name = 'Date'
+                df = df.drop([df.columns[0]], axis=1)
+
+                df = pd.pivot_table(df, index='Date', columns=aggregate_by_field, values=df.columns[-1])
+            elif len(group) == 2:
+                df = df.transpose().unstack()
+
+                # Ignore the field name
+                df.columns = df.columns.map(lambda t: t[1])
+
+                if len(df.columns) > len(df.index):
+                    df = df.transpose()
+
+            # If more than 2 dimensions
+            else:
+                df = df.melt()
+
+        elif group != []:
             df = pd.pivot_table(df, index=aggregate_by_field, values=df.columns).transpose()
 
         return pd.DataFrame(df)

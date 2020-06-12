@@ -96,11 +96,11 @@ def run_tcapy_computation():
                                  # Aggregate the average slippage on trades by venue
                                  HeatmapResultsForm(metric_name=['slippage', 'transient_market_impact'],
                                                     aggregate_by_field=['venue', 'ticker'], scalar=10000.0,
-                                                    trade_order_list='trade_df'),
+                                                    market_trade_order_list='trade_df'),
 
                                  # Aggregate the average slippage on trades by venue
                                  BarResultsForm(metric_name='slippage', aggregate_by_field='venue', scalar=10000.0,
-                                                trade_order_list='trade_df'),
+                                                market_trade_order_list='trade_df'),
 
                                  # Aggregate the average slippage on trades/orders by broker_id
                                  BarResultsForm(metric_name='slippage', aggregate_by_field='broker_id', scalar=10000.0),

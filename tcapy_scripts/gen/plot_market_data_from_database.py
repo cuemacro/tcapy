@@ -32,7 +32,7 @@ if __name__ == '__main__':
     ticker = 'EURUSD'
 
     # Warning for high frequency data file sizes might be very big, so you may need to reduce this!
-    market_request = MarketRequest(start_date='04 Jan 2016', finish_date='05 Jan 2016', ticker=ticker,
+    market_request = MarketRequest(start_date='01 Jan 2020', finish_date='01 Feb 2020', ticker=ticker,
                                    data_store=database_dialect + '-' + data_vendor)
 
     tca_market_trade_loader = TCAMarketTradeLoaderImpl()

@@ -62,7 +62,7 @@ def get_market_trade_holder_via_celery(tca_request):
 
     #from celery import group
 
-    #return group(get_market_trade_holder_via_celery(tca_request), get_trade_order_holder_via_celery(tca_request))
+    #return group(get_market_trade_holder_via_celery(_tca_request), get_trade_order_holder_via_celery(_tca_request))
     return tca_ticker_loader.get_market_trade_order_holder(tca_request)
 
 @app.task(name='get_market_data_via_celery')
@@ -138,6 +138,6 @@ def get_market_trade_holder_and_calculate_metrics_single_ticker_via_celery(tca_r
 
     #from celery import group
 
-    #return group(get_market_trade_holder_via_celery(tca_request), get_trade_order_holder_via_celery(tca_request))
+    #return group(get_market_trade_holder_via_celery(_tca_request), get_trade_order_holder_via_celery(_tca_request))
     return tca_ticker_loader.calculate_metrics_single_ticker(tca_ticker_loader.get_market_trade_order_holder(tca_request),
         tca_request, dummy_market)

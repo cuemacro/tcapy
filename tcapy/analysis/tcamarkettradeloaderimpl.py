@@ -46,10 +46,12 @@ class TCAMarketTradeLoaderImpl(TCAMarketTradeLoader):
         if len(tca_request_list) == 0:
             return {}, DataFrameHolder()
 
+        # Only attempt to execute in parallel if flag has been enabled
         if tca_request_list[0].use_multithreading:
             market_df_dict, trade_order_results_df_dict = self._parallel_get_market_trade_metrics(
                 tca_request_list, dummy_market)
         else:
+            # Otherwise run without any multithreading
             return super(TCAMarketTradeLoaderImpl, self)._get_market_trade_metrics(tca_request_list, dummy_market)
 
         return market_df_dict, trade_order_results_df_dict
@@ -57,11 +59,15 @@ class TCAMarketTradeLoaderImpl(TCAMarketTradeLoader):
     def _apply_summary_metrics(self, tca_request_list, trade_order_results_df_dict, market_df_dict):
 
         trade_order_list = self._util_func.dict_key_list(trade_order_results_df_dict.keys())
+        market_list = self._util_func.dict_key_list(market_df_dict.keys())
 
         if not (isinstance(trade_order_list, list)):
             trade_order_list = [trade_order_list]
 
-        # First get the market data
+        if not (isinstance(market_list, list)):
+            market_list = [market_list]
+
+        # First get the market data (for doing bid/ask on distributions) - only does the first ticker!
         market_df = market_df_dict[tca_request_list[0].ticker]
 
         logger = LoggerManager.getLogger(__name__)
@@ -75,11 +81,12 @@ class TCAMarketTradeLoaderImpl(TCAMarketTradeLoader):
         # If dummy market (ie. don't return market data to the user) has been specified then market data cannot
         # be included in ResultsForm calculations
         if results_form is not None:
+
+            # Go through all the trade/orders doing statistical aggregations
             for i in range(0, len(trade_order_results_df_dict)):
-                current_key = self._util_func.dict_key_list(trade_order_results_df_dict.keys())[i]
 
                 # Ignore 'fig' objects which are Plotly JSON Figures, and only process DataFrames
-                if 'df' in current_key:
+                if 'df' in trade_order_list[i]:
                     for r in results_form:
 
                         # Filter the trades for the event type which has been requested (eg. 'trade' or 'placement')
@@ -89,11 +96,28 @@ class TCAMarketTradeLoaderImpl(TCAMarketTradeLoader):
 
                         # Calculate aggregate ResultForm
                         results = r.aggregate_results(
-                            trade_order_df=trade_order_df, market_df=market_df, trade_order_name=trade_order_list[i])
+                            market_trade_order_df=trade_order_df, market_df=market_df, market_trade_order_name=trade_order_list[i])
 
                         if results[0] is not None:
                             for results_form_df, results_form_name in results:
                                 trade_order_results_df_dict[results_form_name] = results_form_df
+
+            # Go through all the market data doing statistical aggregations
+            for i in range(0, len(market_df_dict)):
+
+                # Ignore 'fig' objects which are Plotly JSON Figures, and only process DataFrames which are not empty
+                if 'fig' not in market_list[i] and market_df_dict[market_list[i]] is not None:
+                    if not(market_df_dict[market_list[i]].empty):
+                        for r in results_form:
+
+                            # Calculate aggregate ResultForm
+                            results = r.aggregate_results(
+                                market_trade_order_df=market_df_dict[market_list[i]],
+                                market_df=market_df_dict[market_list[i]], market_trade_order_name=market_list[i])
+
+                            if results[0] is not None:
+                                for results_form_df, results_form_name in results:
+                                    trade_order_results_df_dict[results_form_name] = results_form_df
 
         logger.debug("Now join table results...")
 
@@ -197,7 +221,7 @@ class TCAMarketTradeLoaderImpl(TCAMarketTradeLoader):
                                          tca_request_data,
                                          dummy_market) for tca_request_data in tca_request_date_split).apply_async())
 
-                # Now combine the results from the parallel operations
+                # Now combine the results from the parallel operations, if using celery
                 if 'celery' in parallel_library:
 
                     output = [p.get(timeout=constants.celery_timeout_seconds) for p in result]

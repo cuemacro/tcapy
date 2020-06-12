@@ -13095,7 +13095,7 @@ div#notebook {
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="Benchmarks">Benchmarks<a class="anchor-link" href="#Benchmarks">&#182;</a></h2><p>Here we'll go through some of the benchmarks available in tcapy, which can be used for trades/orders (although some are more appropriate for orders). The abstract class <code>Benchmark</code> in tcapy can be extended to create your own customised benchmarks. The most common one is for the mid price (<code>BenchmarkMarketMid</code>). However, there are many others including the below.</p>
+<h2 id="Benchmarks">Benchmarks<a class="anchor-link" href="#Benchmarks">&#182;</a></h2><p>Here we'll go through some of the benchmarks available in tcapy, which can be used for trades/orders (although some are more appropriate for orders). The abstract class <code>Benchmark</code> in tcapy can be extended to create your own customised benchmarks. Some which extend <code>BenchmarkMarket</code> are calculated purely on market data to provide more granularity over the market. However, there are many which extend <code>BenchmarkTrade</code> which can be used to calculate specific benchmarks for trades/orders.</p>
 <ul>
 <li>Arrival price (<code>BenchmarkArrival</code>) - <ul>
 <li>arrival price at start of order/trade fill</li>

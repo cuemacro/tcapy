@@ -97,7 +97,7 @@ class DataFactory(object):
         return df
 
 class DataNorm(object):
-    """This class can be used to normalise the data, eg. change tag names, adjust timing etc.
+    """This class can be used to normalise the data, eg. change _tag names, adjust timing etc.
 
     """
 

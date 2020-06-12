@@ -9,7 +9,9 @@ source $SCRIPT_FOLDER/installation/activate_python_environment.sh
 
 # Only allow local access
 jupyter notebook \
-  --notebook-dir=$TCAPY_CUEMACRO/tcapy_notebooks --ip=$(hostname -i) --port=9999
+  --notebook-dir=$TCAPY_CUEMACRO/tcapy_notebooks --ip=* --port=9999
+
+# --ip=$(hostname -i)
 
 # Alternatively have a key to access
 # Create your own pem and key by following https://support.microfocus.com/kb/doc.php?id=7013103

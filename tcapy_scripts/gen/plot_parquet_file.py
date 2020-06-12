@@ -16,9 +16,9 @@ import os
 from chartpy import Chart
 from tcapy.data.databasesource import DatabaseSourceCSVBinary
 
-parquet_path = '/home/tcapyuser/csv_dump'
+parquet_path = '/home/tcapyuser/csv_dump/dukascopy/'
 
-filename = ['AUDUSD_dukascopy_2016-01-03_22_00_01.868000+00_002016-01-31_23_59_57.193000+00_00.parquet']
+filename = ['EURUSD_dukascopy_2020-05-01_00_00_00.096000+00_002020-05-31_23_59_59.084000+00_00.parquet']
 
 for f in filename:
     final_path = os.path.join(parquet_path, f)

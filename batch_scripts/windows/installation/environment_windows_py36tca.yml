@@ -229,7 +229,7 @@ dependencies:
     - cairosvg==2.4.2
     - celery==4.4.0
     - chart-studio==1.1.0
-    - chartpy==0.1.5
+    - chartpy==0.1.8
     - colorlover==0.3.0
     - configparser==5.0.0
     - cssselect2==0.3.0

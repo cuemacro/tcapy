@@ -70,8 +70,7 @@ if __name__ == '__main__':
         data_vendor = 'dukascopy' # 'ncfx' or 'dukascopy'
 
         ticker_mkt = ['EURUSD', 'GBPUSD', 'AUDUSD', 'NZDUSD', 'USDCAD', 'USDCHF',
-                      'EURNOK', 'EURSEK',
-                      'USDJPY',
+                      'EURNOK', 'EURSEK', 'USDJPY',
                       'USDNOK', 'USDSEK', 'EURJPY',
                       'USDMXN', 'USDTRY', 'USDZAR', 'EURPLN']
 
@@ -123,7 +122,7 @@ if __name__ == '__main__':
 
     csv_market_data = [os.path.join(csv_folder, x) for x in csv_file]
 
-    # for each ticker, read in the H5/CSV file and then dump into tick database
+    # For each ticker, read in the H5/CSV file and then dump into tick database
     for i in range(0, len(ticker_mkt)):
         ticker = ticker_mkt[i]
         csv_file = csv_market_data[i]

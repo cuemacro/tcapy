@@ -19,7 +19,7 @@ constants = Constants()
 
 if __name__ == '__main__':
     # 'ms_sql_server' or 'mysql' or 'sqlite'
-    sql_database = 'sqlite'
+    sql_database = 'mysql'
     trade_data_database_name = 'trade_database'
 
     if sql_database == 'ms_sql_server':

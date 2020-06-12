@@ -81,12 +81,12 @@ class TCAComputation(Resource):
                 results_form = [
                     # show the distribution of the selected metric for trades weighted by notional
                     # aggregated by ticker and then by venue
-                    DistResultsForm(trade_order_list=['trade_df'], metric_name=metric_val,
+                    DistResultsForm(market_trade_order_list=['trade_df'], metric_name=metric_val,
                                     aggregate_by_field=['ticker', 'broker_id', 'venue'],
                                     weighting_field='executed_notional_in_reporting_currency'),
 
                     # display the timeline of metrics average by day (and weighted by notional)
-                    TimelineResultsForm(trade_order_list=['trade_df'], by_date='date',
+                    TimelineResultsForm(market_trade_order_list=['trade_df'], by_date='date',
                                         metric_name=metric_val,
                                         aggregation_metric='mean',
                                         aggregate_by_field=['ticker'], scalar=10000.0,
@@ -94,14 +94,14 @@ class TCAComputation(Resource):
 
                     # display a bar chart showing the average metric weighted by notional and aggregated by ticker
                     # venue
-                    BarResultsForm(trade_order_list=['trade_df'],
+                    BarResultsForm(market_trade_order_list=['trade_df'],
                                    metric_name=metric_val,
                                    aggregation_metric='mean',
                                    aggregate_by_field=['ticker', 'venue', 'broker_id'], scalar=10000.0,
                                    weighting_field='executed_notional_in_reporting_currency'),
 
                     # create a table the markout of every trade
-                    TableResultsForm(trade_order_list=['trade_df'], metric_name='markout', filter_by='all',
+                    TableResultsForm(market_trade_order_list=['trade_df'], metric_name='markout', filter_by='all',
                                      replace_text={'markout_': '', 'executed_notional': 'exec not',
                                                    'notional_currency': 'exec not cur'},
                                      keep_fields=['executed_notional', 'side', 'notional_currency'],

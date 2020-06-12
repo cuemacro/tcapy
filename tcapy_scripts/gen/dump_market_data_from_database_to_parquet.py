@@ -28,7 +28,7 @@ if __name__ == '__main__':
     folder = '/home/tcapyuser/debug_tick/'
 
     # Warning for high frequency data file sizes might be very big, so you may need to reduce this!
-    start_date = '01 Jan 2016'; finish_date = '07 Apr 2020'
+    start_date = '01 Jan 2020'; finish_date = '01 Jun 2020'
 
     tickers = ['EURUSD', 'GBPUSD', 'AUDUSD', 'NZDUSD', 'USDCAD', 'USDCHF', 'EURNOK', 'EURSEK', 'USDJPY']
 

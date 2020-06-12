@@ -35,6 +35,11 @@ class TimeSeriesOps(object):
 
     """
 
+    day_of_week_ordinals = {'mon': 0, 'tue': 1, 'wed': 2, 'thu': 3, 'fri': 4, 'sat': 5, 'sun': 6}
+
+    month_of_year_ordinals = {'jan': 1, 'feb': 2, 'mar': 3, 'apr': 4, 'may': 5, 'jun': 6, 'jul': 7, 'aug': 8,
+                              'sep': 9, 'oct': 10, 'nov': 11, 'dec': 12}
+
     def __init__(self):
         pass
         # self.logger = LoggerManager().getLogger(__name__)
@@ -324,6 +329,105 @@ class TimeSeriesOps(object):
             except:
                 return None
 
+    def filter_time_series_by_multiple_time_parameters(self, data_frame, time_of_day=None, day_of_week=None, month_of_year=None,
+        year=None, specific_dates=None, time_zone=None):
+        """Filters a time series by multiple time conditions, including time of day, day of week, month of _year,
+        as well as specific dates. A timezone can also be selected for these dates
+
+        Parameters
+        ----------
+        data_frame : DataFrame
+            DataFrame to filter
+
+        time_of_day : dict
+            Describing the start and finish time of our filter
+
+        day_of_week : str (list)
+            Which day of the week to filter by?
+
+        month_of_year : str (list)
+            Which month of the of the _year to filter by?
+
+        year : int (list)
+            Which _year to filter by
+
+        specific_dates : str / str (list)
+            Which dates to filter by
+
+        time_zone : str
+            Time zone to use (eg. 'utc')
+
+        Returns
+        -------
+        DataFrame
+        """
+
+        # Filter by time of day
+        if time_of_day is not None and data_frame is not None:
+            start_time = time_of_day['start_time']
+            finish_time = time_of_day['finish_time']
+
+            if start_time != finish_time:
+
+                # Convert timezone which we have defined our time in
+                original_time_zone = data_frame.index.tz
+                data_frame = data_frame.tz_convert(pytz.timezone(time_zone))
+
+                # Filter by that time of day
+                data_frame = data_frame.between_time(start_time, finish_time)
+
+                # Convert back to original timezone
+                data_frame = data_frame.tz_convert(original_time_zone)
+
+        # Filter by day of week
+        if day_of_week is not None and data_frame is not None:
+            if not (isinstance(day_of_week, list)): day_of_week = [day_of_week]
+
+            day_of_week = [self.day_of_week_ordinals[x.lower()[0:3]] for x in day_of_week]
+
+            data_frame = data_frame[data_frame.index.dayofweek.isin(day_of_week)]
+
+        # Filter by month of _year
+        if month_of_year is not None and data_frame is not None:
+            if not (isinstance(month_of_year, list)): month_of_year = [month_of_year]
+
+            month_of_year = [self.month_of_year_ordinals[x.lower()[0:3]] for x in month_of_year]
+
+            data_frame = data_frame[data_frame.index.month.isin(month_of_year)]
+
+        # Filter by _year
+        if year is not None and data_frame is not None:
+            if not (isinstance(year, list)): year = [year]
+
+            data_frame = data_frame[data_frame.index.year.isin(year)]
+
+        # Filter by specific dates
+        if specific_dates is not None and data_frame is not None:
+            if not (isinstance(specific_dates, list)): specific_dates = [specific_dates]
+
+            data_frame_list = []
+
+            for d in specific_dates:
+                # If the user has specified the start date/time & finish date/time as a list
+                # eg. ["01 Jan 2017", "10 Jan 2017"]
+                if isinstance(d, list):
+                    start = self._util_func.parse_datetime(d[0])
+                    finish = self._util_func.parse_datetime(d[1])
+                else:
+                    start, finish = self._util_func.period_bounds(self._util_func.parse_datetime(d), period='day')
+
+                if start.tzinfo is None:
+                    start = start.replace(tzinfo=pytz.timezone(time_zone))
+                if finish.tzinfo is None:
+                    finish = finish.replace(tzinfo=pytz.timezone(time_zone))
+
+                data_frame_list.append(data_frame[start:finish])
+
+            data_frame = pd.concat(data_frame_list)
+
+        return data_frame
+
+
     def vlookup_style_data_frame(self, dt, data_frame, search_field, timedelta_amount=None, just_before_point=True):
         """Does a VLOOKUP style search in a DataFrame given a set of times for a particular field. We assume both
         our DataFrame and dates to lookup are sorted (oldest first).
@@ -490,7 +594,8 @@ class TimeSeriesOps(object):
         return seconds
 
     def get_time_unit(self, unit):
-        """Converts full English word of time unit into the letter representation used by Pandas (eg. for resampling)
+        """Converts full English word of time unit into the letter representation used by Pandas (eg. for resampling),
+        if not matched returns for string (so Pandas sampling frequencies can be used directly)
 
         Parameters
         ----------
@@ -507,7 +612,9 @@ class TimeSeriesOps(object):
         unit_dict = {'milliseconds': "L",
                      'seconds': "S",
                      'minutes': "T",
-                     'hours': 'H'}
+                     'hours': 'H',
+                     'days' : 'D',
+                     'months' : 'M'}
 
         unit = unit.lower()
 
@@ -658,7 +765,7 @@ class TimeSeriesOps(object):
             'mean' - mean of each unit
             'last' - last point of each unit
             'first' - first point of each unit
-            'sum' - sum of all the point in a unit
+            'sum' - sum of all the points in a unit
             'high' - high of the unit
             'low' - low of the unit
             'ohlc' - open/high/low/close
@@ -695,15 +802,15 @@ class TimeSeriesOps(object):
         # BQ      business quarter endfrequency
         # QS      quarter start frequency
         # BQS     business quarter start frequency
-        # A       year end frequency
-        # BA      business year end frequency
-        # AS      year start frequency
-        # BAS     business year start frequency
+        # A       _year end frequency
+        # BA      business _year end frequency
+        # AS      _year start frequency
+        # BAS     business _year start frequency
         # BH      business hour frequency
         # H       hourly frequency
         # T       minutely frequency
         # S       secondly frequency
-        # L       milliseonds
+        # L       milliseconds
         # U       microseconds
         # N       nanoseconds
         #
@@ -729,6 +836,14 @@ class TimeSeriesOps(object):
             return resample_func.high()
         elif how == 'low':
             return resample_func.low()
+        elif how == 'return':
+            last = resample_func.last().dropna()
+            last = last[price_field] / last[price_field].shift(1) - 1.0
+            last = pd.DataFrame(last)
+            last.columns = ['return']
+
+            return last
+
         elif how == 'ohlc':
             return resample_func.ohlc()
             # return resample_func.agg({'open': 'first',
@@ -739,15 +854,43 @@ class TimeSeriesOps(object):
 
             def vwap(bucket):
                 try:
-                    return np.average(bucket[price_field], weights=bucket['volume'])
+                    return np.average(bucket[price_field], weights=bucket[volume_field])
                 except ZeroDivisionError:
                     return np.nan
 
             df = pd.DataFrame(resample_func.apply(vwap))
             df.columns = ['vwap']
 
-        elif how == 'twap':
+            return df
 
+        elif how == 'absrange':
+
+            def absrange(bucket):
+                try:
+                    return np.abs(np.max(bucket[price_field]) - np.min(bucket[price_field]))
+                except ZeroDivisionError:
+                    return np.nan
+
+            df = pd.DataFrame(resample_func.apply(absrange))
+            df.columns = ['absrange']
+
+            return df
+
+        elif how == 'absrangeperc':
+
+            def absrangeperc(bucket):
+                try:
+                    return np.divide(np.abs(np.max(bucket[price_field]) - np.min(bucket[price_field])),
+                                     np.average(bucket[price_field]))
+                except ZeroDivisionError:
+                    return np.nan
+
+            df = pd.DataFrame(resample_func.apply(absrangeperc))
+            df.columns = ['absrangeperc']
+
+            return df
+
+        elif how == 'twap':
             df['twap_temp'] = df.index.tz_convert(None).to_series().diff().values / np.timedelta64(1, 's')
 
             resample_func = df.resample(str(resample_amount) + unit_r)
@@ -889,7 +1032,7 @@ class TimeSeriesOps(object):
                 date1 = datetime.datetime.utcnow()
 
                 date1 = date1 - timedelta(days=365 * 10)
-            elif date is 'year':
+            elif date is '_year':
                 date1 = datetime.datetime.utcnow()
 
                 date1 = date1 - timedelta(days=365)
@@ -1069,7 +1212,8 @@ class TimeSeriesOps(object):
 
         d = group[avg_name]
 
-        if weighting_field is None: return d.mean()
+        if weighting_field is None:
+            return d.mean()
 
         w = group[weighting_field]
 

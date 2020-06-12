@@ -9,7 +9,7 @@ source $SCRIPT_FOLDER/activate_python_environment.sh
 
 echo 'Installing Jupyter extensions...'
 
-# Jupyter and Jupyterlab extensions
+# Jupyter extensions
 jupyter contrib nbextension install --user # to activate js on Jupyter
 jupyter nbextension enable execute_time/ExecuteTime
 jupyter-nbextension install rise --py --sys-prefix
@@ -18,8 +18,9 @@ jupyter nbextension enable toc2/main --sys-prefix
 jupyter nbextension install --sys-prefix --symlink --py jupyter_dash
 jupyter nbextension enable --py jupyter_dash
 
-jupyter labextension install @jupyter-widgets/jupyterlab-manager@2.0.0 --no-build
-jupyter labextension install plotlywidget@1.5.4 --no-build
-jupyter labextension install jupyterlab-plotly@1.5.4 --no-build
-jupyter labextension install bqplot
-jupyter lab build
+# JupyterLab extensions optional
+# jupyter labextension install @jupyter-widgets/jupyterlab-manager@2.0.0 --no-build
+# jupyter labextension install plotlywidget@1.5.4 --no-build
+# jupyter labextension install jupyterlab-plotly@1.5.4 --no-build
+# jupyter labextension install bqplot
+# jupyter lab build

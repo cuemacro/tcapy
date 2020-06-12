@@ -138,7 +138,7 @@ class DataTestCreator(object):
                                 number_of_orders_max_per_year=252 * 200):
 
         """Create a randomised list of orders & trade using indicative market data as a source (and perturbing the
-        execution prices, within various constraints, such as the approximate size of orders trades, the orders per year
+        execution prices, within various constraints, such as the approximate size of orders trades, the orders per _year
 
         Parameters
         ----------
@@ -158,10 +158,10 @@ class DataTestCreator(object):
             Maximum size of orders
 
         number_of_orders_min_per_year : int
-            Minimum orders per year
+            Minimum orders per _year
 
         number_of_orders_max_per_year : int
-            Maximum orders per year
+            Maximum orders per _year
 
         Returns
         -------
@@ -200,7 +200,7 @@ class DataTestCreator(object):
                 # Need to make sure there's sufficient market data!
                 if df is not None:
                     if len(df.index) >= 2:
-                        # Get the percentage of the year represented by the difference between the start and finish dates
+                        # Get the percentage of the _year represented by the difference between the start and finish dates
                         year_perc = float((df.index[-1] - df.index[0]).seconds / (24.0 * 60.0 * 60.0)) / 365.0
 
                         logger.info("Constructing randomised trades for " + tick)
