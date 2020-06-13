@@ -12,7 +12,7 @@ services:
       - ./artifacts:/antarctic/artifacts
       - ./source:/source:ro
     environment:
-      - Maffay = 1
+      - Maffay=1
     depends_on:
       - influx
 
