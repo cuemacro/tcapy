@@ -109,7 +109,7 @@ class Mediator(object):
 
         if version not in Mediator._data_norm.keys():
             with Mediator._data_norm_lock:
-                if version == 'test_tcapy':
+                if version == 'gen' or version == 'tcapy_test':
                     try:
                         from tcapygen.datafactorygen import DataNormGen as DataNorm
                     except:

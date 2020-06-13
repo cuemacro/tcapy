@@ -1,7 +1,7 @@
 <img src="cuemacro_logo.png?raw=true"/>
 
 # [tcapy - Python library for transaction cost analysis (TCA)](https://github.com/cuemacro/tcapy)
-[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/cuemacro/tcapy/master)
+[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/cuemacro/tcapy/master?filepath=tcapy_notebooks)
 
 tcapy is a Python library for doing transaction cost analysis (TCA), essentially finding the cost of your trading activity. 
 Across the industry many financial firms and corporates trading within financial markets spend a lot of money on TCA, either
@@ -126,22 +126,28 @@ Sometimes GitHub might not render the Jupyter notebooks, in which case you can u
 
 * [Introducing tcapy and explaining TCA](tcapy_notebooks/introducing_tcapy.ipynb) - how to use tcapy in more detail 
 and gives many examples of how to call it programmatically 
-([nbviewer](https://nbviewer.jupyter.org/github/cuemacro/tcapy/blob/master/tcapy_notebooks/introducing_tcapy.ipynb))
-* [Compliance and other more involved TCA calculations](binder/tcapy_notebooks/compliance_tca_calculations) - how to do 
+([nbviewer](https://nbviewer.jupyter.org/github/cuemacro/tcapy/blob/master/tcapy_notebooks/introducing_tcapy.ipynb)
+or [run on Binder](https://mybinder.org/v2/gh/cuemacro/tcapy/master?filepath=tcapy_notebooks/introducing_tcapy.ipynb))
+* [Compliance and other more involved TCA calculations](tcapy_notebooks/compliance_tca_calculations) - how to do 
 TCA calculations for compliance and other more involved use cases
-([nbviewer](https://nbviewer.jupyter.org/github/cuemacro/tcapy/blob/master/tcapy_notebooks/compliance_tca_calculations))
+([nbviewer](https://nbviewer.jupyter.org/github/cuemacro/tcapy/blob/master/tcapy_notebooks/compliance_tca_calculations.ipynb)
+or [run on Binder](https://mybinder.org/v2/gh/cuemacro/tcapy/master?filepath=tcapy_notebooks/compliance_tca_calculations.ipynb))
 * [Populating databases for tcapy](tcapy_notebooks/populating_databases_for_tcapy.ipynb) - how to 
 populate your trade/order (MySQL/SQLite/Microsoft SQL Server) and market data databases (Arctic/MongoDB/PyStore)
-([nbviewer](https://nbviewer.jupyter.org/github/cuemacro/tcapy/blob/master/tcapy_notebooks/populating_databases_for_tcapy.ipynb))
+([nbviewer](https://nbviewer.jupyter.org/github/cuemacro/tcapy/blob/master/tcapy_notebooks/populating_databases_for_tcapy.ipynb)
+or [run on Binder](https://mybinder.org/v2/gh/cuemacro/tcapy/master?filepath=tcapy_notebooks/populating_databases_for_tcapy.ipynb))
 * [Excel/xlwings with tcapy](tcapy_notebooks/excel_xlwings_with_tcapy.ipynb) - how to run tcapy from Excel
 with xlwings, with a demo spreadsheet
-([nbviewer](https://nbviewer.jupyter.org/github/cuemacro/tcapy/blob/master/tcapy_notebooks/excel_xlwings_with_tcapy.ipynb))
+([nbviewer](https://nbviewer.jupyter.org/github/cuemacro/tcapy/blob/master/tcapy_notebooks/excel_xlwings_with_tcapy.ipynb)
+or [run on Binder](https://mybinder.org/v2/gh/cuemacro/tcapy/master?filepath=tcapy_notebooks/excel_xlwings_with_tcapy.ipynb))
 * [Additional benchmark and metrics for tcapy](tcapy_notebooks/additional_benchmarks_metrics_for_tcapy.ipynb) - we go through some of the
 benchmarks and metrics available in tcapy in more detail
-([nbviewer](https://nbviewer.jupyter.org/github/cuemacro/tcapy/blob/master/tcapy_notebooks/additional_benchmarks_metrics_for_tcapy.ipynb))
+([nbviewer](https://nbviewer.jupyter.org/github/cuemacro/tcapy/blob/master/tcapy_notebooks/additional_benchmarks_metrics_for_tcapy.ipynb) 
+or [run on Binder](https://mybinder.org/v2/gh/cuemacro/tcapy/master?filepath=tcapy_notebooks/additional_benchmarks_metrics_for_tcapy.ipynb))
 * [Real life tcapy case study on an asset manager's trade data](tcapy_notebooks/real_life_tcapy_case_study.ipynb) - we do a real life
 TCA case study on the FX trade data of a Swedish asset manager
-([nbviewer](https://nbviewer.jupyter.org/github/cuemacro/tcapy/blob/master/tcapy_notebooks/real_life_tcapy_case_study.ipynb))
+([nbviewer](https://nbviewer.jupyter.org/github/cuemacro/tcapy/blob/master/tcapy_notebooks/real_life_tcapy_case_study.ipynb)
+or [run on Binder](https://mybinder.org/v2/gh/cuemacro/tcapy/master?filepath=tcapy_notebooks/real_life_tcapy_case_study.ipynb))
 
 
 A few things to note:

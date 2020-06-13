@@ -260,7 +260,7 @@ class VolatileAdvCache(VolatileCache):
         df = None
 
         # Only try cache if reload has been requested!
-        if not (data_request.reload):
+        if not(data_request.reload):
             df = self.get(key=key)
 
         return start_date, finish_date, key, df
@@ -442,7 +442,7 @@ class VolatileAdvCache(VolatileCache):
 
         logger.debug("Now pushing " + str(key) + " to cache")
 
-        if True:
+        try:
             filter_keep = []
 
             if (not(convert_cache_handle)):
@@ -459,8 +459,8 @@ class VolatileAdvCache(VolatileCache):
 
             self._put(key, obj)
             logger.debug("Pushed " + str(key) + " to cache")
-        #except Exception as e:
-        #    logger.warning("Couldn't push " + str(key) + " to cache: " + str(e))
+        except Exception as e:
+            logger.warning("Couldn't push " + str(key) + " to cache: " + str(e))
 
     def get(self, key, burn_after_reading=False):
         """Gets the object(s) associated with the key(s) or CacheHandle(s)
@@ -477,6 +477,7 @@ class VolatileAdvCache(VolatileCache):
         -------
         object
         """
+        logger = LoggerManager.getLogger(__name__)
 
         key = copy.copy(key)
 
@@ -491,12 +492,17 @@ class VolatileAdvCache(VolatileCache):
             if isinstance(key[i], CacheHandle):
                 key[i] = key[i].handle_name
 
-        obj = self._get(key, burn_after_reading=burn_after_reading)
+        obj = None
+
+        try:
+            obj = self._get(key, burn_after_reading=burn_after_reading)
+        except Exception as e:
+            logger.warning("Couldn't retrieve " + str(key) + " from cache: " + str(e))
 
         if ('market_df' in key):
             print("market_df")
 
-        if single:
+        if single and obj is not None:
             return obj[0]
 
         return obj
