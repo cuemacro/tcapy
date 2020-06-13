@@ -22,7 +22,8 @@ psutil==5.6.3
 matplotlib==3.1.1
 boto3==1.5.11
 pyodbc==4.0.23
-pytest==5.1.0 pytest-cov==2.5.1
+pytest==5.1.0
+pytest-cov==2.5.1
 mysql-connector-python==8.0.19
 IPython==7.13.0
 chartpy==0.1.8
