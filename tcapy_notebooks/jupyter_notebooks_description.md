@@ -4,7 +4,8 @@ Here we list the various Jupyter notebooks we have written to illustrate how to 
 how to call the library programatically.
 
 Sometimes GitHub might not render the Jupyter notebooks, in which case you can use the nbviewer link. You can also
-run all the Jupyter notebooks interactively in Binder. Note, for those examples which use databases/multithreading, they
+run all the Jupyter notebooks interactively in [Binder](https://mybinder.org/v2/gh/cuemacro/tcapy/master?filepath=tcapy_notebooks]). 
+Note, for those examples which use databases/multithreading, they
 will not function fully in Binder. However, all other examples, which don't rely on databases/multithreading do work.
 
 * [Introducing tcapy and explaining TCA](introducing_tcapy.ipynb) - how to use tcapy in more detail 

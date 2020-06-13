@@ -121,8 +121,12 @@ Below we have a montage illustrating some of the ways you can interact with tcap
 Given we can call tcapy programmatically, if you are doing a more customized sort of TCA research project, it is ideal
 to use Jupyter notebooks to mix code and results in one place.
 
-Sometimes GitHub might not render the Jupyter notebooks, in which case you can use the nbviewer link. Also see
-[here](tcapy_notebooks/jupyter_notebooks_description.md), which lists all the notebooks
+Sometimes GitHub might not render the Jupyter notebooks, in which case you can use the nbviewer link. You can also
+run all the Jupyter notebooks interactively in [Binder](https://mybinder.org/v2/gh/cuemacro/tcapy/master?filepath=tcapy_notebooks]). 
+Note, for those examples which use databases/multithreading, they
+will not function fully in Binder. However, all other examples, which don't rely on databases/multithreading do work.
+
+Also see [here](tcapy_notebooks/jupyter_notebooks_description.md), which lists all the notebooks
 
 * [Introducing tcapy and explaining TCA](tcapy_notebooks/introducing_tcapy.ipynb) - how to use tcapy in more detail 
 and gives many examples of how to call it programmatically 
