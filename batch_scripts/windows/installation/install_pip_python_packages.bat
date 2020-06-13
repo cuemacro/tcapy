@@ -29,7 +29,8 @@ if %TCAPY_PYTHON_ENV_TYPE%==virtualenv (
         celery==4.4.0 msgpack-python pytest-tap kombu==4.6.7 python-memcached==1.59 ^
         numba==0.48.0 vispy==0.6.4 pdfkit==0.6.1 jinja2==2.11.1 xlwings==0.19.4 ^
         jupyterlab jupyter_contrib_nbextensions jupyter_nbextensions_configurator RISE bqplot WeasyPrint==51 ^
-        dask==2.14.0 distributed==2.14.0 cloudpickle==1.3.0 python-snappy==0.5.4 bokeh=2.0.1 msgpack==1.0.0 pystore==0.1.15
+        dask==2.14.0 distributed==2.14.0 cloudpickle==1.3.0 python-snappy==0.5.4 bokeh=2.0.1 msgpack==1.0.0 pystore==0.1.15 ^
+        fsspec==0.3.3
 
 
     REM Cannot install orca with pip (has to be done manually or via conda)
@@ -59,7 +60,8 @@ if %TCAPY_PYTHON_ENV_TYPE%==conda (
           dash==1.12.0 dash-html-components==1.0.3 dash-core-components==1.10.0 dash-table==4.7.0 jupyter-dash==0.2.1 dtale==1.8.1 ^
           qpython==2.0.0 influxdb==5.2.3 ^
           Flask-Session==0.3.1 ^
-          celery==4.4.0 pytest-tap kombu==4.6.7 python-memcached==1.59 boto3==1.5.11 pdfkit==0.6.1 WeasyPrint==51 pystore==0.1.15
+          celery==4.4.0 pytest-tap kombu==4.6.7 python-memcached==1.59 boto3==1.5.11 pdfkit==0.6.1 WeasyPrint==51 pystore==0.1.15 ^
+          fsspec==0.3.3
 
         REM to allow printing of Plotly to PDF
         call conda install -c plotly plotly-orca=1.3.1 --yes
