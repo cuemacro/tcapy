@@ -37,8 +37,7 @@ class Constants(object):
 
     env = 'default'
 
-    tcapy_version = 'test_tcapy'  # 'user' for user specific or 'test_tcapy' for generic version
-
+    tcapy_version = 'gen'  # 'user' for user specific or 'gen' for generic version (also for future usage 'tcapy_test')
     tcapy_provider = 'internal_tcapy' # Will add external providers
 
     root_folder = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
