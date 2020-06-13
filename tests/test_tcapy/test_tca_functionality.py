@@ -13,36 +13,30 @@ __author__ = 'saeedamen'  # Saeed Amen / saeed@cuemacro.com
 #
 
 from pandas.testing import assert_frame_equal
-import pandas as pd
-import numpy as np
-import os
 
 from tcapy.util.fxconv import FXConv
 
 from tcapy.analysis.tcaengine import TCAEngineImpl
-
 from tcapy.analysis.tcarequest import TCARequest, MarketRequest
-
 from tcapy.analysis.algos.benchmark import *
 from tcapy.analysis.algos.metric import MetricSlippage, MetricTransientMarketImpact
 from tcapy.analysis.algos.resultsform import *
 from tcapy.analysis.tradeorderfilter import *
+
 from tcapy.vis.tcaresults import TCAResults
 from tcapy.vis.report.tcareport import TCAReport
 
-from collections import OrderedDict
-
-from tests.config import resource
+from tests.config import *
 
 constants = Constants()
 logger = LoggerManager().getLogger(__name__)
 
 from tcapy.util.mediator import Mediator
 
-tcapy_version = constants.tcapy_version
-
 logger.info('Make sure you have created folder ' + constants.csv_folder + ' & ' + constants.temp_data_folder +
             ' otherwise tests will fail')
+
+Mediator.get_volatile_cache().clear_cache()
 
 ########################################################################################################################
 # YOU MAY NEED TO CHANGE TESTING PARAMETERS IF YOUR DATABASE DOESN'T COVER THESE DATES
@@ -53,10 +47,19 @@ filter_date = '03 May 2017'
 start_filter_date = '00:00:00 03 May 2017'
 finish_filter_date = '23:59:59 03 May 2017'
 
-# Current data vendors are 'ncfx' or 'dukascopy'
-data_source = 'dukascopy'
-trade_data_store = 'ms_sql_server'
-market_data_store = 'arctic-' + data_source
+trade_data_store = 'mysql'
+trade_data_database_name = 'trade_database_test_harness'
+trade_order_mapping = {
+    'ms_sql_server' :   {'trade_df' : '[dbo].[trade]',      # Name of table which has broker messages to client
+                         'order_df' : '[dbo].[order]'},     # Name of table which has orders from client
+    'mysql':            {'trade_df': 'trade_database_test_harness.trade',   # Name of table which has broker messages to client
+                         'order_df': 'trade_database_test_harness.order'},  # Name of table which has orders from client
+    'sqlite':           {'trade_df': 'trade_table',  # Name of table which has broker messages to client
+                         'order_df': 'order_table'}  # Name of table which has orders from client
+}
+
+market_data_store = 'arctic-testharness'
+market_data_database_table = 'market_data_table_test_harness'
 
 ticker = 'EURUSD'
 reporting_currency = 'USD'
@@ -72,6 +75,8 @@ missing_ticker = 'AUDSEK'
 use_trade_test_csv = True
 use_market_test_csv = False
 
+use_multithreading = False
+
 ########################################################################################################################
 
 # you can change the test_data_harness_folder to one on your own machine with real data
@@ -79,23 +84,18 @@ folder = constants.test_data_harness_folder
 
 eps = 10 ** -5
 
-trade_order_mapping = constants.test_trade_order_list
-trade_df_name = trade_order_mapping[0] # usually 'trade_df'
-order_df_name = trade_order_mapping[1] # usually 'order_df'
+trade_order_mapping = trade_order_mapping[trade_data_store]
 
 if use_market_test_csv:
 
     # Only contains limited amount of EURUSD and USDJPY in Apr/Jun 2017
-    if use_hdf5_market_files:
-        market_data_store = os.path.join(folder, 'small_test_market_df.h5')
-    else:
-        market_data_store = os.path.join(folder, 'small_test_market_df.csv.gz')
+    market_data_store = resource('small_test_market_df.parquet')
 
 if use_trade_test_csv:
     trade_data_store = 'csv'
 
-    trade_order_mapping = OrderedDict([(trade_df_name, resource('small_test_trade_df.csv')),
-                                       (order_df_name, resource('small_test_order_df.csv'))])
+    trade_order_mapping = OrderedDict([('trade_df', resource('small_test_trade_df.csv')),
+                                       ('order_df', resource('small_test_order_df.csv'))])
     venue_filter = 'venue1'
 else:
     # Define your own trade order mapping
@@ -108,34 +108,41 @@ def get_sample_data(ticker_spec=None):
 
     tca_request = TCARequest(start_date=start_date, finish_date=finish_date, ticker=ticker_spec,
                              trade_data_store=trade_data_store,
+                             trade_data_database_name=trade_data_database_name,
                              reporting_currency=reporting_currency,
                              market_data_store=market_data_store,
+                             market_data_database_table=market_data_database_table,
                              trade_order_mapping=trade_order_mapping,
-                             tca_type=tca_type, benchmark_calcs=BenchmarkMarketMid())
+                             tca_type=tca_type, benchmark_calcs=BenchmarkMarketMid(),
+                             use_multithreading=use_multithreading)
 
     tca_engine = TCAEngineImpl(version=tcapy_version)
 
     trade_order_results_df_dict = tca_engine.calculate_tca(tca_request)
 
-    return trade_order_results_df_dict[ticker_spec + "_df"], trade_order_results_df_dict[trade_df_name], \
-           trade_order_results_df_dict[order_df_name]
+    return trade_order_results_df_dict[ticker_spec + "_df"], trade_order_results_df_dict['trade_df'], \
+           trade_order_results_df_dict['order_df']
 
 
-def test_full_detailed_tca_calculation():
+def test_full_detailed_tca_calculation(fill_market_trade_databases):
     """Tests a detailed TCA calculation, checking that it has the right tables returned.
     """
 
     tca_request = TCARequest(start_date=start_date, finish_date=finish_date, ticker=ticker,
                              trade_data_store=trade_data_store,
+                             trade_data_database_name=trade_data_database_name,
                              market_data_store=market_data_store,
-                             trade_order_mapping=trade_order_mapping)
+                             market_data_database_table=market_data_database_table,
+                             trade_order_mapping=trade_order_mapping,
+                             use_multithreading=use_multithreading)
 
     tca_engine = TCAEngineImpl(version=tcapy_version)
 
     dict_of_df = tca_engine.calculate_tca(tca_request=tca_request)
 
-    assert (trade_df_name in dict_of_df and 'sparse_market_' + trade_df_name in dict_of_df and 'market_df' in dict_of_df)
+    assert ('trade_df' in dict_of_df and 'sparse_market_trade_df' in dict_of_df and 'market_df' in dict_of_df)
 
+    # Missing ticker won't return any data, internally a DataMissingException is thrown
     tca_request.ticker = missing_ticker
 
     data_missing_exception = False
@@ -147,7 +154,7 @@ def test_full_detailed_tca_calculation():
 
     assert data_missing_exception
 
-def test_invalid_tca_inputs():
+def test_invalid_tca_inputs(fill_market_trade_databases):
     """Check exception is thrown with TCAEngine if ticker is not valid (eg. if none, or just a random string of 6 letters,
     or if the includes '/'
     """
@@ -157,7 +164,12 @@ def test_invalid_tca_inputs():
     invalid_tickers = [None, 'KRPAZY', 'EUR/USD']
 
     for t in invalid_tickers:
-        tca_request = TCARequest(start_date=start_date, finish_date=finish_date, ticker=t)
+        tca_request = TCARequest(start_date=start_date, finish_date=finish_date, ticker=t,
+                                 trade_data_store=trade_data_store,
+                                 trade_data_database_name=trade_data_database_name,
+                                 market_data_store=market_data_store,
+                                 market_data_database_table=market_data_database_table,
+                                 use_multithreading=use_multithreading)
 
         ticker_exception_ok = []
 
@@ -182,7 +194,7 @@ def test_invalid_tca_inputs():
 
     assert any(ticker_exception_ok) and any(date_exception_ok)
 
-def test_metric_calculation():
+def test_metric_calculation(fill_market_trade_databases):
     """Tests slippage calculation on a test set of market and trade data
     """
 
@@ -201,7 +213,7 @@ def test_metric_calculation():
     ind_list = [0, 1, 2, -2 -1]
 
     for i in ind_list:
-        # now replicate slippage calculation from first principles (get the last available point if no match)
+        # Now replicate slippage calculation from first principles (get the last available point if no match)
         mid_index = market_df['mid'].index.get_loc(trade_df.index[i], method='ffill')
 
         trade = trade_df['executed_price'][i]
@@ -219,7 +231,7 @@ def test_metric_calculation():
         # Check that the 'slippage' column exists and is consistent
         assert ('slippage' in trade_df.columns and abs(slippage - slippage_comp) < eps)
 
-    ### check anomalous trade identification
+    ### Check anomalous trade identification
     market_df, trade_df, order_df = get_sample_data()
 
     market_df.index = market_df.index + timedelta(milliseconds=10)
@@ -227,7 +239,7 @@ def test_metric_calculation():
     # Force spread to mid to be 0.25bp
     anomalous_spread_to_mid_bp = 0.25
 
-    market_df = BenchmarkMarketSpreadToMid().calculate_benchmark(trade_order_df=trade_df, market_df=market_df,
+    market_df = BenchmarkMarketSpreadToMid().calculate_benchmark(market_df=market_df,
                                                                     bid_mid_bp=anomalous_spread_to_mid_bp,
                                                                     ask_mid_bp=anomalous_spread_to_mid_bp, overwrite_bid_ask=True)
 
@@ -275,7 +287,7 @@ def test_metric_calculation():
         assert ('transient_market_impact' in trade_df.columns) and \
                (abs(transient_market_impact - transient_market_impact_comp) < eps)
 
-def test_benchmark_calculation():
+def test_benchmark_calculation(fill_market_trade_databases):
     """Tests TWAP/VWAP/Arrival benchmark calculation for an order (between the order's start and finish)
     """
 
@@ -331,7 +343,7 @@ def test_benchmark_calculation():
 
             assert abs(arrival_price - arrival_price_comparison) < eps
 
-def test_tag_filter_calculation():
+def test_tag_filter_calculation(fill_market_trade_databases):
     """Test we can filter by venue and by broker correctly.
     """
 
@@ -339,18 +351,21 @@ def test_tag_filter_calculation():
 
     tca_request = TCARequest(start_date=start_date, finish_date=finish_date, ticker=ticker,
                              trade_data_store=trade_data_store,
+                             trade_data_database_name=trade_data_database_name,
                              reporting_currency=reporting_currency,
                              market_data_store=market_data_store,
+                             market_data_database_table=market_data_database_table,
                              trade_order_mapping=trade_order_mapping,
                              tca_type=tca_type,
                              trade_order_filter=trade_order_filter,
-                             venue='venue1')
+                             venue='venue1',
+                             use_multithreading=use_multithreading)
 
     tca_engine = TCAEngineImpl(version=tcapy_version)
 
     trade_order_results_df_dict = tca_engine.calculate_tca(tca_request)
 
-    trade_df = trade_order_results_df_dict[trade_df_name]
+    trade_df = trade_order_results_df_dict['trade_df']
 
     if trade_df is not None:
         if not(trade_df.empty):
@@ -365,7 +380,7 @@ def test_tag_filter_calculation():
             # check the filtering has been correctly, so we only have trades by broker1 and venue1
             assert match_brokers > 0 and non_brokers == 0 and match_venue > 0 and non_match_venue == 0
 
-def test_time_of_day_filter_calculation():
+def test_time_of_day_filter_calculation(fill_market_trade_databases):
     """Test we can filter by time of day/date
     """
 
@@ -373,17 +388,20 @@ def test_time_of_day_filter_calculation():
 
     tca_request = TCARequest(start_date=start_date, finish_date=finish_date, ticker=ticker,
                              trade_data_store=trade_data_store,
+                             trade_data_database_name=trade_data_database_name,
                              reporting_currency=reporting_currency,
                              market_data_store=market_data_store,
+                             market_data_database_table=market_data_database_table,
                              trade_order_mapping=trade_order_mapping,
                              tca_type=tca_type,
-                             trade_order_filter=trade_order_filter)
+                             trade_order_filter=trade_order_filter,
+                             use_multithreading=use_multithreading)
 
     tca_engine = TCAEngineImpl(version=tcapy_version)
 
     trade_order_results_df_dict = tca_engine.calculate_tca(tca_request)
 
-    trade_df = trade_order_results_df_dict[trade_df_name]
+    trade_df = trade_order_results_df_dict['trade_df']
 
     if trade_df is not None:
         if not(trade_df.empty):
@@ -394,7 +412,7 @@ def test_time_of_day_filter_calculation():
             # check the filtering has been correctly, so we only have trades by broker1 and venue1
             assert match_filtered_date > 0 and non_filtered_date == 0
 
-def test_executed_price_notional_calculation():
+def test_executed_price_notional_calculation(fill_market_trade_databases):
     """Test that the executed average price calculation from trades is correctly reflected in the order level
     """
     Mediator.get_volatile_cache().clear_cache()
@@ -419,7 +437,7 @@ def test_executed_price_notional_calculation():
 
             assert abs(executed_price - executed_avg_trade) < eps
 
-def test_data_offset():
+def test_data_offset(fill_market_trade_databases):
     """Tests the offsetting of market and trade data by milliseconds by user. This might be useful if clocks are slightly
     offset when recording market or trade data
     """
@@ -427,8 +445,11 @@ def test_data_offset():
 
     tca_request = TCARequest(start_date=start_date, finish_date=finish_date, ticker=ticker,
                              trade_data_store=trade_data_store,
+                             trade_data_database_name=trade_data_database_name,
                              market_data_store=market_data_store,
-                             trade_order_mapping=trade_order_mapping)
+                             market_data_database_table=market_data_database_table,
+                             trade_order_mapping=trade_order_mapping,
+                             use_multithreading=use_multithreading)
 
     tca_engine = TCAEngineImpl(version=tcapy_version)
 
@@ -440,8 +461,8 @@ def test_data_offset():
 
     dict_of_df_offset = tca_engine.calculate_tca(tca_request=tca_request)
 
-    trade_df = dict_of_df[trade_df_name]; market_df = dict_of_df['market_df']
-    trade_df_offset = dict_of_df_offset[trade_df_name]; market_df_offset = dict_of_df_offset['market_df']
+    trade_df = dict_of_df['trade_df']; market_df = dict_of_df['market_df']
+    trade_df_offset = dict_of_df_offset['trade_df']; market_df_offset = dict_of_df_offset['market_df']
 
     assert all(market_df.index + timedelta(milliseconds=-1) == market_df_offset.index)
     assert all(trade_df.index + timedelta(milliseconds=1) == trade_df_offset.index)
@@ -451,13 +472,15 @@ def test_data_offset():
             assert all(trade_df[c]+ timedelta(milliseconds=1) == trade_df_offset[c])
 
 
-def test_market_data_convention():
+def test_market_data_convention(fill_market_trade_databases):
     """Tests that market data for unusual quotations is consistent (ie. if the user requests USDEUR, this should be
     inverted EURUSD (which is the correct convention)
     """
+    Mediator.get_volatile_cache().clear_cache()
+
     market_loader =  Mediator.get_tca_market_trade_loader(version=tcapy_version)
     market_request = MarketRequest(start_date=start_date, finish_date=finish_date, ticker=ticker,
-                             data_store=market_data_store)
+                             data_store=market_data_store, market_data_database_table=market_data_database_table)
 
     #### Compare EURUSD to USDEUR
     market_correct_conv_series = pd.DataFrame(market_loader.get_market_data(market_request)['mid'])
@@ -484,9 +507,10 @@ def test_market_data_convention():
 
     assert all(comp < eps)
 
-def test_quotation_conv():
+def test_quotation_conv(fill_market_trade_databases):
     """Check that we can correctly classify if an FX cross is in the right convention
     """
+
     FX_pair = "EURUSD"
     incorrect_FX_pair = "JPYAUD"
 
@@ -494,22 +518,24 @@ def test_quotation_conv():
 
     assert fx_conv.is_EM_cross(FX_pair) == False and fx_conv.correct_notation(incorrect_FX_pair) == 'AUDJPY'
 
-def test_results_form_average():
+def test_results_form_average(fill_market_trade_databases):
     """Tests averages are calculated correctly by ResultsForm, compared to a direct calculation
     """
+    Mediator.get_volatile_cache().clear_cache()
 
     market_df, trade_df, order_df = get_sample_data()
 
     trade_df, _ = MetricSlippage().calculate_metric(trade_order_df=trade_df, market_df=market_df, bid_benchmark='mid',
                                                     ask_benchmark='mid')
 
-    results_form = BarResultsForm(market_trade_order_list=[trade_df_name],
+    results_form = BarResultsForm(market_trade_order_list=['trade_df'],
                                   metric_name='slippage',
                                   aggregation_metric='mean',
                                   aggregate_by_field=['ticker', 'venue'], scalar=10000.0,
                                   weighting_field='executed_notional_in_reporting_currency')
 
-    results_df = results_form.aggregate_results(market_trade_order_df=trade_df, market_df=market_df, market_trade_order_name=trade_df_name)
+    results_df = results_form.aggregate_results(market_trade_order_df=trade_df, market_df=market_df,
+                                                market_trade_order_name='trade_df')
 
     slippage_average = float(results_df[0][0].values[0])
 
@@ -530,16 +556,20 @@ def test_results_form_average():
     # Check the average slippage by venue
     assert slippage_average_venue - slippage_average_venue_comp < eps
 
-def test_create_tca_report():
+def test_create_tca_report(fill_market_trade_databases):
     """Tests the creation of a TCAResults, checking they are fichecking it generates the right document
     """
+    Mediator.get_volatile_cache().clear_cache()
 
     tca_request = TCARequest(start_date=start_date, finish_date=finish_date, ticker=ticker,
                              trade_data_store=trade_data_store,
+                             trade_data_database_name=trade_data_database_name,
                              market_data_store=market_data_store,
+                             market_data_database_table=market_data_database_table,
                              trade_order_mapping=trade_order_mapping,
                              metric_calcs=MetricSlippage(),
-                             results_form=TimelineResultsForm(metric_name='slippage', by_date='datehour'))
+                             results_form=TimelineResultsForm(metric_name='slippage', by_date='datehour'),
+                             use_multithreading=use_multithreading)
 
     tca_engine = TCAEngineImpl(version=tcapy_version)
 

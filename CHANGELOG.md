@@ -5,6 +5,12 @@
 * No official releases yet
 
 ## Coding log
+* xx Jun 2020
+    * Beginning process of Dockerizing the project
+    * Adding Binder
+    * Making tests self contained
+        * Add necessary test market/trade data to databases before running tests
+    * Numerous bug fixes
 * 12 Jun 2020
     * Added parameter to adjust market impact by side of trade
     * ResultsForm aggregations now work purely for market data (in addition to trade/order data from before)

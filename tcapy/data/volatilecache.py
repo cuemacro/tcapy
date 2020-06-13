@@ -616,7 +616,10 @@ class VolatileRedis(VolatileAdvCache):
     #    return self._db.lrange(key, 0, -1)
 
     def clear_cache(self):
-        VolatileRedis._db.flushall()
+        try:
+            VolatileRedis._db.flushall()
+        except Exception as err:
+            LoggerManager.getLogger(__name__).debug('Warn did not clear cache: ' + str(err))
 
     def clear_key_match(self, key_match):
         # Allow deletion of keys by pattern matching

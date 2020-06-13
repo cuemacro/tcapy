@@ -17,6 +17,7 @@ from plotly.utils import PlotlyJSONEncoder
 import plotly.graph_objs as go
 
 from tcapy.conf.constants import Constants
+from tcapy.util.timeseries import TimeSeriesOps
 from tcapy.util.loggermanager import LoggerManager
 
 context = pa.default_serialization_context()
@@ -29,6 +30,10 @@ class DeltaizeSerialize(object):
     and there's a limit to how much we can store in each key.
 
     """
+
+    def __init__(self):
+        self._time_series_ops = TimeSeriesOps()
+
     def convert_python_to_binary(self, obj, key):
         """
 

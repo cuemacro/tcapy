@@ -658,7 +658,7 @@ class DatabaseSourceCSV(DatabaseSource):
             try:
                 # Check that the ticker has been defined for every row
                 # If not, likely some problems with the data and warn the user
-                no_nan_ticker_entries = df['ticker'].df.isnull().sum()
+                no_nan_ticker_entries = df['ticker'].isnull().sum()
 
                 if no_nan_ticker_entries > 0:
                     LoggerManager.getLogger(__name__).warning(
@@ -671,7 +671,8 @@ class DatabaseSourceCSV(DatabaseSource):
 
         return self._downsample_localize_utc(df)
 
-    def fetch_trade_order_data(self, start_date=None, finish_date=None, ticker=None, table_name=None, date_format=None):
+    def fetch_trade_order_data(self, start_date=None, finish_date=None, ticker=None, table_name=None, date_format=None,
+                               database_name=None):
         start_date, finish_date = self._parse_start_finish_dates(start_date, finish_date)
 
         if table_name is None:
@@ -725,7 +726,7 @@ class DatabaseSourceCSV(DatabaseSource):
 ########################################################################################################################
 
 class DatabaseSourceCSVBinary(DatabaseSourceCSV):
-    """Implements DatabaseSource for CSV/H5/JSON datasets which are read from disk (or are in binary format, such as through
+    """Implements DatabaseSource for CSV/H5/JSON/Parquet datasets which are read from disk (or are in binary format, such as through
     a web request), both for market and trade/order data.
 
     """
@@ -934,7 +935,7 @@ class DatabaseSourceSQL(DatabaseSource):
         if database_name is None:
             database_name = self._trade_data_database_name
 
-        sql_query = sql_query + ' from ' + table_name + ' ' + where_clause
+        sql_query = sql_query + ' from ' + self._wrap_table_name_sql_query(table_name) + ' ' + where_clause
 
         df = self._fetch_table(database_name, table_name, sql_query)
         df = self._downsample_localize_utc(df)
@@ -972,6 +973,9 @@ class DatabaseSourceSQL(DatabaseSource):
 
         return Exception(err_msg)
 
+    def _wrap_table_name_sql_query(self, table_name):
+        return table_name
+
     def _fetch_table(self, database_name, table, sql_query):
         """Fetches data from SQL database as a pd DataFrame
 
@@ -993,7 +997,7 @@ class DatabaseSourceSQL(DatabaseSource):
         logger = LoggerManager.getLogger(__name__)
 
         # Connect to database
-        engine, con_str = self._get_database_engine(database_name=database_name)
+        engine, con_str = self._get_database_engine(database_name=database_name, table_name=table)
 
         df = None
 
@@ -1279,6 +1283,21 @@ class DatabaseSourceSQL(DatabaseSource):
     def _reserved_keywords(self, keyword):
         return '`' + keyword + '`'
 
+    def _create_database_not_exists(self, database_name=None):
+        # Create database if it doesn't exist
+        if database_name is not None:
+            engine = create_engine(self._create_connection_string(database_name=None, table_name=None))
+
+            try:
+                engine.execute("CREATE DATABASE IF NOT EXISTS {0} ".format(database_name))
+            except:
+                logger = LoggerManager.getLogger(__name__)
+                logger.warn("Could not create database " + database_name)
+
+    @abc.abstractmethod
+    def _create_connection_string(self):
+        pass
+
     def _sql_col_maker(self, df):
         """For a DataFrame creates columns which map pd data types to SQL data types
 
@@ -1381,6 +1400,27 @@ class DatabaseSourceMSSQLServer(DatabaseSourceSQL):
         Engine, str
         """
 
+        self._create_database_not_exists(database_name=database_name)
+        con_exp = self._create_connection_string(database_name=database_name, table_name=table_name)
+        engine = create_engine(con_exp, pool_size=20, max_overflow=0)
+
+        # Uses a special flag from pyodbc fast_executemany which speeds up SQL inserts 100x including when doing df.to_sql
+        # https://gitlab.com/timelord/timelord/blob/master/timelord/utils/connector.py
+        # https://stackoverflow.com/questions/48006551/speeding-up-pandas-dataframe-to-sql-with-fast-executemany-of-pyodbc
+        @event.listens_for(engine, 'before_cursor_execute')
+        def receive_before_cursor_execute(conn, cursor, statement, params, context, executemany):
+            # print('Func call')
+            if executemany:
+                # only supported on pyodbc driver
+                try:
+                    cursor.fast_executemany = True
+                except:
+                    pass
+
+        return engine, con_exp
+
+    def _create_connection_string(self, database_name=None, table_name=None):
+
         # Official Microsoft pyodbc driver is recommended
         if constants.ms_sql_server_python_package == 'pyodbc':
             if constants.ms_sql_server_use_trusted_connection:
@@ -1398,8 +1438,8 @@ class DatabaseSourceMSSQLServer(DatabaseSourceSQL):
         if database_name is not None:
             con_exp = con_exp + "/" + database_name
 
-            if table_name is not None:
-                con_exp = con_exp + "::" + table_name
+            # if table_name is not None:
+            #    con_exp = con_exp + "::" + table_name
 
         if constants.ms_sql_server_python_package == 'pyodbc':
             con_exp = con_exp + "?driver=" + constants.ms_sql_server_odbc_driver
@@ -1438,22 +1478,8 @@ class DatabaseSourceMSSQLServer(DatabaseSourceSQL):
 
                 kinit.wait()
 
-        engine = create_engine(con_exp, pool_size=20, max_overflow=0)
+        return con_exp
 
-        # Uses a special flag from pyodbc fast_executemany which speeds up SQL inserts 100x including when doing df.to_sql
-        # https://gitlab.com/timelord/timelord/blob/master/timelord/utils/connector.py
-        # https://stackoverflow.com/questions/48006551/speeding-up-pandas-dataframe-to-sql-with-fast-executemany-of-pyodbc
-        @event.listens_for(engine, 'before_cursor_execute')
-        def receive_before_cursor_execute(conn, cursor, statement, params, context, executemany):
-            # print('Func call')
-            if executemany:
-                # only supported on pyodbc driver
-                try:
-                    cursor.fast_executemany = True
-                except:
-                    pass
-
-        return engine, con_exp
 
     def _datetime(self):
         return sqlalchemy.dialects.mssql.DATETIME2(precision=6)
@@ -1481,17 +1507,22 @@ class DatabaseSourcePostgres(DatabaseSourceSQL):
         self._sql_dialect = 'postgres'
 
     def _get_database_engine(self, database_name=None, table_name=None):
+        self._create_database_not_exists(database_name=database_name)
+        con_exp = self._create_connection_string(database_name=database_name, table_name=table_name)
 
+        return create_engine(con_exp), con_exp
+
+    def _create_connection_string(self, database_name=None, table_name=None):
         con_exp = "postgresql://" + self._username + ":" + self._password \
                   + "@" + self._server_host + ":" + self._server_port
 
         if database_name is not None:
             con_exp = con_exp + "/" + database_name
 
-            if table_name is not None:
-                con_exp = con_exp + "::" + table_name
+            # if table_name is not None:
+            #    con_exp = con_exp + "::" + table_name
 
-        return sqlalchemy.create_engine(con_exp), con_exp
+        return con_exp
 
 class DatabaseSourceSQLite(DatabaseSourceSQL):
     """Implements the DatabaseSourceSQL class for SQLite instances.
@@ -1502,23 +1533,31 @@ class DatabaseSourceSQLite(DatabaseSourceSQL):
         """Initialises SQL object.
 
         """
-
         super(DatabaseSourceSQLite, self).__init__(trade_data_database_name=trade_data_database_name)
 
         self._sql_dialect = 'sqlite'
 
     def _get_database_engine(self, database_name=None, table_name=None):
 
+        # SQLite automatically create a new database if it doesn't exist
+        con_exp = self._create_connection_string(database_name=database_name, table_name=table_name)
+
+        return create_engine(con_exp), con_exp
+
+    def _create_connection_string(self, database_name=None, table_name=None):
         # Careful use three slashes for SQLite!
         con_exp = "sqlite:///"
 
         if database_name is not None:
             con_exp = con_exp + database_name
 
-            if table_name is not None:
-                con_exp = con_exp + "::" + table_name
+            # if table_name is not None:
+            #    con_exp = con_exp + "::" + table_name
 
-        return sqlalchemy.create_engine(con_exp), con_exp
+        return con_exp
+
+    def _wrap_table_name_sql_query(self, table_name):
+        return "'" + table_name + "'"
 
 
 class DatabaseSourceMySQL(DatabaseSourceSQL):
@@ -1555,19 +1594,22 @@ class DatabaseSourceMySQL(DatabaseSourceSQL):
         # SQLTable._execute_insert = _execute_insert
 
     def _get_database_engine(self, database_name=None, table_name=None):
+        self._create_database_not_exists(database_name=database_name)
+        con_exp = self._create_connection_string(database_name=database_name, table_name=table_name)
 
+        return create_engine(con_exp), con_exp
+
+    def _create_connection_string(self, database_name=None, table_name=None):
         con_exp = "mysql+mysqlconnector://" + self._username + ":" + self._password \
                   + "@" + self._server_host + ":" + self._server_port
 
         if database_name is not None:
             con_exp = con_exp + "/" + database_name
 
-            if table_name is not None:
-                con_exp = con_exp + "::" + table_name
+            #if table_name is not None:
+            #    con_exp = con_exp + "::" + table_name
 
-        engine = sqlalchemy.create_engine(con_exp)
-
-        return engine, con_exp
+        return con_exp
 
     def _datetime(self):
         return sqlalchemy.dialects.mysql.DATETIME(fsp=6)
@@ -3498,7 +3540,8 @@ class DatabaseSourceDataFrame(DatabaseSource):
         return self._filter_dataframe(start_date, finish_date, ticker,
                                       self._fetch_table(table_name, date_format=date_format))
 
-    def fetch_trade_order_data(self, start_date=None, finish_date=None, ticker=None, table_name=None, date_format=None):
+    def fetch_trade_order_data(self, start_date=None, finish_date=None, ticker=None, table_name=None, date_format=None,
+                               database_name=None):
         start_date, finish_date = self._parse_start_finish_dates(start_date, finish_date, utc=True)
 
         if table_name is None:

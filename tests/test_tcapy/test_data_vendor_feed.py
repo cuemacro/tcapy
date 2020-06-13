@@ -1,4 +1,5 @@
-"""Tests functions for downloading data from New Change FX (NCFX) - an external data source and also dumping to disk
+"""Tests functions for downloading data from external sources including Dukascopy and New Change FX (NCFX) - which
+are external data source and also dumping to disk
 """
 
 __author__ = 'saeedamen'  # Saeed Amen / saeed@cuemacro.com
@@ -11,24 +12,19 @@ __author__ = 'saeedamen'  # Saeed Amen / saeed@cuemacro.com
 
 import pytz
 
-import pandas as pd
-
 from pandas.testing import assert_frame_equal
 
-
 import glob
-import os
 
 from tcapy.conf.constants import Constants
 from tcapy.util.loggermanager import LoggerManager
+from tcapy.util.mediator import Mediator
 from tcapy.util.utilfunc import UtilFunc
 
 from tcapy.data.databasepopulator import DatabasePopulatorNCFX, DatabasePopulatorDukascopy
 from tcapy.data.databasesource import DatabaseSourceNCFX, DatabaseSourceDukascopy
 
-from collections import OrderedDict
-
-from tests.config import resource
+from tests.config import *
 
 logger = LoggerManager().getLogger(__name__)
 
@@ -41,24 +37,18 @@ util_func = UtilFunc()
 logger.info('Make sure you have created folder ' + constants.csv_folder + ' & ' + constants.temp_data_folder +
             ' otherwise tests will fail')
 
+Mediator.get_volatile_cache().clear_cache()
+
 ########################################################################################################################
 # YOU MAY NEED TO CHANGE THESE
-
-# market_data_store = 'arctic-ncfx'
-# trade_data_store = 'ms_sql_server'
 
 start_date = '26 Apr 2017'
 finish_date = '05 Jun 2017'
 ticker = 'EURUSD'
 
-# mainly just to speed up tests - note: you will need to generate the HDF5 files using convert_csv_to_h5.py from the CSVs
-use_hdf5_market_files = True
+read_cached_from_disk = False # Generally want to download from the data vendor to test
 
-test_harness_data_store = 'arctic-testharness'
-test_harness_sql_trade_data_database_name = 'trade_database_test_harness'
-read_cached_from_disk = False # generally want to download from the data vendor to test
-
-# can test web proxies (can run a pure Python proxy server https://pypi.org/project/pproxy/)
+# Can test web proxies (can run a pure Python proxy server https://pypi.org/project/pproxy/)
 # or alternatively use web proxy provided by your internal IT team (more realistic environment, also to help test
 # firewall issues)
 web_proxies = {'https' : None}
@@ -73,8 +63,8 @@ chunk_int_min_dict = {'dukascopy' : None, 'ncfx' : 60} # number of minutes to do
 ########################################################################################################################
 folder = Constants().test_data_harness_folder
 
-#### change for your data vendor
-data_vendor_name_list = ['ncfx', 'dukascopy']
+#### Change for your data vendor
+data_vendor_name_list = ['dukascopy'] # ['ncfx', 'dukascopy']
 
 database_populator_dict = {'dukascopy' : DatabasePopulatorDukascopy(), 'ncfx' : DatabasePopulatorNCFX()}
 database_source_dict = {'dukascopy' : DatabaseSourceDukascopy(), 'ncfx' : DatabaseSourceNCFX()}
@@ -82,28 +72,11 @@ database_source_dict = {'dukascopy' : DatabaseSourceDukascopy(), 'ncfx' : Databa
 if constants.ncfx_url is None:
     data_vendor_name_list.remove('ncfx')
 
-####
-
-trade_order_list = ['trade_df', 'order_df']
-
-sql_trade_order_mapping = OrderedDict(
-    [('trade_df', '[dbo].[trade]'),  # name of table which has broker messages to client
-     ('order_df', '[dbo].[order]')])  # name of table which has orders from client
-
-eps = 10 ** -5
-
 invalid_start_date = '01 Jan 1999'
 invalid_finish_date = '01 Feb 1999'
 
-if use_hdf5_market_files:
-    csv_market_data_store = os.path.join(folder, 'small_test_market_df.h5')
-    csv_reverse_market_data_store = os.path.join(folder, 'small_test_market_df_reverse.h5')
-else:
-    csv_market_data_store = os.path.join(folder, 'small_test_market_df.csv.gz')
-    csv_reverse_market_data_store = os.path.join(folder, 'small_test_market_df_reverse.csv.gz')
-
-csv_trade_order_mapping = OrderedDict([('trade_df', resource('small_test_trade_df.csv')),
-                                       ('order_df', resource('small_test_order_df.csv'))])
+csv_market_data_store = resource('small_test_market_df.parquet')
+csv_reverse_market_data_store = resource('small_test_market_df_reverse.parquet')
 
 use_multithreading = False
 
@@ -118,7 +91,7 @@ def test_fetch_market_data_from_data_vendor():
         database_populator = database_populator_dict[data_vendor_name]
         chunk_int_min = chunk_int_min_dict[data_vendor_name]
 
-        # test the low level downloader (to download in one chunk) - DatabaseSource
+        # Test the low level downloader (to download in one chunk) - DatabaseSource
         start_date = '04 Dec 2017 10:00'; finish_date = '04 Dec 2017 10:05'
 
         df_low_level = database_source.fetch_market_data(start_date, finish_date, 'EURUSD', web_proxies=web_proxies)
@@ -129,7 +102,7 @@ def test_fetch_market_data_from_data_vendor():
         assert not(df_low_level.empty) and df_low_level.index[0] >= start_date \
                        and df_low_level.index[-1] <= finish_date
 
-        # test the high level downloader, which can download multiple chunks (don't write anything to disk) - DatabasePopulator
+        # Test the high level downloader, which can download multiple chunks (don't write anything to disk) - DatabasePopulator
         start_date = '04 Dec 2017 10:00'; finish_date = '04 Dec 2017 10:20'
 
         msg, df_high_level_dict = database_populator.download_from_external_source(
@@ -143,11 +116,11 @@ def test_fetch_market_data_from_data_vendor():
 
         df_high_level = df_high_level_dict[ticker]
 
-        # check to make sure the start/finish dates are within bounds and also no error messages returned
+        # Check to make sure the start/finish dates are within bounds and also no error messages returned
         assert not(df_high_level.empty) and df_high_level.index[0] >= start_date \
                         and df_high_level.index[-1] <= finish_date and msg == []
 
-        # now try dates with no data in the weekend, which should return back a None and also an error message, which
+        # Now try dates with no data in the weekend, which should return back a None and also an error message, which
         # can be collected and returned to the user
         start_date = '03 Dec 2017 10:00';
         finish_date = '03 Dec 2017 10:20'
@@ -179,16 +152,18 @@ def test_write_csv_from_data_vendor():
         database_populator = database_populator_dict[data_vendor_name]
         chunk_int_min = chunk_int_min_dict[data_vendor_name]
 
-        # specifically choose dates which straddle the weekend boundary
-        start_date = '27 Apr 2018'; finish_date = '03 May 2018'; expected_csv_files = 5    # during British Summer Time in London
-        # start_date = '02 Feb 2018'; finish_date = '07 Feb 2018'; expected_csv_files = 4    # during GMT time in London
+        # Specifically choose dates which straddle the weekend boundary
+        # 1) during British Summer Time in London
+        # 2) during GMT time in London
+        start_date = '27 Apr 2018'; finish_date = '03 May 2018'; expected_csv_files = 5
+        # start_date = '02 Feb 2018'; finish_date = '07 Feb 2018'; expected_csv_files = 4
         split_size = 'daily'
         write_csv = False
 
-        # prepare the CSV folder first
-        csv_folder = os.path.join(constants.test_data_harness_folder, 'csv_' + data_vendor_name + '_dump')
+        # Prepare the CSV folder first
+        csv_folder = resource('csv_' + data_vendor_name + '_dump')
 
-        # empty the CSV test harness folder
+        # Empty the CSV test harness folder
         UtilFunc().forcibly_create_empty_folder(csv_folder)
 
         msg, df_dict = database_populator.download_to_csv(
@@ -197,7 +172,7 @@ def test_write_csv_from_data_vendor():
 
         df_read_direct_from_data_vendor = df_dict['EURUSD']
 
-        # check it has data for every market hour (eg. ignoring Saturdays)
+        # Check it has data for every market hour (eg. ignoring Saturdays)
         assert util_func.check_data_frame_points_in_every_hour(df_read_direct_from_data_vendor, start_date, finish_date)
 
         if write_csv:
@@ -227,8 +202,8 @@ def test_daily_download_boundary_from_data_vendor():
         database_populator = database_populator_dict[data_vendor_name]
         chunk_int_min = chunk_int_min_dict[data_vendor_name]
 
-        start_date = '29 Apr 2018 21:00'; # Saturday
-        finish_date = '30 Apr 2018 01:00'; # Monday
+        start_date = '29 Apr 2018 21:00';   # Saturday
+        finish_date = '30 Apr 2018 01:00';  # Monday
 
         msg, df = database_populator.download_from_external_source(remove_duplicates=False,
                                                                 chunk_int_min=chunk_int_min,
@@ -253,6 +228,7 @@ def test_weekend_download_boundary_from_data_vendor():
         # start_date = '12 Jan 2018 19:00';
         # finish_date = '15 Jan 2018 05:00';
 
+        # Fri 12 - Mon 15 Jan 2018
         start_date = '12 Jan 2018 21:00';
         finish_date = '15 Jan 2018 01:00';
 
@@ -265,5 +241,5 @@ def test_weekend_download_boundary_from_data_vendor():
                                                                     read_cached_from_disk=read_cached_from_disk,
                                                                     return_df=True, web_proxies=web_proxies)
 
-        # note: this will exclude data when FX market is not trading, eg. Saturday
+        # Note: this will exclude data when FX market is not trading, eg. Saturday
         assert util_func.check_data_frame_points_in_every_hour(df['EURUSD'], start_date, finish_date)

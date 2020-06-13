@@ -29,6 +29,8 @@ class DataRequest(object):
 
     def __init__(self, start_date=None, finish_date=None, ticker=None, data_store=constants.default_data_store, data_offset_ms=None,
                  reload=False, instrument=constants.default_instrument, asset_class=constants.default_asset_class, access_control=None,
+                 trade_data_database_table=None,
+                 market_data_database_table=None,
                  use_multithreading=constants.use_multithreading, multithreading_params=constants.multithreading_params, data_norm=None):
 
         self.start_date = start_date
@@ -40,6 +42,8 @@ class DataRequest(object):
         self.instrument = instrument
         self.asset_class = asset_class
         self.access_control = access_control
+        self.trade_data_database_table = trade_data_database_table
+        self.market_data_database_table = market_data_database_table
         self.data_norm = data_norm
 
         self.use_multithreading = use_multithreading
@@ -134,6 +138,22 @@ class DataRequest(object):
         self.__multithreading_params = multithreading_params
 
     @property
+    def trade_data_database_name(self):
+        return self.__trade_data_database_name
+
+    @trade_data_database_name.setter
+    def trade_data_database_name(self, trade_data_database_name):
+        self.__trade_data_database_name = trade_data_database_name
+
+    @property
+    def market_data_database_table(self):
+        return self.__market_data_database_table
+
+    @market_data_database_table.setter
+    def market_data_database_table(self, market_data_database_table):
+        self.__market_data_database_table = market_data_database_table
+
+    @property
     def data_norm(self):
         return self.__data_norm
 
@@ -210,14 +230,6 @@ class MarketRequest(DataRequest):
 
         self.market_data_database_table = market_data_database_table
 
-    @property
-    def market_data_database_table(self):
-        return self.__market_data_database_table
-
-    @market_data_database_table.setter
-    def market_data_database_table(self, market_data_database_table):
-        self.__market_data_database_table = market_data_database_table
-
 ########################################################################################################################
 
 class TradeRequest(DataRequest):
@@ -228,6 +240,8 @@ class TradeRequest(DataRequest):
 
     def __init__(self, trade_request=None, start_date=None, finish_date=None, ticker=None, data_store=constants.default_data_store, data_offset_ms=None,
                  reload=False, instrument=constants.default_instrument, asset_class=constants.default_asset_class, access_control=None,
+                 trade_data_database_name=None,
+                 # market_data_database_table=None,
                  use_multithreading=constants.use_multithreading, multithreading_params=constants.multithreading_params, data_norm=None,
                  trade_order_type=None, trade_order_mapping=None, event_type='trade'):
 
@@ -239,7 +253,6 @@ class TradeRequest(DataRequest):
             if hasattr(trade_request, 'trade_data_store'):
                 data_store = trade_request.trade_data_store
                 data_offset_ms = trade_request.trade_data_offset_ms
-
             else:
                 data_store = trade_request.data_store
                 data_offset_ms = trade_request.data_offset_ms
@@ -250,6 +263,8 @@ class TradeRequest(DataRequest):
             access_control = trade_request.access_control
             use_multithreading = trade_request.use_multithreading
             multithreading_params = trade_request.multithreading_params
+            trade_data_database_name = trade_request.trade_data_database_name
+            # market_data_database_table = trade_request.market_data_database_table
             data_norm = trade_request.data_norm
 
             if hasattr(trade_request, 'trade_order_type'): # only TradeRequest has trade_order_type
@@ -268,6 +283,8 @@ class TradeRequest(DataRequest):
         self.instrument = instrument
         self.asset_class = asset_class
         self.access_control = access_control
+        self.trade_data_database_name = trade_data_database_name
+        # self.market_data_database_table = market_data_database_table
 
         self.use_multithreading = use_multithreading
         self.multithreading_params = multithreading_params
@@ -336,6 +353,7 @@ class TCARequest(TradeRequest, ComputationRequest):
     def __init__(self, start_date=None, finish_date=None, ticker=None, venue='All',
                  market_data_store=constants.default_market_data_store,
                  trade_data_store=constants.default_trade_data_store,
+                 trade_data_database_name=None,
                  market_data_database_table=None,
                  market_data_offset_ms=None, trade_data_offset_ms=None,
                  bid_benchmark='mid', ask_benchmark='mid',
@@ -358,6 +376,7 @@ class TCARequest(TradeRequest, ComputationRequest):
             venue = tca_request.venue
             market_data_store = tca_request.market_data_store
             trade_data_store = tca_request.trade_data_store
+            trade_data_database_name = tca_request.trade_data_database_name
             market_data_database_table = tca_request.market_data_database_table
             market_data_offset_ms = tca_request.market_data_offset_ms
             trade_data_offset_ms = tca_request.trade_data_offset_ms
@@ -396,6 +415,7 @@ class TCARequest(TradeRequest, ComputationRequest):
         self.venue = venue  # which venues do we want to analyse?
         self.market_data_store = market_data_store  # what is the dataset for market data?
         self.trade_data_store = trade_data_store  # what is the dataset for trade data?
+        self.trade_data_database_name = trade_data_database_name
         self.market_data_database_table = market_data_database_table
         self.market_data_offset_ms = market_data_offset_ms
         self.trade_data_offset_ms = trade_data_offset_ms
@@ -475,14 +495,6 @@ class TCARequest(TradeRequest, ComputationRequest):
     @trade_data_store.setter
     def trade_data_store(self, trade_data_store):
         self.__trade_data_store = self._check_data_store(trade_data_store)
-
-    @property
-    def market_data_database_table(self):
-        return self.__market_data_database_table
-
-    @market_data_database_table.setter
-    def market_data_database_table(self, market_data_database_table):
-        self.__market_data_database_table = market_data_database_table
 
     @property
     def market_data_offset_ms(self):

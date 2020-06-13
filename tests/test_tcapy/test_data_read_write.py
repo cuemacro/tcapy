@@ -1,6 +1,8 @@
-"""Tests functions for writing market data to Arctic, InfluxDB, KDB etc and trade/order data to SQL Server.
+"""Tests functions for loading market and trade/order data (CSVs, SQL, Arctic, InfluxDB and KDB). Check that your database has
+market and trade data for these before running the test. test_data_write will write data into a test database first
+and then read - so that can be used instead, if your production market and trade databases are not yet populated.
 
-It writes test trade/market data to a test database in all instances.
+This will also involve setting your database IP, username, password etc.
 """
 
 __author__ = 'saeedamen'  # Saeed Amen / saeed@cuemacro.com
@@ -11,46 +13,53 @@ __author__ = 'saeedamen'  # Saeed Amen / saeed@cuemacro.com
 # See the License for the specific language governing permissions and limitations under the License.
 #
 
+import datetime
+import os
+from collections import OrderedDict
+
 import pandas as pd
 from pandas.testing import assert_frame_equal
 
-
-import os
-
-from tcapy.conf.constants import Constants
-from tcapy.util.loggermanager import LoggerManager
 from tcapy.util.timeseries import TimeSeriesOps
 from tcapy.util.utilfunc import UtilFunc
+from tcapy.conf.constants import Constants
+from tcapy.util.loggermanager import LoggerManager
 
-from tcapy.analysis.tcarequest import MarketRequest
+from tcapy.analysis.tcarequest import TCARequest
+from tcapy.data.datafactory import MarketRequest, TradeRequest
 
 from tcapy.data.databasesource import DatabaseSourceCSVBinary as DatabaseSourceCSV
 from tcapy.data.databasesource import \
     DatabaseSourceMSSQLServer, DatabaseSourceMySQL, DatabaseSourceSQLite, \
     DatabaseSourceArctic, DatabaseSourceKDB, DatabaseSourceInfluxDB, DatabaseSourcePyStore
 
-import datetime
-
-from collections import OrderedDict
-
+from tcapy.util.mediator import Mediator
 from tcapy.util.customexceptions import *
-from tests.config import resource
+
+from tests.config import *
 
 logger = LoggerManager().getLogger(__name__)
 
 constants = Constants()
 
-from tcapy.util.mediator import Mediator
-
-tcapy_version = constants.tcapy_version
-
-# check that your database has market and trade data for these before running the test
-
 logger.info('Make sure you have created folder ' + constants.csv_folder + ' & ' + constants.temp_data_folder +
             ' otherwise tests will fail')
 
+Mediator.get_volatile_cache().clear_cache()
+
 ########################################################################################################################
 # YOU MAY NEED TO CHANGE THESE
+
+# For market data
+run_arctic_tests = True
+run_pystore_tests = False
+run_influx_db_tests = False
+run_kdb_tests = False
+
+# For trade data
+run_ms_sql_server_tests = False
+run_mysql_server_tests = True
+run_sqlite_server_tests = True
 
 start_date = '26 Apr 2017'
 finish_date = '05 Jun 2017'
@@ -61,70 +70,51 @@ test_harness_arctic_market_data_table = 'market_data_table_test_harness'
 test_harness_arctic_market_data_store = 'arctic-testharness'
 
 test_harness_kdb_market_data_table = 'market_data_table_test_harness'
-test_harness_kdb_data_store = 'kdb-testharness'
+test_harness_kdb_market_data_store = 'kdb-testharness'
 
 test_harness_influxdb_market_data_table = 'market_data_table_test_harness' # InfluxDB database
-test_harness_influxdb_data_store = 'influxdb-testharness' # InfluxDB measurement
+test_harness_influxdb_market_data_store = 'influxdb-testharness' # InfluxDB measurement
 
-test_harness_pystore_market_data_table = 'market_data_table_test_harness' # InfluxDB database
-test_harness_pystore_data_store = 'pystore-testharness' # InfluxDB measurement
+test_harness_pystore_market_data_table = 'market_data_table_test_harness' # PyStore
+test_harness_pystore_market_data_store = 'pystore-testharness' # PyStore folder
 
-arctic_lib_type = ['CHUNK_STORE', 'TICK_STORE', 'VERSION_STORE']
+# Default format is CHUNK_STORE, so should be last, so we can read in later
+arctic_lib_type = ['TICK_STORE', 'VERSION_STORE', 'CHUNK_STORE']
 
-# Trade data for tables/databases
-# Note: make sure you have already created the test_harness databases beforehand
-test_harness_ms_sql_trade_data_database = 'trade_database_test_harness'
-test_harness_ms_sql_data_store = 'ms_sql_server'
-
+# Trade data parameters
+test_harness_ms_sql_server_trade_data_database = 'trade_database_test_harness'
+test_harness_ms_sql_server_trade_data_store = 'ms_sql_server'
 test_harness_mysql_trade_data_database = 'trade_database_test_harness'
-test_harness_mysql_data_store = 'mysql'
-
-test_harness_sqlite_trade_data_database = '/home/tcapyuser/db/trade_database_test_harness.db'
-test_harness_sqlite_data_store = 'sqlite'
-
-# Mainly just to speed up tests - note: you will need to generate the Parquet files using convert_csv_to_h5.py from the CSVs
-use_parquet_market_files = True
-
-run_arctic_tests = True
-run_pystore_tests = False
-run_influx_db_tests = False
-run_kdb_tests = True
-
-run_ms_sql_server_tests = True
-run_mysql_server_tests = True
-run_sqlite_server_tests = True
+test_harness_mysql_trade_data_store = 'mysql'
+test_harness_sqlite_trade_data_database = resource('trade_database_test_harness.db')
+test_harness_sqlite_trade_data_store = 'sqlite'
 
 ########################################################################################################################
-folder = Constants().test_data_harness_folder
 
 trade_order_list = ['trade_df', 'order_df']
 
 sql_trade_order_mapping = {
     'ms_sql_server' :   {'trade_df' : '[dbo].[trade]',      # Name of table which has broker messages to client
-                         'order_df' : '[dbo].[order]'},             # Name of table which has orders from client
+                         'order_df' : '[dbo].[order]'},     # Name of table which has orders from client
     'mysql':            {'trade_df': 'trade_database_test_harness.trade',   # Name of table which has broker messages to client
                          'order_df': 'trade_database_test_harness.order'},  # Name of table which has orders from client
     'sqlite':           {'trade_df': 'trade_table',  # Name of table which has broker messages to client
                          'order_df': 'order_table'}  # Name of table which has orders from client
 }
-
 eps = 10 ** -5
 
 invalid_start_date = '01 Jan 1999'
 invalid_finish_date = '01 Feb 1999'
 
-# todo: WHERE ARE THOSE FILES?
-if use_parquet_market_files:
-    csv_market_data_store = os.path.join(folder, 'small_test_market_df.parquet')
-    csv_reverse_market_data_store = os.path.join(folder, 'small_test_market_df_reverse.parquet')
-else:
-    csv_market_data_store = os.path.join(folder, 'small_test_market_df.csv.gz')
-    csv_reverse_market_data_store = os.path.join(folder, 'small_test_market_df_reverse.csv.gz')
+csv_market_data_store = resource('small_test_market_df.parquet')
+csv_reverse_market_data_store = resource('small_test_market_df_reverse.parquet')
 
 csv_trade_order_mapping = OrderedDict([('trade_df', resource('small_test_trade_df.csv')),
                                        ('order_df', resource('small_test_order_df.csv'))])
 
-use_multithreading = False
+########################################################################################################################
+#### WRITING DATA ######################################################################################################
+########################################################################################################################
 
 ### Arctic #############################################################################################################
 
@@ -143,6 +133,7 @@ def test_write_market_data_arctic():
     # Check first when replacing full table and then appending
     for a in arctic_lib_type:
         for i in replace_append:
+
             database_source = DatabaseSourceArctic(postfix='testharness', arctic_lib_type=a)
 
             # Write CSV to Arctic
@@ -159,7 +150,7 @@ def test_write_market_data_arctic():
                 start_date=db_start_date, finish_date=db_finish_date, ticker=ticker)
 
             # Read back data from Arctic and compare with CSV
-            market_request = MarketRequest(start_date=db_start_date, finish_date=db_finish_date, ticker=ticker,
+            market_request = MarketRequest(start_date=db_start_date, finish_date=db_finish_date, ticker=tick,
                                            data_store=database_source, # test_harness_arctic_market_data_store,
                                            market_data_database_table=test_harness_arctic_market_data_table)
 
@@ -227,9 +218,8 @@ def test_append_market_data_arctic():
 
         assert len(outside_bounds) == 0
 
-
 def test_delete_market_data_arctic():
-    """Tests we can delete a section of a data for a particular
+    """Tests we can delete a section of a data for a particular time section
     """
     if not (run_arctic_tests): return
 
@@ -260,12 +250,12 @@ def test_delete_market_data_arctic():
         database_source.delete_market_data(ticker, start_date=db_start_cut_off, finish_date=db_finish_cut_off,
                                            table_name=test_harness_arctic_market_data_table)
 
-        # read back data from database (will exclude the deleted records)
+        # Read back data from database (will exclude the deleted records)
         market_df_new = database_source.fetch_market_data(start_date=db_start_date, finish_date=db_finish_date,
                                                           ticker=ticker,
                                                           table_name=test_harness_arctic_market_data_table)
 
-        # sort columns so they are same order
+        # Sort columns so they are same order
         market_df_old = market_df_old.sort_index(axis=1)
         market_df_new = market_df_new.sort_index(axis=1)
 
@@ -353,7 +343,7 @@ def test_write_multiple_wildcard_market_data_csvs_arctic():
             start_date=arctic_start_date, finish_date=arctic_finish_date, ticker=ticker)
 
         # Prepare the CSV folder first
-        csv_folder = os.path.join(constants.test_data_harness_folder, 'csv_arctic_mult')
+        csv_folder = resource('csv_arctic_mult')
 
         # Empty the CSV test harness folder, where we shall dump the mini CSVs
         UtilFunc().forcibly_create_empty_folder(csv_folder)
@@ -400,43 +390,36 @@ def test_write_multiple_wildcard_market_data_csvs_arctic():
 def _get_db_trade_database_source():
     database_source_list = [];
     test_harness_trade_database_list = [];
-    test_harness_data_store_list = []
+    test_harness_trade_data_store_list = []
 
     if run_ms_sql_server_tests:
         database_source_list.append(DatabaseSourceMSSQLServer())
-        test_harness_trade_database_list.append(test_harness_ms_sql_trade_data_database)
-        test_harness_data_store_list.append(test_harness_ms_sql_data_store)
+        test_harness_trade_database_list.append(test_harness_ms_sql_server_trade_data_database)
+        test_harness_trade_data_store_list.append(test_harness_ms_sql_server_trade_data_store)
 
     if run_mysql_server_tests:
         database_source_list.append(DatabaseSourceMySQL())
         test_harness_trade_database_list.append(test_harness_mysql_trade_data_database)
-        test_harness_data_store_list.append(test_harness_mysql_data_store)
+        test_harness_trade_data_store_list.append(test_harness_mysql_trade_data_store)
 
     if run_sqlite_server_tests:
         database_source_list.append(DatabaseSourceSQLite())
         test_harness_trade_database_list.append(test_harness_sqlite_trade_data_database)
-        test_harness_data_store_list.append(test_harness_sqlite_data_store)
+        test_harness_trade_data_store_list.append(test_harness_sqlite_trade_data_store)
 
-    return database_source_list, test_harness_trade_database_list, test_harness_data_store_list
+    return database_source_list, test_harness_trade_database_list, test_harness_trade_data_store_list
 
 def test_write_trade_data_sql():
     """Tests that trade data can be read from CSV and dumped to various SQL dialect
     """
 
-    database_source_list, test_harness_trade_database_list, test_harness_data_store_list = _get_db_trade_database_source()
-
-    for i in range(0, len(database_source_list)):
-
-        database_source = database_source_list[i]
-
-        test_harness_trade_database = test_harness_trade_database_list[i]
-        test_harness_data_store = test_harness_data_store_list[i]
+    for database_source, test_harness_trade_database, test_harness_data_store in zip(*_get_db_trade_database_source()):
 
         for t in trade_order_list:
             # Dump trade_df to SQL test harness database and overwrite
             database_source.convert_csv_to_table(csv_trade_order_mapping[t], None,
                                                  (sql_trade_order_mapping[test_harness_data_store])[t],
-                                                 test_harness_trade_database,
+                                                 database_name=test_harness_trade_database,
                                                  if_exists_table='replace', market_trade_data='trade')
 
             trade_order_df_sql = database_source.fetch_trade_order_data(
@@ -462,7 +445,7 @@ def test_write_trade_data_sql():
                     assert all(exec_diff < eps)
 
 
-### KDB/InfluxDB #######################################################################################################
+# ### KDB/InfluxDB #######################################################################################################
 
 def _get_db_market_database_source():
     database_source_list = [];
@@ -472,33 +455,26 @@ def _get_db_market_database_source():
     if run_kdb_tests:
         database_source_list.append(DatabaseSourceKDB(postfix='testharness'))
         test_harness_market_data_table_list.append(test_harness_kdb_market_data_table)
-        test_harness_data_store_list.append(test_harness_kdb_data_store)
+        test_harness_data_store_list.append(test_harness_kdb_market_data_store)
 
     if run_influx_db_tests:
         database_source_list.append(DatabaseSourceInfluxDB(postfix='testharness'))
         test_harness_market_data_table_list.append(test_harness_influxdb_market_data_table)
-        test_harness_data_store_list.append(test_harness_influxdb_data_store)
+        test_harness_data_store_list.append(test_harness_influxdb_market_data_store)
 
     if run_pystore_tests:
         database_source_list.append(DatabaseSourcePyStore(postfix='testharness'))
         test_harness_market_data_table_list.append(test_harness_pystore_market_data_table)
-        test_harness_data_store_list.append(test_harness_pystore_data_store)
+        test_harness_data_store_list.append(test_harness_pystore_market_data_store)
 
     return database_source_list, test_harness_market_data_table_list, test_harness_data_store_list
 
 def test_write_market_data_db():
     """Tests we can write market data to KDB/Influxdb/PyStore
     """
-
-    database_source_list, test_harness_market_data_table_list, test_harness_data_store_list = _get_db_market_database_source()
-
     market_loader = Mediator.get_tca_market_trade_loader(version=tcapy_version)
 
-    for i in range(0, len(database_source_list)):
-
-        database_source = database_source_list[i]
-        test_harness_market_data_table = test_harness_market_data_table_list[i]
-        test_harness_data_store = test_harness_data_store_list[i]
+    for database_source, test_harness_market_data_table, test_harness_data_store in zip(*_get_db_market_database_source()):
 
         ### Test we can read data from CSV and dump to InfluxDB/KDB/PyStore (and when read back it matches CSV)
         db_start_date = '01 Jan 2016'; db_finish_date = pd.Timestamp(datetime.datetime.utcnow())
@@ -530,20 +506,14 @@ def test_write_market_data_db():
 def test_append_market_data_db():
     """Tests we can append market data to KDB/InfluxDB/PyStore.
     """
-    database_source_list, test_harness_market_data_table_list, test_harness_data_store_list = _get_db_market_database_source()
 
     market_loader = Mediator.get_tca_market_trade_loader(version=tcapy_version)
 
-    for i in range(0, len(database_source_list)):
-
-        database_source = database_source_list[i]
-        test_harness_market_data_table = test_harness_market_data_table_list[i]
-        test_harness_data_store = test_harness_data_store_list[i]
+    for database_source, test_harness_market_data_table, test_harness_data_store in zip(*_get_db_market_database_source()):
 
         ### Test we can append (non-overlapping) data to InfluxDB/KDB/PyStore
         db_start_date = '01 Jan 2016'; db_finish_date = pd.Timestamp(datetime.datetime.utcnow())
 
-        # TODO
         market_request = MarketRequest(start_date=db_start_date, finish_date=db_finish_date, ticker=ticker,
                                        data_store=test_harness_data_store, market_data_database_table=test_harness_market_data_table)
 
@@ -582,14 +552,7 @@ def test_delete_market_data_db():
     """Tests that we can delete a section of a ticker by start/finish date in KDB/InfluxDB/PyStore
     """
 
-    database_source_list, test_harness_market_data_table_list, _ = _get_db_market_database_source()
-
-    # market_loader = Mediator.get_tca_market_trade_loader(version=tcapy_version)
-
-    for i in range(0, len(database_source_list)):
-        database_source = database_source_list[i]
-        test_harness_market_data_table = test_harness_market_data_table_list[i]
-        # test_harness_data_store = test_harness_data_store_list[i]
+    for database_source, test_harness_market_data_table, _ in zip(*_get_db_market_database_source()):
 
         ### Test we can read data from CSV and dump to KDB/InfluxDB (and when read back it matches CSV)
         db_start_date = '01 Jan 2016';
@@ -620,3 +583,290 @@ def test_delete_market_data_db():
 
         # Both pandas and KDB/InfluxDB implementation should be the same
         assert_frame_equal(market_df_old, market_df_new)
+
+########################################################################################################################
+#### READING DATA ######################################################################################################
+########################################################################################################################
+def test_fetch_market_trade_data_csv():
+    """Tests downloading of market and trade/order data from CSV files
+    """
+
+    ### Get market data
+    market_loader = Mediator.get_tca_market_trade_loader()
+
+    market_request = MarketRequest(
+        start_date=start_date, finish_date=finish_date, ticker=ticker, data_store=csv_market_data_store)
+
+    market_df = market_loader.get_market_data(market_request)
+
+    assert not(market_df.empty) \
+           and market_df.index[0] >= pd.Timestamp(start_date).tz_localize('utc') \
+           and market_df.index[-1] <= pd.Timestamp(finish_date).tz_localize('utc')
+
+    # For a high level trade data request, we need to use TCA request, because it usually involves some
+    # market data download (we are assuming that the market data is being downloaded from our arctic database)
+    # eg. for converting notionals to reporting currency)
+    tca_request = TCARequest(
+        start_date=start_date, finish_date=finish_date, ticker=ticker,
+        trade_data_store='csv', market_data_store=test_harness_arctic_market_data_store,
+        trade_order_mapping=csv_trade_order_mapping,
+        market_data_database_table=test_harness_arctic_market_data_table
+    )
+
+    for t in trade_order_list:
+        trade_order_df = market_loader.get_trade_order_data(tca_request, t)
+
+        try:
+            trade_order_df = Mediator.get_volatile_cache().get_dataframe_handle(trade_order_df)
+        except:
+            pass
+
+        assert not trade_order_df.empty \
+               and trade_order_df.index[0] >= pd.Timestamp(start_date).tz_localize('utc') \
+               and trade_order_df.index[-1] <= pd.Timestamp(finish_date).tz_localize('utc')
+
+    ### Test using DataFactory and DatabaseSource
+    from tcapy.data.datafactory import DataFactory
+
+    data_factory = DataFactory()
+
+    for t in trade_order_list:
+        ### Test using DataFactory
+        trade_request = TradeRequest(start_date=start_date, finish_date=finish_date, ticker=ticker,
+                                     data_store='csv', trade_order_mapping=csv_trade_order_mapping,
+                                     trade_order_type=t)
+
+        trade_order_df = data_factory.fetch_table(trade_request)
+
+        assert not trade_order_df.empty \
+                          and trade_order_df.index[0] >= pd.Timestamp(start_date).tz_localize('utc') \
+                          and trade_order_df.index[-1] <= pd.Timestamp(finish_date).tz_localize('utc')
+
+        ### Test using DatabaseSourceCSV
+        database_source = DatabaseSourceCSV()
+
+        trade_order_df = database_source.fetch_trade_order_data(start_date, finish_date, ticker,
+                                                          table_name=csv_trade_order_mapping[t])
+
+        assert not trade_order_df.empty \
+                             and trade_order_df.index[0] >= pd.Timestamp(start_date).tz_localize('utc') \
+                             and trade_order_df.index[-1] <= pd.Timestamp(finish_date).tz_localize('utc')
+
+
+def test_trade_data_connection():
+    """Tests the connection with the trade databases
+    """
+    for database_source, test_harness_trade_database, _ in zip(*_get_db_trade_database_source()):
+
+        engine, connection_expression = database_source._get_database_engine(database_name=test_harness_trade_database)
+        connection = engine.connect()
+
+        # Try running simple query (getting the table names of the database)
+        logger.info("Table names = " + str(engine.table_names()))
+        connection.close()
+
+        assert connection is not None
+
+### SQL dialects #######################################################################################################
+
+def _get_db_trade_database_source():
+    database_source_list = [];
+    test_harness_trade_database_list = [];
+    test_harness_trade_data_store_list = []
+
+    if run_ms_sql_server_tests:
+        database_source_list.append(DatabaseSourceMSSQLServer())
+        test_harness_trade_database_list.append(test_harness_ms_sql_server_trade_data_database)
+        test_harness_trade_data_store_list.append(test_harness_ms_sql_server_trade_data_store)
+
+    if run_mysql_server_tests:
+        database_source_list.append(DatabaseSourceMySQL())
+        test_harness_trade_database_list.append(test_harness_mysql_trade_data_database)
+        test_harness_trade_data_store_list.append(test_harness_mysql_trade_data_store)
+
+    if run_sqlite_server_tests:
+        database_source_list.append(DatabaseSourceSQLite())
+        test_harness_trade_database_list.append(test_harness_sqlite_trade_data_database)
+        test_harness_trade_data_store_list.append(test_harness_sqlite_trade_data_store)
+
+    return database_source_list, test_harness_trade_database_list, test_harness_trade_data_store_list
+
+def test_fetch_trade_data_sql():
+    """Tests that we can fetch data from the Microsoft SQL Server database. Note you need to populate the database
+    first before running this for the desired dates.
+    """
+
+    from tcapy.data.datafactory import DataFactory
+
+    ### Test using TCAMarketTradeLoader
+    market_loader = Mediator.get_tca_market_trade_loader(version=tcapy_version)
+
+    # database_source_list, test_harness_trade_database_list, test_harness_trade_data_store_list =
+
+    for database_source, test_harness_trade_database, test_harness_trade_data_store in zip(*_get_db_trade_database_source()):
+
+        for t in trade_order_list:
+            trade_order_mapping = {t : sql_trade_order_mapping[test_harness_trade_data_store][t]}
+
+            trade_request = TCARequest(start_date=start_date, finish_date=finish_date, ticker=ticker,
+                                       trade_data_store=test_harness_trade_data_store, trade_order_mapping=trade_order_mapping,
+                                       trade_data_database_name=test_harness_trade_database,
+                                       market_data_store=test_harness_arctic_market_data_store,
+                                       market_data_database_table=test_harness_arctic_market_data_table,
+                                       use_multithreading=use_multithreading)
+
+            trade_order_df = market_loader.get_trade_order_data(trade_request, t)
+
+            try:
+                trade_order_df = Mediator.get_volatile_cache().get_dataframe_handle(trade_order_df)
+            except:
+                pass
+
+            assert not trade_order_df.empty \
+                   and trade_order_df.index[0] >= pd.Timestamp(start_date).tz_localize('utc') \
+                   and trade_order_df.index[-1] <= pd.Timestamp(finish_date).tz_localize('utc')
+
+            ### Test using DataFactory
+            data_factory = DataFactory()
+
+            trade_request = TradeRequest(start_date=start_date, finish_date=finish_date, ticker=ticker,
+                                         data_store=test_harness_trade_data_store,
+                                         trade_data_database_name=test_harness_trade_database,
+                                         trade_order_mapping=trade_order_mapping,
+                                         trade_order_type=t)
+
+            trade_order_df = data_factory.fetch_table(trade_request)
+
+            assert not trade_order_df.empty \
+                   and trade_order_df.index[0] >= pd.Timestamp(start_date).tz_localize('utc') \
+                   and trade_order_df.index[-1] <= pd.Timestamp(finish_date).tz_localize('utc')
+
+            ### Test using DatabaseSource
+            trade_order_df = database_source.fetch_trade_order_data(start_date, finish_date, ticker,
+                                                                    database_name=test_harness_trade_database,
+                                                                    table_name=trade_order_mapping[t])
+
+            assert not trade_order_df.empty \
+                   and trade_order_df.index[0] >= pd.Timestamp(start_date).tz_localize('utc') \
+                   and trade_order_df.index[-1] <= pd.Timestamp(finish_date).tz_localize('utc')
+
+def test_fetch_market_trade_data_dataframe():
+    """Tests downloading of market and trade/order data from dataframe
+    """
+
+    ### Get market data
+    market_loader = Mediator.get_tca_market_trade_loader()
+
+    market_data_store = DatabaseSourceCSV(market_data_database_csv=csv_market_data_store).fetch_market_data(
+        ticker=ticker, start_date=start_date, finish_date=finish_date)
+
+    dataframe_trade_order_mapping = OrderedDict()
+
+    for k in csv_trade_order_mapping.keys():
+        dataframe_trade_order_mapping[k] = DatabaseSourceCSV(trade_data_database_csv=csv_trade_order_mapping[k]).fetch_trade_order_data(
+            ticker=ticker, start_date=start_date, finish_date=finish_date)
+
+    # for a high level trade data request, we need to use TCA request, because it usually involves some
+    # market data download (we are assuming that the market data is being downloaded from our arctic database)
+    # eg. for converting notionals to reporting currency
+    tca_request = TCARequest(
+        start_date=start_date, finish_date=finish_date, ticker=ticker,
+        trade_data_store='dataframe', market_data_store=market_data_store,
+        trade_order_mapping=dataframe_trade_order_mapping
+    )
+
+    for t in trade_order_list:
+        trade_order_df = market_loader.get_trade_order_data(tca_request, t)
+
+        try:
+            trade_order_df = Mediator.get_volatile_cache().get_dataframe_handle(trade_order_df)
+        except:
+            pass
+
+        assert not trade_order_df.empty \
+               and trade_order_df.index[0] >= pd.Timestamp(start_date).tz_localize('utc') \
+               and trade_order_df.index[-1] <= pd.Timestamp(finish_date).tz_localize('utc')
+
+    ### Test using DataFactory and DatabaseSource
+    from tcapy.data.datafactory import DataFactory
+
+    data_factory = DataFactory()
+
+    for t in trade_order_list:
+        ### Test using DataFactory
+        trade_request = TradeRequest(start_date=start_date, finish_date=finish_date, ticker=ticker,
+                                     data_store='dataframe', trade_order_mapping=dataframe_trade_order_mapping,
+                                     trade_order_type=t)
+
+        trade_order_df = data_factory.fetch_table(trade_request)
+
+        assert not trade_order_df.empty \
+                          and trade_order_df.index[0] >= pd.Timestamp(start_date).tz_localize('utc') \
+                          and trade_order_df.index[-1] <= pd.Timestamp(finish_date).tz_localize('utc')
+
+        ### Test using DatabaseSourceDataFrame
+        from tcapy.data.databasesource import DatabaseSourceDataFrame
+
+        database_source = DatabaseSourceDataFrame()
+
+        trade_order_df = database_source.fetch_trade_order_data(start_date, finish_date, ticker,
+                                                          table_name=dataframe_trade_order_mapping[t])
+
+        assert not trade_order_df.empty \
+                             and trade_order_df.index[0] >= pd.Timestamp(start_date).tz_localize('utc') \
+                             and trade_order_df.index[-1] <= pd.Timestamp(finish_date).tz_localize('utc')
+
+### Arctic/KDB/InfluxDB #################################################################################################
+
+def _get_db_market_data_store():
+    market_data_store_list = [];
+    market_data_database_table_list = [];
+
+    if run_arctic_tests:
+        market_data_store_list.append(test_harness_arctic_market_data_store)
+        market_data_database_table_list.append(test_harness_arctic_market_data_table)
+
+    if run_kdb_tests:
+        market_data_store_list.append(test_harness_kdb_market_data_store)
+        market_data_database_table_list.append(test_harness_kdb_market_data_table)
+
+    if run_influx_db_tests:
+        market_data_store_list.append(test_harness_influxdb_market_data_store)
+        market_data_database_table_list.append(test_harness_influxdb_market_data_table)
+
+    return market_data_store_list, market_data_database_table_list
+
+def test_fetch_market_data_db():
+    """Tests that we can fetch data from Arctic/KDB/InfluxDB. Note you need to populate the database first before running this for
+    the desired dates.
+    """
+    market_loader = Mediator.get_tca_market_trade_loader()
+
+    market_data_store_list, market_data_database_table_list  = _get_db_market_data_store()
+
+    for market_data_store, market_data_database_table in zip(market_data_store_list, market_data_database_table_list):
+        market_request = MarketRequest(
+            start_date=start_date, finish_date=finish_date, ticker=ticker, data_store=market_data_store,
+            market_data_database_table=market_data_database_table)
+
+        market_df = market_loader.get_market_data(market_request)
+
+        try:
+            market_df = Mediator.get_volatile_cache().get_dataframe_handle(market_df)
+        except:
+            pass
+
+        assert not(market_df.empty) \
+               and market_df.index[0] >= pd.Timestamp(start_date).tz_localize('utc') \
+               and market_df.index[-1] <= pd.Timestamp(finish_date).tz_localize('utc')
+
+        market_request.start_date = invalid_start_date; market_request.finish_date = invalid_finish_date
+
+        market_empty_df = market_loader.get_market_data(market_request)
+        
+        try:
+            market_empty_df = Mediator.get_volatile_cache().get_dataframe_handle(market_empty_df)
+        except:
+            pass
+
+        assert market_empty_df.empty

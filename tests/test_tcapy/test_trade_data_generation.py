@@ -18,56 +18,53 @@ from tcapy.conf.constants import Constants
 from tcapy.data.datatestcreator import DataTestCreator
 from tcapy.data.databasesource import DatabaseSourceCSVBinary as DatabaseSourceCSV
 from tcapy.data.databasesource import DatabaseSourceArctic
+from tcapy.util.mediator import Mediator
 from tcapy.util.loggermanager import LoggerManager
 
 logger = LoggerManager().getLogger(__name__)
 
 constants = Constants()
 
-postfix = 'dukascopy'
+postfix = 'testharness'
 ticker = ['EURUSD']
 start_date = '01 May 2017'
 finish_date = '31 May 2017'
 
-use_test_csv = True
+use_market_data_test_csv = True
 
-# mainly just to speed up tests - note: you will need to generate the HDF5 files using convert_csv_to_h5.py from the CSVs
-use_hdf5_market_files = False
-
+from tests.config import *
 
 logger.info('Make sure you have created folder ' + constants.csv_folder + ' & ' + constants.temp_data_folder +
             ' otherwise tests will fail')
 
+Mediator.get_volatile_cache().clear_cache()
+
 ########################################################################################################################
 
-# you can change the test_data_harness_folder to one on your own machine with real data
+# You can change the test_data_harness_folder to one on your own machine with real data
 folder = constants.test_data_harness_folder
 
 eps = 10 ** -5
 
-if use_test_csv:
+if use_market_data_test_csv:
+    # Only contains limited amount of EURUSD and USDJPY in Apr/Jun 2017
+    market_data_store = resource('small_test_market_df.parquet')
 
-    # only contains limited amount of EURUSD and USDJPY in Apr/Jun 2017
-    if use_hdf5_market_files:
-        market_data_store = os.path.join(folder, 'small_test_market_df.h5')
-    else:
-        market_data_store = os.path.join(folder, 'small_test_market_df.csv.gz')
-
-def test_randomized_trade_data_generation():
+def test_randomized_trade_data_generation(fill_market_trade_databases):
     """Tests randomized trade generation data (and writing to database)
     """
     data_test_creator = DataTestCreator(write_to_db=False)
 
-    # use database source as Arctic for market data (assume we are using market data as a source)
-    if use_test_csv:
+    # Use database source as Arctic for market data (assume we are using market data as a source)
+    if use_market_data_test_csv:
         data_test_creator._database_source_market = DatabaseSourceCSV(market_data_database_csv=market_data_store)
     else:
         data_test_creator._database_source_market = DatabaseSourceArctic(postfix=postfix)
 
-    # create randomised trade/order data
+    # Create randomised trade/order data
     trade_order = data_test_creator.create_test_trade_order(ticker, start_date=start_date, finish_date=finish_date)
 
-    # trade_order has dictionary of trade_df and order_df
+    # Trade_order has dictionary of trade_df and order_df
 
-    # make sure the number of trades > number of orders
+    # Make sure the number of trades > number of orders
     assert (len(trade_order['trade_df'].index) > len(trade_order['order_df'].index))

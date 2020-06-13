@@ -1,4 +1,4 @@
-"""Tests more involved functionality of TCA such as multithreading (and checks computations are
+"""Tests more involved functionality of TCA such as use_multithreading (and checks computations are
 the same as single threaded - note that if there are gaps in market data, there could be differences) and also if there
 are multiple requests made at same time (stress testing).
 
@@ -26,29 +26,25 @@ from tcapy.conf.constants import Constants
 from tcapy.util.mediator import Mediator
 
 constants = Constants()
-tcapy_version = constants.tcapy_version
 
 from tcapy.analysis.tcaengine import TCARequest, TCAEngineImpl
 
+from tests.config import *
+
 ########################################################################################################################
 # YOU MAY NEED TO CHANGE TESTING PARAMETERS IF YOUR DATABASE DOESN'T COVER THESE DATES
+# Can try longer time periods - will make tests slower, but will make tests more exhaustive
 start_date = '02 May 2017';
 finish_date = '05 Jun 2017'
 
-# Can try longer time periods - will make tests slower, but will make tests more exhaustive
-# start_date = '01 Jan 2016'; finish_date = '01 Mar 2018'
+market_data_store = 'arctic-testharness'
+market_data_database_table = 'market_data_table_test_harness'
+trade_data_store = 'mysql'
+trade_data_database_name = 'trade_database_test_harness'
 
-# Stress test for TCA analysis (larger dataset more likely to see any issues)
-# multithreading_start_date = '01 May 2017'; multithreading_finish_date = '20 Jul 2017'
-multithreading_start_date = '01 May 2017'; multithreading_finish_date = '02 Jul 2017'
-large_start_date = '01 Jan 2016';
-large_finish_date = '01 Apr 2016'
-
-market_data_store = 'arctic-ncfx'
-trade_data_store = 'ms_sql_server'
 ticker = 'EURUSD'
 
-valid_ticker_list = ['EURUSD', 'GBPUSD', 'AUDSEK']  # it should return gracefully if at least 1 ticker exists
+valid_ticker_list = ['EURUSD', 'USDJPY', 'AUDSEK']  # it should return gracefully if at least 1 ticker exists
 missing_ticker = 'AUDSEK'
 
 from collections import OrderedDict
@@ -69,60 +65,65 @@ dump_csv_output = True  # Can slow down testing, but is useful for debugging pur
 # Do a stress test, calling several large TCA requests in quick succession
 stress_test = True
 
+Mediator.get_volatile_cache().clear_cache()
+
 ########################################################################################################################
 
-# you can change the test_data_harness_folder to one on your own machine with real data
-folder = constants.test_data_harness_folder
-
-trade_order_mapping = constants.test_trade_order_list
-trade_df_name = trade_order_mapping[0] # usually 'trade_df'
-order_df_name = trade_order_mapping[1] # usually 'order_df'
+trade_order_mapping = {
+    'ms_sql_server' :   {'trade_df' : '[dbo].[trade]',      # Name of table which has broker messages to client
+                         'order_df' : '[dbo].[order]'},     # Name of table which has orders from client
+    'mysql':            {'trade_df': 'trade_database_test_harness.trade',   # Name of table which has broker messages to client
+                         'order_df': 'trade_database_test_harness.order'},  # Name of table which has orders from client
+    'sqlite':           {'trade_df': 'trade_table',  # Name of table which has broker messages to client
+                         'order_df': 'order_table'}  # Name of table which has orders from client
+}
+trade_order_mapping = trade_order_mapping[trade_data_store]
 
 eps = 10 ** -3
 
 if use_market_test_csv:
-    # only contains limited amount of EURUSD and USDJPY in Apr/Jun 2017
-    market_data_store = os.path.join(folder, 'small_test_market_df.csv.gz')
+    # Only contains limited amount of EURUSD and USDJPY in Apr/Jun 2017
+    market_data_store = resource('small_test_market_df.parquet')
 
 if use_trade_test_csv:
     trade_data_store = 'csv'
 
-    trade_order_mapping = OrderedDict([(trade_df_name, os.path.join(folder, 'small_test_trade_df.csv')),
-                                       (order_df_name, os.path.join(folder, 'small_test_order_df.csv'))])
+    trade_order_mapping = OrderedDict([('trade_df', resource('small_test_trade_df.csv')),
+                                       ('order_df', resource('small_test_order_df.csv'))])
 
 else:
-    # define your own trade order mapping
+    # Define your own trade order mapping
     pass
 
-# Test will only succeed if the test_tcapy specific version is set
-assert constants.tcapy_version == 'test_tcapy'
+# Test various TCA types with/without use_multithreading
+# Note: to test multithreading you need to have a Celery instance running
+tca_type = ['aggregated', 'detailed', 'compliance']
+use_multithreading = [True, False]
 
-def test_multithreading_full_basic_tca():
-    """Tests if the trade/order and market data is identical for multithreading versus singlethreading for detailed,
-    aggregated and compliance. Note that we need a running Celery server for multithreading to work (as well as the
-    usual SQL and Arctic databases running, if the test_csv option has not been selected). Uses a very large data sample
+# Test will only succeed if the test_tcapy specific version is set
+# assert constants.tcapy_version == 'test_tcapy'
+
+def test_multithreading_full_basic_tca(fill_market_trade_databases):
+    """Tests if the trade/order and market data is identical for use_multithreading versus singlethreading for detailed,
+    aggregated and compliance. Note that we need a running Celery server for use_multithreading to work (as well as the
+    usual MySQL and Arctic/MongoDB databases running, if the test_csv option has not been selected).
     """
     Mediator.get_volatile_cache().clear_cache()  # clear cache to ensure all test code runs!
 
-    tca_request = TCARequest(start_date=multithreading_start_date, finish_date=multithreading_finish_date,
+    tca_request = TCARequest(start_date=start_date, finish_date=finish_date,
                              ticker=valid_ticker_list,
                              trade_data_store=trade_data_store,
                              market_data_store=market_data_store,
+                             market_data_database_table=market_data_database_table,
                              trade_order_mapping=trade_order_mapping)
 
     tca_engine = TCAEngineImpl(version=tcapy_version)
-
-    tca_type = ['aggregated', 'detailed', 'compliance']
-
-    multithreading = [True, False]
 
     #### Checked the executed prices match with single and multithreaded cases
     for t in tca_type:
         dict_list = []
 
-        for m in multithreading:
-            Mediator.get_volatile_cache(
-                version=tcapy_version).clear_cache()  # Clear cache to ensure all test code runs!
+        for m in use_multithreading:
 
             tca_request.use_multithreading = m
             tca_request.tca_type = t
@@ -170,31 +171,28 @@ def test_multithreading_full_basic_tca():
                         assert len(id_multi.index) == len(id_single.unique())
 
 
-def test_invalid_dates_missing_data_tca():
-    """Tests if the trade/order and market data is identical for multithreading versus singlethreading for detailed,
-    aggregated and compliance. Note that we need a running Celery server for multithreading to work (as well as the
+def test_invalid_dates_missing_data_tca(fill_market_trade_databases):
+    """Tests if the trade/order and market data is identical for use_multithreading versus singlethreading for detailed,
+    aggregated and compliance. Note that we need a running Celery server for use_multithreading to work (as well as the
     usual SQL and Arctic databases running, if the test_csv option has not been selected). Uses a very large data sample
     """
-    Mediator.get_volatile_cache().clear_cache()  # clear cache to ensure all test code runs!
+    Mediator.get_volatile_cache().clear_cache()  # Clear cache to ensure all test code runs!
 
-    tca_request = TCARequest(start_date=large_start_date, finish_date=large_finish_date, ticker=valid_ticker_list,
+    tca_request = TCARequest(start_date=start_date, finish_date=finish_date, ticker=valid_ticker_list,
                              trade_data_store=trade_data_store,
+                             trade_data_database_name=trade_data_database_name,
                              market_data_store=market_data_store,
+                             market_data_database_table=market_data_database_table,
                              trade_order_mapping=trade_order_mapping)
 
     tca_engine = TCAEngineImpl(version=tcapy_version)
 
-    tca_type = ['detailed', 'aggregated', 'compliance']
-
-    multithreading = [True, False]
-
-    ## test invalid dates
+    ## Test invalid dates
     tca_request.start_date = invalid_start_date;
     tca_request.finish_date = invalid_finish_date
 
     for t in tca_type:
-        for m in multithreading:
-            Mediator.get_volatile_cache().clear_cache()  # clear cache to ensure all test code runs!
+        for m in use_multithreading:
             tca_request.use_multithreading = m
             tca_request.tca_type = t
 
@@ -208,15 +206,14 @@ def test_invalid_dates_missing_data_tca():
             except DataMissingException:
                 assert exception_triggered
 
-    ## test a single valid ticker, but missing data (only one ticker)
+    ## Test a single valid ticker, but missing data (only one ticker)
     tca_request.start_date = start_date;
     tca_request.finish_date = finish_date;
     tca_request.ticker = missing_ticker
 
     for t in tca_type:
-        for m in multithreading:
-            Mediator.get_volatile_cache(
-                version=tcapy_version).clear_cache()  # clear cache to ensure all test code runs!
+        for m in use_multithreading:
+            Mediator.get_volatile_cache().clear_cache()  # Clear cache to ensure all test code runs!
             tca_request.use_multithreading = m
             tca_request.tca_type = t
 
@@ -230,9 +227,9 @@ def test_invalid_dates_missing_data_tca():
             except DataMissingException:
                 assert exception_triggered
 
-def test_stress_tca():
+def test_stress_tca(fill_market_trade_databases):
     """Makes several large TCARequests at the same time to stress test tcapy application and also to check it works
-    with paralle requests (note: you may need to reduce the length of the dataset if your machine has limited amounts of RAM).
+    with parallel requests (note: you may need to reduce the length of the dataset if your machine has limited amounts of RAM).
 
     It can be possible that when deployed on the web, several users might make simultaneous requests. Note, do not use
     pylibmc, and instead use python-memcached, when using memcached as a result backend. pylibmc is not thread-safe so
@@ -246,11 +243,14 @@ def test_stress_tca():
     # Clear cache to ensure all test code runs!
     Mediator.get_volatile_cache().clear_cache()
 
-    tca_request = TCARequest(start_date=large_start_date, finish_date=large_finish_date, ticker=['All'],
+    tca_request = TCARequest(start_date=start_date, finish_date=finish_date, ticker=valid_ticker_list,
                              dummy_market=True,
                              trade_data_store=trade_data_store,
+                             trade_data_database_name=trade_data_database_name,
                              market_data_store=market_data_store,
-                             trade_order_mapping=trade_order_mapping, use_multithreading=True, tca_type='aggregated')
+                             market_data_database_table=market_data_database_table,
+                             trade_order_mapping=trade_order_mapping, use_multithreading=True,
+                             tca_type='aggregated')
 
     # Kick off several simulanteous large TCA requests
     request_no = 2
@@ -267,13 +267,6 @@ def test_stress_tca():
 
     result = []
 
-    # TODO: Bad Python
-    for i in range(0, len(tca_request_list)):
-        result.append(
-            pool.apply_async(tca_engine.calculate_tca,
-                             args=(tca_request_list[i],)))
-
-    # Better Python
     for item in tca_request_list:
         result.append(pool.apply_async(tca_engine.calculate_tca, args=(item,)))
 

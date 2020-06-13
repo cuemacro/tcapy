@@ -732,7 +732,7 @@ class UtilFunc(object):
         return date_range, date_range_end
 
     def remove_weekend_points(self, start_date_hist, finish_date_hist, friday_close_utc_hour=constants.friday_close_utc_hour,
-                              sunday_open_utc_hour=constants.sunday_open_utc_hour):
+                              sunday_open_utc_hour=constants.sunday_open_utc_hour, timezone='utc'):
         """Removes those periods where either the start or endpoint are in the weekend. So for example if we have periods which
         start or end on a Saturday these will be removed
 
@@ -764,17 +764,19 @@ class UtilFunc(object):
         for i in range(0, len(start_date_hist)):
 
             # Ignore weekends/create a cutoff at Sunday open/Friday close
-            if self.is_weekday_point(start_date_hist[i], finish_date_hist[i], friday_close_utc_hour=friday_close_utc_hour,
-                                     sunday_open_utc_hour=sunday_open_utc_hour):
+            if self.is_weekday_point(start_date_hist[i], finish_date_hist[i], friday_close_nyc_hour=friday_close_utc_hour,
+                                     sunday_open_utc_hour=sunday_open_utc_hour, timezone=timezone):
 
                 filtered_start_date_hist.append(start_date_hist[i])
                 filtered_finish_date_hist.append(finish_date_hist[i])
 
         return filtered_start_date_hist, filtered_finish_date_hist
 
-    def is_weekday_point(self, start_date, finish_date, friday_close_utc_hour=constants.friday_close_utc_hour, sunday_open_utc_hour=constants.sunday_open_utc_hour):
+    def is_weekday_point(self, start_date, finish_date, friday_close_nyc_hour=constants.friday_close_nyc_hour,
+                         sunday_open_utc_hour=constants.sunday_open_utc_hour, timezone='UTC'):
         """Is the time duration partially between the start and finish date in normal FX working time? (ie. not on a Saturday, also
-        after Sunday 2200 GMT (this arbitrary, some data providers could provide data before this) and on Friday before 2200 GMT
+        after Sunday 2200 GMT (this arbitrary, some data providers could provide data before this) and on Friday before 2200 GMT.
+        We assume timezone is UTC.
 
         Parameters
         ----------
@@ -784,7 +786,7 @@ class UtilFunc(object):
         finish_date : pd.Timestamp
             Finish date/time of the duration
 
-        friday_close_utc_hour : int
+        friday_close_nyc_hour : int
             Closing hour for markets on Friday night in UTC
 
         sunday_open_utc_hour : int
@@ -799,31 +801,38 @@ class UtilFunc(object):
         if (finish_date - start_date).seconds >= constants.weekend_period_seconds:
             return True
         else:
-            return self.date_within_market_hours(start_date, friday_close_utc_hour=friday_close_utc_hour, \
-                                                 sunday_open_utc_hour=sunday_open_utc_hour) \
-                or self.date_within_market_hours(finish_date, friday_close_utc_hour=friday_close_utc_hour, \
-                                                 sunday_open_utc_hour=sunday_open_utc_hour)
+            return self.date_within_market_hours(start_date, friday_close_nyc_hour=friday_close_nyc_hour, \
+                                                 sunday_open_utc_hour=sunday_open_utc_hour, timezone=timezone) \
+                or self.date_within_market_hours(finish_date, friday_close_nyc_hour=friday_close_nyc_hour, \
+                                                 sunday_open_utc_hour=sunday_open_utc_hour, timezone=timezone)
 
-    def date_within_market_hours(self, date, friday_close_utc_hour=constants.friday_close_utc_hour, sunday_open_utc_hour=constants.sunday_open_utc_hour):
+    def date_within_market_hours(self, date, friday_close_nyc_hour=constants.friday_close_nyc_hour,
+                                 sunday_open_utc_hour=constants.sunday_open_utc_hour, timezone='UTC'):
+
+        try:
+            ny_date = pd.Timestamp(copy.copy(date)).tz_convert('US/Eastern')
+        except:
+            ny_date = pd.Timestamp(copy.copy(date)).tz_localize(timezone).tz_convert('US/Eastern')
+
         if (date.dayofweek >= 0 and date.dayofweek <= 3):
             return True
-        elif date.dayofweek == 4 and date.hour < friday_close_utc_hour:
+        elif date.dayofweek == 4 and ny_date.hour < friday_close_nyc_hour:
             return True
         elif date.dayofweek == 6 and date.hour >= sunday_open_utc_hour:
             return True
 
         return False
 
-    def check_data_frame_points_in_every_hour(self, df, start_date, finish_date):
+    def check_data_frame_points_in_every_hour(self, df, start_date, finish_date, timezone='UTC'):
         """Checks if there are data points in every hour window between the start and finish date/time.
 
-        We ignore any time on Sunday (as no strict starting point for FX markets on Sunday). Also any point after 2200 GMT
-        on a Friday ignored (strictly speaking 5pm NY is the closing time).
+        We ignore any time on Sunday (as no strict starting point for FX markets on Sunday). Also any point after 1700 NYC
+        on a Friday ignored
 
         Parameters
         ----------
         df : pandas.DataFrame
-            Dataframe to check for integrity
+            DataFrame to check for integrity
 
         start_date : str/pandas.Timestamp
             Start date/time of duration
@@ -848,8 +857,13 @@ class UtilFunc(object):
             if self.is_weekday_point(st, fi):
                 df_mini = df.truncate(before=st, after=fi)
 
+                try:
+                    fi_nyc = pd.Timestamp(copy.copy(fi)).tz_convert('US/Eastern')
+                except:
+                    fi_nyc = pd.Timestamp(copy.copy(fi)).tz_localize(timezone).tz_convert('US/Eastern')
+
                 # Special case for Friday close/Sunday open (ignore)
-                if df_mini.empty and not(fi.dayofweek == 4 and fi.hour > constants.friday_close_utc_hour) and not(st.dayofweek == 0) and not(st.dayofweek == 6):
+                if df_mini.empty and not(fi.dayofweek == 4 and fi_nyc.hour >= constants.friday_close_nyc_hour) and not(st.dayofweek == 0) and not(st.dayofweek == 6):
                     return False
 
         return True

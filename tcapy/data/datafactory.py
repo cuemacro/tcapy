@@ -72,6 +72,7 @@ class DataFactory(object):
 
             trade_order_type = data_request.trade_order_type
             trade_order_mapping = data_request.trade_order_mapping
+            trade_data_database_name = data_request.trade_data_database_name
 
             if data_request.data_store == 'csv' and trade_order_type != None and trade_order_mapping != None:
                 df = database_source.fetch_trade_order_data(start_date=start_date, finish_date=finish_date,
@@ -80,7 +81,8 @@ class DataFactory(object):
             elif trade_order_mapping is not None:
                 df = database_source.fetch_trade_order_data(start_date=start_date, finish_date=finish_date,
                                                             ticker=ticker,
-                                                            table_name=trade_order_mapping[trade_order_type])
+                                                            table_name=trade_order_mapping[trade_order_type],
+                                                            database_name=trade_data_database_name)
             else:
                 # Otherwise we have a CSV file without any sort of mapping, which we assume only contains trade_df data
                 df = database_source.fetch_trade_order_data(start_date=start_date, finish_date=finish_date,

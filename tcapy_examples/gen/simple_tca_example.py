@@ -315,7 +315,7 @@ def venue_tca_aggregated_example():
     Chart(engine='plotly').plot(summary_slippage_df, style=Style(plotly_plot_mode='offline_html', connect_line_gaps=True))
 
 def compare_multithreading_type():
-    """Compares different type of multithreading types
+    """Compares different type of use_multithreading types
     """
     tca_engine = TCAEngineImpl(version=tca_version)
 

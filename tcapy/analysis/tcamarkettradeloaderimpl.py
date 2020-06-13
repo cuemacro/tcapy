@@ -51,7 +51,7 @@ class TCAMarketTradeLoaderImpl(TCAMarketTradeLoader):
             market_df_dict, trade_order_results_df_dict = self._parallel_get_market_trade_metrics(
                 tca_request_list, dummy_market)
         else:
-            # Otherwise run without any multithreading
+            # Otherwise run without any use_multithreading
             return super(TCAMarketTradeLoaderImpl, self)._get_market_trade_metrics(tca_request_list, dummy_market)
 
         return market_df_dict, trade_order_results_df_dict
@@ -194,7 +194,7 @@ class TCAMarketTradeLoaderImpl(TCAMarketTradeLoader):
                             # This is not actually parallel, but is mainly for debugging purposes
                             for tca_request_s in tca_request_date_split:
 
-                                print(tca_request_s.start_date)
+                                # print(tca_request_s.start_date)
                                 market_df, trade_order_df_dict = tca_ticker_loader.get_market_trade_order_holder(
                                     tca_request_s, return_cache_handles=False)
 
@@ -224,7 +224,8 @@ class TCAMarketTradeLoaderImpl(TCAMarketTradeLoader):
                 # Now combine the results from the parallel operations, if using celery
                 if 'celery' in parallel_library:
 
-                    output = [p.get(timeout=constants.celery_timeout_seconds) for p in result]
+                    # Careful, when the output is empty!
+                    output = [p.get(timeout=constants.celery_timeout_seconds) for p in result if p is not None]
 
                     # If pipelined/splice_request_by_dates will have two lists so flatten it into one
                     output = self._util_func.flatten_list_of_lists(output)
@@ -262,6 +263,7 @@ class TCAMarketTradeLoaderImpl(TCAMarketTradeLoader):
 
             # Exception likely related to Celery and possibly lack of communication with Redis message broker
             # or Memcached results backend
+            # except Exception as e:
             except Exception as e:
                 if i == no_of_tries - 1:
                     err_msg = "Failed with " + parallel_library + " after multiple attempts: " + str(e) + ", " + str(traceback.format_exc())

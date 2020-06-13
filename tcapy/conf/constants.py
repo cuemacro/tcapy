@@ -64,9 +64,9 @@ class Constants(object):
     parquet_compression = 'gzip'
 
     ###### FOR TEST HARNESS ONLY
-    test_data_harness_folder = os.path.join(os.path.dirname(root_folder), 'tests_harness_data')
+    test_data_harness_folder = os.path.join(os.path.dirname(root_folder), 'tests/resources')
     test_harness_sql_trade_data_database_name = 'trade_database_test_harness'
-    test_harness_tickers = {'EURUSD': 'EURUSD'}
+    test_harness_tickers = {'EURUSD' : 'EURUSD', 'USDJPY' : 'USDJPY'}
 
     ###### SETUP ENVIRONMENT VARIABLES ######
     plat = str(platform.platform()).lower()
@@ -80,6 +80,7 @@ class Constants(object):
     default_asset_class = 'fx'
 
     friday_close_utc_hour = 22; sunday_open_utc_hour = 20
+    friday_close_nyc_hour = 17;
 
     weekend_period_seconds = 48 * 3600
 
@@ -466,7 +467,7 @@ class Constants(object):
     # On Windows recommend using 'thread', whilst on Linux preferred to use 'multiprocess'
     database_populator_threading_library = 'multiprocess'
 
-    # Allow use of multithreading in general (if set to False, will avoid eg. using Celery)
+    # Allow use of use_multithreading in general (if set to False, will avoid eg. using Celery)
     use_multithreading = True
 
     parallel_library = 'multiprocess' # For the default swim
@@ -603,6 +604,18 @@ class Constants(object):
                 pass
 
         elif Constants.tcapy_version == 'test_tcapy':
+            # Override fields related to assets etc. which are proprietary to each client
+            try:
+                from tcapygen.constantsgen import ConstantsGen
+                cred_keys = ConstantsGen.__dict__.keys()
+
+                for k in ConstantsGen.__dict__.keys():
+                    if k in cred_keys and '__' not in k:
+                        setattr(Constants, k, getattr(ConstantsGen, k))
+            except:
+                pass
+
+        elif Constants.tcapy_version == 'gen':
             # Override fields related to assets etc. which are proprietary to each client
             try:
                 from tcapygen.constantsgen import ConstantsGen

@@ -22,6 +22,7 @@ import copy
 from random import randint
 
 from tcapy.conf.constants import Constants
+from tcapy.util.utilfunc import UtilFunc
 from tcapy.util.loggermanager import LoggerManager
 
 constants = Constants()
@@ -41,7 +42,7 @@ class TimeSeriesOps(object):
                               'sep': 9, 'oct': 10, 'nov': 11, 'dec': 12}
 
     def __init__(self):
-        pass
+        self._util_func = UtilFunc()
         # self.logger = LoggerManager().getLogger(__name__)
 
     def concat_dataframe_list(self, df_list, sort=True):

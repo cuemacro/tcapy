@@ -17,7 +17,11 @@ discuss later.
 tcapy is tested for use with Python 3.6 and does not support any version of Python 2, and do not use it with earlier
 versions of Python 3.
 
-In the future, I'm planning on making a Docker container to install tcapy (and potentionally also to have tcapy available in `conda` and `pip`).
+# Docker Installation (working on!)
+
+I'm planning on making a Docker container to install tcapy (and potentionally also to have tcapy available in `pip`). It
+has been included in the repo but still needs proper testing. Thanks to Thomas Schmelzer (@tschm) for working on this element 
+and helping me a lot on the Docker part.
 
 ## Download tcapy to your machine
 

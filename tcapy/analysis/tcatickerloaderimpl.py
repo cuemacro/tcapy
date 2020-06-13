@@ -137,7 +137,7 @@ class TCATickerLoaderImpl(TCATickerLoader):
             market_df = super(TCATickerLoaderImpl, self).get_market_data(market_request)
 
         # Return as a cache handle (which can be easily passed across Celery for example)
-        # Only if multithreading
+        # Only if use_multithreading
         if return_cache_handles and market_request.use_multithreading:
             return volatile_cache.put_dataframe_handle(market_df,
                 use_cache_handles=market_request.multithreading_params['cache_period_market_data'])
@@ -210,6 +210,7 @@ class TCATickerLoaderImpl(TCATickerLoader):
         return trade_df
 
     def calculate_metrics_single_ticker(self, market_trade_order_combo, tca_request, dummy_market):
+
         volatile_cache = Mediator.get_volatile_cache(volatile_cache_engine=self._volatile_cache_engine)
 
         market_df, trade_order_df_values, ticker, trade_order_df_keys \

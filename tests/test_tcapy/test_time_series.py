@@ -14,10 +14,11 @@ import numpy as np
 from datetime import timedelta
 from pandas.testing import assert_frame_equal
 
-
 from tcapy.util.timeseries import TimeSeriesOps
 
 from tcapy.util.customexceptions import *
+
+from tests.config import *
 
 ticker = 'EURUSD'
 start_date = '20 Apr 2017'
@@ -35,12 +36,12 @@ def test_vlookup():
 
     millseconds_tests = [100, 500]
 
-    # try perturbing by nothing, then 100 and 500 milliseconds
+    # Try perturbing by nothing, then 100 and 500 milliseconds
     for millseconds in millseconds_tests:
         df_perturb = pd.DataFrame(index=dt - timedelta(milliseconds=millseconds), columns=['rand'],
                                       data=rand_data)
 
-        # do a VLOOKUP (which should give us all the previous ones) - take off the last point (which would be AFTER
+        # Do a VLOOKUP (which should give us all the previous ones) - take off the last point (which would be AFTER
         # our perturbation)
         search, dt_search = TimeSeriesOps().vlookup_style_data_frame(dt[0:-1], df_perturb, 'rand')
 
@@ -94,7 +95,7 @@ def test_remove_consecutive_duplicates():
     df['bid'] = np.random.random(len(dt))
     df['ask'] = np.random.random(len(dt))
 
-    # filter by 'mid'
+    # Filter by 'mid'
     df2 = df.copy()
 
     df2.index = df2.index + timedelta(seconds=10)
@@ -106,7 +107,7 @@ def test_remove_consecutive_duplicates():
 
     assert_frame_equal(df_new, df)
 
-    # for 'bid' and 'ask'
+    # For 'bid' and 'ask'
     df2 = df.copy()
 
     df2.index = df2.index + timedelta(seconds=10)

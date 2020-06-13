@@ -46,7 +46,7 @@ def tca_example_csv_trade_data_dukascopy():
     csv_trade_order_mapping = OrderedDict([('trade_df', os.path.join(folder, 'small_test_trade_df.csv')),
                                            ('order_df', os.path.join(folder, 'small_test_order_df.csv'))])
 
-    # Specify the TCA request (note: by specifiying multithreading is False, we avoid dependencies like Celery
+    # Specify the TCA request (note: by specifiying use_multithreading is False, we avoid dependencies like Celery
 
     # Depending on how the caching is setup, tcapy may try to download market data in monthly/weekly chunks and cache them,
     # To force deletion of the cache you can run the below
@@ -92,7 +92,7 @@ def tca_example_csv_trade_data_dukascopy_no_redis():
     csv_trade_order_mapping = OrderedDict([('trade_df', os.path.join(folder, 'small_test_trade_df.csv')),
                                            ('order_df', os.path.join(folder, 'small_test_order_df.csv'))])
 
-    # Specify the TCA request (note: by specifiying multithreading is False, we avoid dependencies like Celery
+    # Specify the TCA request (note: by specifiying use_multithreading is False, we avoid dependencies like Celery
 
     # Depending on how the caching is setup, tcapy may try to download market data in monthly/weekly chunks and cache them,
     # To force deletion of the cache you can run the below

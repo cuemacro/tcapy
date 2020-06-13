@@ -306,7 +306,8 @@ class DatabasePopulator(ABC):
             else:
                 logger.info("Downloading new data for " + ticker + ".")
 
-            # Date range may not work with timezones
+            # Date range may not work with timezones, so strip these back as naive -
+            # but we assume timezone is UTC later on when deciding to strip weekends
             start_date = pd.Timestamp(start_date.replace(tzinfo=None))
             finish_date = pd.Timestamp(finish_date.replace(tzinfo=None))
 
@@ -338,7 +339,7 @@ class DatabasePopulator(ABC):
                 # Loop by day (otherwise can end up with too many open files!)
                 for i in range(0, len(start_date_list) - 1):
 
-                    # Specifying a chunk size can also be helpful for multithreading a request
+                    # Specifying a chunk size can also be helpful for use_multithreading a request
                     if chunk_size_str is not None:
                         start_date_hist, finish_date_hist = UtilFunc().split_into_freq(
                             start_date_list[i], start_date_list[i + 1], freq=chunk_size_str, chunk_int_min=chunk_int_min)
@@ -346,9 +347,10 @@ class DatabasePopulator(ABC):
                         start_date_hist = [start_date_list[i]]
                         finish_date_hist = [start_date_list[i + 1]]
 
-                    # For FX and most other markets we should remove weekends (cryptocurrencies do have weekend data)
+                    # For FX and most other markets we should remove weekends (Note: cryptocurrencies do have weekend data)
                     if self._remove_weekend_points():
-                        start_date_hist, finish_date_hist = UtilFunc().remove_weekend_points(start_date_hist, finish_date_hist)
+                        start_date_hist, finish_date_hist = UtilFunc().remove_weekend_points(start_date_hist, finish_date_hist,
+                                                                                             timezone='UTC')
 
                     output = []
 
@@ -479,7 +481,7 @@ class DatabasePopulator(ABC):
 
     def combine_mini_df_from_disk(self, tickers=None, remove_duplicates=True):
         """Combines the mini HDF5/Parquet files for eg. 5 min chunks and combine into a very large HDF5/Parquet file, which is likely to be
-        for multiple months of data. Uses multithreading to speed up, by using a thread for each different ticker.
+        for multiple months of data. Uses use_multithreading to speed up, by using a thread for each different ticker.
 
         Parameters
         ----------
@@ -604,7 +606,7 @@ class DatabasePopulator(ABC):
 
     def write_df_to_db(self, tickers=None, remove_duplicates=True, if_exists_table='append', if_exists_ticker='replace'):
         """Loads up a large HDF5/Parquet file from disk into a pd DataFrame and then dumps locally.
-        Uses multithreading to speed it up, by using a thread for each different ticker.
+        Uses use_multithreading to speed it up, by using a thread for each different ticker.
 
         Parameters
         ----------
@@ -738,7 +740,7 @@ class DatabasePopulatorNCFX(DatabasePopulator):
             weekend_data = "Weekend? " + key
 
             weekday_point = UtilFunc().is_weekday_point(start_time_stamp, finish_time_stamp,
-                                                        friday_close_utc_hour=constants.friday_close_utc_hour,
+                                                        friday_close_nyc_hour=constants.friday_close_utc_hour,
                                                         sunday_open_utc_hour=constants.sunday_open_utc_hour)
 
             if not(weekday_point):

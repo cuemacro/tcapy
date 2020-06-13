@@ -93,8 +93,9 @@ class TCATickerLoader(ABC):
         if isinstance(market_request.data_store, DatabaseSource):
             # TODO improve ticker check here!
             available_tickers = [ticker]
-        elif 'csv' in market_request.data_store or 'h5' in market_request.data_store or 'gzip' in market_request.data_store or \
-                isinstance(market_request.data_store, pd.DataFrame) :
+        elif 'csv' in market_request.data_store or 'h5' in market_request.data_store or 'gzip' in market_request.data_store \
+            or 'parquet' in market_request.data_store or isinstance(market_request.data_store, pd.DataFrame) :
+
             # For CSV (or H5) we don't have much choice, and could differ between CSV files (if CSV has 'ticker' field, will
             # match on that)
             available_tickers = [ticker]
@@ -265,24 +266,25 @@ class TCATickerLoader(ABC):
             trade_inverted_df = self._data_factory.fetch_table(data_request=inv_trade_request)
 
             # Only add inverted trades if they exist!
-            if not (trade_inverted_df.empty):
+            if trade_inverted_df is not None:
+                if not(trade_inverted_df.empty):
 
-                invert_price_columns = ['executed_price', 'price_limit', 'market_bid', 'market_mid', 'market_ask',
-                                        'arrival_price']
-                invert_price_columns = [x for x in invert_price_columns if x in trade_inverted_df.columns]
+                    invert_price_columns = ['executed_price', 'price_limit', 'market_bid', 'market_mid', 'market_ask',
+                                            'arrival_price']
+                    invert_price_columns = [x for x in invert_price_columns if x in trade_inverted_df.columns]
 
-                # For trades (but not orders), there is an executed price field, which needs to be inverted
-                if invert_price_columns != []:
-                    trade_inverted_df[invert_price_columns] = 1.0 / trade_inverted_df[invert_price_columns].values
+                    # For trades (but not orders), there is an executed price field, which needs to be inverted
+                    if invert_price_columns != []:
+                        trade_inverted_df[invert_price_columns] = 1.0 / trade_inverted_df[invert_price_columns].values
 
-                trade_inverted_df['side'] = -trade_inverted_df['side']  # buys become sells, and vice versa!
-                trade_inverted_df['ticker'] = trade_request.ticker
+                    trade_inverted_df['side'] = -trade_inverted_df['side']  # buys become sells, and vice versa!
+                    trade_inverted_df['ticker'] = trade_request.ticker
 
-                if trade_df is not None:
-                    trade_df = trade_df.append(trade_inverted_df)
-                    trade_df = trade_df.sort_index()
-                else:
-                    trade_df = trade_inverted_df
+                    if trade_df is not None:
+                        trade_df = trade_df.append(trade_inverted_df)
+                        trade_df = trade_df.sort_index()
+                    else:
+                        trade_df = trade_inverted_df
 
         # Check if trade data is not empty? if it is return None
         if self._check_is_empty_trade_order(trade_df, tca_request, start_date, finish_date, trade_order_type):
@@ -615,6 +617,7 @@ class TCATickerLoader(ABC):
                                        ticker=ticker, data_store=tca_request.market_data_store,
                                        data_offset_ms=tca_request.market_data_offset_ms,
                                        use_multithreading=tca_request.use_multithreading,
+                                       market_data_database_table=tca_request.market_data_database_table,
                                        multithreading_params=tca_request.multithreading_params)
 
         market_conversion_df = self.get_market_data(market_request)
@@ -767,7 +770,7 @@ class TCATickerLoader(ABC):
 
                 market_df = market_df.sort_index()
 
-        # Check if there's any market data? if we have none at all, then can't do any TCA, so give up!
+        # Check if there's any market data? if we have none at all, then can't do any TCA, so warn user...
         if market_df is None or len(market_df.index) == 0:
             err_msg = "No market data between selected dates for " + ticker + " between " + str(start_date) + " - " \
                       + str(finish_date)

@@ -156,6 +156,20 @@ class TCAEngineImpl(TCAEngine):
 
             return None
 
+        contains_data = False
+
+        for t in trade_order_results_df_dict:
+            if t is None:
+                contains_data = contains_data or False
+            else:
+                if isinstance(trade_order_results_df_dict[t], pd.DataFrame):
+                    if not(trade_order_results_df_dict[t].empty):
+                        contains_data = True
+
+        if not(contains_data):
+            raise DataMissingException("Raise no data for " + str(tca_request.ticker) + " between " + str(tca_request.start_date) +
+                                       " - " + str(tca_request.finish_date))
+
         return trade_order_results_df_dict
 
     def get_engine_description(self):
