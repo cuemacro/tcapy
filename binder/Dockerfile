@@ -5,7 +5,7 @@ FROM tschm/jupyter as builder
 
 COPY --chown=jovyan:users  . /tmp/tcapy
 
-# install snappy for pystore
+# Install snappy for pystore
 USER root
 
 RUN apt-get update && \
@@ -16,4 +16,4 @@ RUN apt-get update && \
 USER $NB_UID
 
 RUN pip install --no-cache-dir /tmp/tcapy && \
-    rm  -rf /tmp/tcapy
+    rm -rf /tmp/tcapy
