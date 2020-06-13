@@ -29,7 +29,7 @@ constants = Constants()
 
 from tcapy.analysis.tcaengine import TCARequest, TCAEngineImpl
 
-from tests.config import *
+from test.config import *
 
 ########################################################################################################################
 # YOU MAY NEED TO CHANGE TESTING PARAMETERS IF YOUR DATABASE DOESN'T COVER THESE DATES

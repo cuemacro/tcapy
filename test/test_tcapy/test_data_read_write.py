@@ -36,7 +36,7 @@ from tcapy.data.databasesource import \
 from tcapy.util.mediator import Mediator
 from tcapy.util.customexceptions import *
 
-from tests.config import *
+from test.config import *
 
 logger = LoggerManager().getLogger(__name__)
 

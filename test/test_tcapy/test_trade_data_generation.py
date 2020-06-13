@@ -32,7 +32,7 @@ finish_date = '31 May 2017'
 
 use_market_data_test_csv = True
 
-from tests.config import *
+from test.config import *
 
 logger.info('Make sure you have created folder ' + constants.csv_folder + ' & ' + constants.temp_data_folder +
             ' otherwise tests will fail')

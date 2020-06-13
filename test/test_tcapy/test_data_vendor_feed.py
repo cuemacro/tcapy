@@ -24,7 +24,7 @@ from tcapy.util.utilfunc import UtilFunc
 from tcapy.data.databasepopulator import DatabasePopulatorNCFX, DatabasePopulatorDukascopy
 from tcapy.data.databasesource import DatabaseSourceNCFX, DatabaseSourceDukascopy
 
-from tests.config import *
+from test.config import *
 
 logger = LoggerManager().getLogger(__name__)
 

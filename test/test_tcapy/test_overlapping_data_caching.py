@@ -22,7 +22,7 @@ from tcapy.analysis.algos.resultsform import *
 
 from collections import OrderedDict
 
-from tests.config import *
+from test.config import *
 
 constants = Constants()
 logger = LoggerManager().getLogger(__name__)

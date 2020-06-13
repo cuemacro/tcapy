@@ -16,7 +16,7 @@ from tcapy.util.utilfunc import UtilFunc
 
 from tcapy.analysis.algos.resultssummary import ResultsSummary
 
-from tests.config import *
+from test.config import *
 
 logger = LoggerManager().getLogger(__name__)
 

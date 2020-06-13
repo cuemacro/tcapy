@@ -26,7 +26,7 @@ from tcapy.analysis.tradeorderfilter import *
 from tcapy.vis.tcaresults import TCAResults
 from tcapy.vis.report.tcareport import TCAReport
 
-from tests.config import *
+from test.config import *
 
 constants = Constants()
 logger = LoggerManager().getLogger(__name__)

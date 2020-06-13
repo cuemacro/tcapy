@@ -21,7 +21,7 @@ from tcapy.util.mediator import Mediator
 
 from tcapy.data.databasesource import DatabaseSourceMySQL, DatabaseSourceArctic
 
-from tests.config import *
+from test.config import *
 
 logger = LoggerManager().getLogger(__name__)
 

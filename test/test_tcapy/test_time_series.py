@@ -18,7 +18,7 @@ from tcapy.util.timeseries import TimeSeriesOps
 
 from tcapy.util.customexceptions import *
 
-from tests.config import *
+from test.config import *
 
 ticker = 'EURUSD'
 start_date = '20 Apr 2017'
