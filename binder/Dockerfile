@@ -2,6 +2,7 @@ FROM tschm/jupyter as builder
 
 # File Author / Maintainer
 # MAINTAINER Thomas Schmelzer "thomas.schmelzer@gmail.com"
+ENV HOME /home/${NB_USER}
 
 COPY --chown=jovyan:users  . /tmp/tcapy
 

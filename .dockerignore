@@ -5,8 +5,9 @@
 
 !requirements.txt
 
-!test
+!tests
 !tcapy
+!tcapy_notebooks
 !setup.py
 !README.md
 !requirements.txt
