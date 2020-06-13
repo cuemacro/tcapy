@@ -15,7 +15,7 @@ USER root
 
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
-    libsnappy-dev gcc g++
+    libsnappy-dev gcc g++ unixodbc-dev
 
 # Switch back to jovyan to avoid accidental container runs as root
 USER $NB_UID

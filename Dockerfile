@@ -6,7 +6,7 @@ FROM python:3.7.7-slim-stretch as builder
 
 COPY requirements.txt /tmp/tcapy/requirements.txt
 
-RUN buildDeps='gcc g++ libsnappy-dev' && \
+RUN buildDeps='gcc g++ libsnappy-dev unixodbc-dev' && \
     apt-get update && apt-get install -y $buildDeps --no-install-recommends && \
     pip install --no-cache-dir -r /tmp/tcapy/requirements.txt && \
     rm  /tmp/tcapy/requirements.txt
