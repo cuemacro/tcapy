@@ -8,6 +8,7 @@
 !tests
 !tcapy
 !tcapy_notebooks
+!tcapygen
 !setup.py
 !README.md
 !requirements.txt
