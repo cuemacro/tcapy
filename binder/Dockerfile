@@ -5,6 +5,10 @@ FROM tschm/jupyter as builder
 
 COPY --chown=jovyan:users  . /tmp/tcapy
 
+COPY . ${HOME}
+USER root
+RUN chown -R ${NB_UID} ${HOME}
+
 # Install snappy for pystore
 USER root
 
