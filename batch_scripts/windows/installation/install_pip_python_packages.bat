@@ -12,7 +12,7 @@ if %TCAPY_PYTHON_ENV_TYPE%==virtualenv (
     REM Install everything by pip
     call pip install ^
         setuptools-git==1.2 cython==0.29.13 arctic==1.79.2 sqlalchemy==1.3.7 redis==3.3.7 pymssql==2.1.4 ^
-        pandas=0.24.2 numpy==1.16.4 scipy==1.3.1 statsmodels==0.10.1 pytables==3.5.2 blosc==1.8.3 pyarrow==0.16.0 ^
+        pandas==0.24.2 numpy==1.16.4 scipy==1.3.1 statsmodels==0.10.1 pytables==3.5.2 blosc==1.8.3 pyarrow==0.16.0 ^
         pathos==0.2.1 multiprocess==0.70.8 fastparquet==0.3.3 ^
         flask-restplus==0.13.0 ^
         beautifulsoup4==4.8.0 psutil==5.6.3 ^
@@ -29,7 +29,7 @@ if %TCAPY_PYTHON_ENV_TYPE%==virtualenv (
         celery==4.4.0 msgpack-python pytest-tap kombu==4.6.7 python-memcached==1.59 ^
         numba==0.48.0 vispy==0.6.4 pdfkit==0.6.1 jinja2==2.11.1 xlwings==0.19.4 ^
         jupyterlab jupyter_contrib_nbextensions jupyter_nbextensions_configurator RISE bqplot WeasyPrint==51 ^
-        dask==2.14.0 distributed==2.14.0 cloudpickle==1.3.0 python-snappy==0.5.4 bokeh=2.0.1 msgpack==1.0.0 pystore==0.1.15 ^
+        dask==2.14.0 distributed==2.14.0 cloudpickle==1.3.0 python-snappy==0.5.4 bokeh==2.0.1 msgpack==1.0.0 pystore==0.1.15 ^
         fsspec==0.3.3
 
 
