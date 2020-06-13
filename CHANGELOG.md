@@ -5,10 +5,10 @@
 * No official releases yet
 
 ## Coding log
-* xx Jun 2020
+* 13 Jun 2020
     * Beginning process of Dockerizing the project
     * Adding Binder
-    * Making tests self contained
+    * Making tests self contained and reorganized
         * Add necessary test market/trade data to databases before running tests
     * Numerous bug fixes
 * 12 Jun 2020
