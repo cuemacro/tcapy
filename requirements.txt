@@ -12,3 +12,5 @@ fsspec==0.3.3
 influxdb
 qpython
 findatapy
+dash_html_components
+dash
