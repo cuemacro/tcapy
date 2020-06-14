@@ -63,7 +63,7 @@ also work purely at a trade level, as well on both trades and orders.
 
 # What should the format of my trade and orders be?
 
-tcapy expects your orders in a specific format with specific field names, which can viewed under the `tests_harness_data` folder:
+tcapy expects your orders in a specific format with specific field names, which can viewed under the `test/resources` folder:
 * `small_test_order_df.csv` for the format of the orders
 * `small_test_trade_df.csv` for the format of the trades
 
