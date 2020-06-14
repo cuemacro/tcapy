@@ -5,6 +5,8 @@
 * No official releases yet
 
 ## Coding log
+* 14 Jun 2020
+    * Minor changes to Docker
 * 13 Jun 2020
     * Beginning process of Dockerizing the project
     * Adding Binder
