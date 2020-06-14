@@ -1,0 +1,36 @@
+name: Python package
+
+on: [push]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [3.6, 3.7]
+
+    steps:
+      - name: checkout
+        uses: actions/checkout@v2
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install nbconvert
+
+      - name: Convert Notebooks
+        run: |
+          jupyter nbconvert --output-dir=./slides ./binder/tcapy_notebooks/*.ipynb --to html
+
+      - name: Artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          # declare the artifacts...
+          name: slides
+          path: slides
