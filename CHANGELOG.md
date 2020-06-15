@@ -5,6 +5,8 @@
 * No official releases yet
 
 ## Coding log
+* 16 Jun 2020
+    * Adding tcapy quick guide & microstructure notebooks
 * 14 Jun 2020
     * Minor changes to Docker
 * 13 Jun 2020

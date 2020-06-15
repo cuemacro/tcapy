@@ -10,7 +10,7 @@ COPY . ${HOME}
 USER root
 RUN chown -R ${NB_UID} ${HOME}
 
-# Install snappy for pystore
+# Install snappy for pystore and ODBC
 USER root
 
 RUN apt-get update && \

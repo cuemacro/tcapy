@@ -128,6 +128,12 @@ will not function fully in Binder. However, all other examples, which don't rely
 
 Also see [here](tcapy_notebooks/jupyter_notebooks_description.md), which lists all the notebooks
 
+* [A 10 minute view of tcapy](tcapy_notebooks/a_10_minute_view_of_tcapy.ipynb) - quick guide to
+ doing simple TCA calculcations in Python with tcapy ([nbviewer](https://nbviewer.jupyter.org/github/cuemacro/tcapy/blob/master/tcapy_notebooks/a_10_minute_view_of_tcapy.ipynb)
+or [run on Binder](https://mybinder.org/v2/gh/cuemacro/tcapy/master?filepath=tcapy_notebooks/a_10_minute_view_of_tcapy.ipynb))
+
+We also have many more detailed notebooks:
+
 * [Introducing tcapy and explaining TCA](tcapy_notebooks/introducing_tcapy.ipynb) - how to use tcapy in more detail 
 and gives many examples of how to call it programmatically 
 ([nbviewer](https://nbviewer.jupyter.org/github/cuemacro/tcapy/blob/master/tcapy_notebooks/introducing_tcapy.ipynb)
@@ -152,6 +158,10 @@ or [run on Binder](https://mybinder.org/v2/gh/cuemacro/tcapy/master?filepath=tca
 TCA case study on the FX trade data of a Swedish asset manager
 ([nbviewer](https://nbviewer.jupyter.org/github/cuemacro/tcapy/blob/master/tcapy_notebooks/real_life_tcapy_case_study.ipynb)
 or [run on Binder](https://mybinder.org/v2/gh/cuemacro/tcapy/master?filepath=tcapy_notebooks/real_life_tcapy_case_study.ipynb))
+* [Market microstructure with tcapy](tcapy_notebooks/market_microstructure_with_tcapy.ipynb) - generating results for
+spreads and volatility using tick data
+([nbviewer](https://nbviewer.jupyter.org/github/cuemacro/tcapy/blob/master/tcapy_notebooks/market_microstructure_with_tcapy.ipynb)
+or [run on Binder](https://mybinder.org/v2/gh/cuemacro/tcapy/master?filepath=tcapy_notebooks/market_microstructure_with_tcapy.ipynb))
 
 
 A few things to note:
