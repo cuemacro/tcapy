@@ -779,7 +779,7 @@ class DatabaseSourceCSVBinary(DatabaseSourceCSV):
                 raise Exception(err_msg)
 
             # Read Parquet file
-            df = pd.read_parquet(csv_file_path)
+            df = pd.read_parquet(csv_file_path, engine=constants.parquet_engine)
 
         elif '.h5' in csv_file_path:
             # For an H5 file

@@ -258,7 +258,7 @@ class UtilFunc(object):
 
                     return data_frame
 
-                return pd.read_parquet(fname)
+                return pd.read_parquet(fname, engine=constants.parquet_engine)
             except Exception as e:
                 logger.error("No valid data for " + fname + ': ' + str(e))
 
@@ -324,7 +324,7 @@ class UtilFunc(object):
         if format == 'parquet':
             if data_frame is not None:
                 if not (data_frame.empty):
-                    data_frame.to_parquet(fname, compression=constants.parquet_compression)
+                    data_frame.to_parquet(fname, compression=constants.parquet_compression, engine=constants.parquet_engine)
 
         elif format == 'hdf5':
             if data_frame is not None:

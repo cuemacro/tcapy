@@ -62,6 +62,9 @@ class Constants(object):
     # 'snappy' or 'gzip'
     parquet_compression = 'gzip'
 
+    # 'fastparquet' or 'pyarrow' (can have issues with pyarrow in Jupyter)
+    parquet_engine = 'fastparquet'
+
     ###### FOR TEST HARNESS ONLY
     test_data_harness_folder = os.path.join(os.path.dirname(root_folder), 'tests/resources')
     test_harness_sql_trade_data_database_name = 'trade_database_test_harness'
