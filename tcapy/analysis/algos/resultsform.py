@@ -334,7 +334,9 @@ class BarResultsForm(ResultsForm):
                                                                        aggregate_by_field=agg,
                                                                        aggregation_metric=aggregation_metric,
                                                                        weighting_field=weighting_field,
-                                                                       by_date=self._by_date) * scalar
+                                                                       by_date=self._by_date)
+
+                    results_df = results_df * scalar
 
                     results_df = self._time_series_ops.round_dataframe(results_df, round_figures_by)
 

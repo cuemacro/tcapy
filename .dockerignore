@@ -19,3 +19,7 @@
 **/.cache
 **/.pytest_cache
 **/*.log
+**/server.*
+**/.idea
+**/.github
+**/.git

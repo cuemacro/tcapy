@@ -282,8 +282,7 @@ class ResultsSummary(object):
 
         # TODO weighting field
 
-        # eg. aggregate output by 'vendor' and calculate the average slippage per 'vendor'
-        group = [aggregate_by_field]
+        group = []
 
         if by_date is not None:
 
@@ -329,6 +328,9 @@ class ResultsSummary(object):
 
             if aggregate_by_field is not None:
                 group.append(aggregate_by_field)
+        else:
+            # eg. aggregate output by 'vendor' and calculate the average slippage per 'vendor'
+            group = [aggregate_by_field]
 
         displayed_fields = [metric_name, weighting_field]
 

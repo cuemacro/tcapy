@@ -5,6 +5,9 @@
 * No official releases yet
 
 ## Coding log
+* 17 Jun 2020
+    * Bug fixes for loading GUI
+    * Fix for ResultsSummary aggregation of results
 * 16 Jun 2020
     * Adding tcapy quick guide & microstructure notebooks
 * 14 Jun 2020
