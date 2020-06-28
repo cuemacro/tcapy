@@ -5,7 +5,7 @@
 # to allow Plotly to create PNG
 #
 # If you install with conda you don't need to do this, you can just do something like...
-#   conda install -c plotly plotly-orca=1.2.1 --yes
+#   conda install -c plotly plotly-orca=1.3.1 --yes
 
 export SCRIPT_FOLDER="$( dirname "$(readlink -f -- "$0")" )"
 source $SCRIPT_FOLDER/set_tcapy_env_vars.sh

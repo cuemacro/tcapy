@@ -16,6 +16,16 @@ import pickle
 
 import ssl
 
+def docker_var(docker_var, normal_var):
+
+    try:
+        if os.environ.get('APP_ENV') == 'docker':
+            return docker_var
+    except:
+        pass
+
+    return normal_var
+
 class Constants(object):
     """The constants of tcapy are stored here. They govern behavior such as: tickers, settings, markout
     and resampling settings, asset list, logging functionality and chart settings.
@@ -322,8 +332,6 @@ class Constants(object):
     # Might be necessary if trying to parallelize computations
     re_sort_market_data_when_assembling = False
 
-    database_host = '127.0.0.1'  # default database host
-
     # Line chunks to read csv when parsing into database
     csv_read_chunksize = 10 ** 6  # 10 ** 2 # very small chunk size
 
@@ -334,7 +342,7 @@ class Constants(object):
     sql_dump_record_chunksize = 100000
 
     ## SQL Server specific
-    ms_sql_server_host = database_host
+    ms_sql_server_host = 'localhost'
     ms_sql_server_port = '1433'
 
     ms_sql_server_odbc_driver = "ODBC+Driver+17+for+SQL+Server"
@@ -360,7 +368,7 @@ class Constants(object):
          ('order_df', '[dbo].[order]')])  # Name of table which has orders from client
 
     ## Postgres specific
-    postgres_host = '127.0.0.1'
+    postgres_host = docker_var('postgres', 'localhost')
     postgres_port = '1033'
 
     postgres_trade_data_database_name = 'trade_database'
@@ -369,7 +377,7 @@ class Constants(object):
     postgres_password = 'TODO'
 
     ## MySQL
-    mysql_host = '127.0.0.1'
+    mysql_host = docker_var('mysql', 'localhost')
     mysql_port = '3306'
 
     mysql_trade_data_database_name = 'trade_database'
@@ -397,7 +405,7 @@ class Constants(object):
     pystore_market_data_database_table = 'market_data_table'
 
     ### Arctic/MongoDB
-    arctic_host = database_host
+    arctic_host = docker_var('mongodb', 'localhost')
     arctic_port = 27017
     arctic_username = 'OVERWRITE_IN_ConstantsCred'
     arctic_password = 'OVERWRITE_IN_ConstantsCred'
@@ -433,7 +441,7 @@ class Constants(object):
     kdb_market_data_database_table = 'market_data_table'
 
     ### InfluxDB tickers
-    influxdb_host = 'localhost'
+    influxdb_host = docker_var('influxdb', 'localhost')
     influxdb_port = 8086
     influxdb_username = None
     influxdb_password = None
@@ -510,7 +518,7 @@ class Constants(object):
     volatile_cache_engine = 'redis' # 'redis' (TODO 'plasma')
 
     # Redis settings (for internal usage - not Celery message broker - those settings need to be specified seperately)
-    volatile_cache_host_redis = '127.0.0.1'
+    volatile_cache_host_redis = docker_var('redis', 'localhost')
     volatile_cache_port_redis = '6379'
     volatile_cache_timeout_redis = 3000
     volatile_cache_redis_internal_database = 1  # For storing tcapy data (as opposed to for message broker reasons with Celery)
@@ -540,8 +548,8 @@ class Constants(object):
     # Using Redis as both can result in race conditions, because tcapy extensively uses Redis to cache datasets
     # alternatively: amqp/RabbitMQ as the result_backend, but this is deprecated on Celery and is more difficult to configure
 
-    celery_broker_url = 'redis://localhost:6379/0';
-    celery_result_backend = "cache+memcached://127.0.0.1:11211/"
+    celery_broker_url = docker_var('redis://redis:6379/0', 'redis://localhost:6379/0')
+    celery_result_backend = docker_var("cache+memcached://memcached:11211/", "cache+memcached://localhost:11211/")
 
     # celery_result_backend = "amqp://tcapy:tcapy@localhost:5672//" # RabbitMQ
 

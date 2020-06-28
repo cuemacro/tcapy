@@ -36,7 +36,7 @@ data_source = 'dukascopy'
 
 # Change the market and trade data store as necessary
 market_data_store = 'arctic-' + data_source
-trade_data_store = 'ms_sql_server'
+trade_data_store = 'mysql'
 
 tca_version = constants.tcapy_version
 
@@ -125,7 +125,7 @@ def single_ticker_tca_example():
 
                                               # At the spread at the time of every trade/order
                                               BenchmarkMarketSpreadToMid()],
-                             trade_order_mapping=trade_order_list, use_multithreading=True)
+                             trade_order_mapping=trade_order_list, use_multithreading=False)
 
     # Dictionary of dataframes as output from TCA calculation
     dict_of_df = tca_engine.calculate_tca(tca_request)
@@ -391,13 +391,13 @@ if __name__ == '__main__':
 
     Mediator.get_volatile_cache().clear_cache()
 
-    #single_ticker_tca_example()
-    #simplest_tca_single_ticker_example()
+    single_ticker_tca_example()
+    simplest_tca_single_ticker_example()
     single_ticker_tca_example_1600LDN_benchmark()
-    #multiple_ticker_tca_aggregated_example()
-    #venue_tca_aggregated_example()
-    #compare_multithreading_type()
-    #multiple_ticker_tca_aggregated_with_results_example()
+    multiple_ticker_tca_aggregated_example()
+    venue_tca_aggregated_example()
+    compare_multithreading_type()
+    multiple_ticker_tca_aggregated_with_results_example()
 
     finish = time.time()
     print('Status: calculated ' + str(round(finish - start, 3)) + "s")

@@ -1286,7 +1286,8 @@ class DatabaseSourceSQL(DatabaseSource):
     def _create_database_not_exists(self, database_name=None):
         # Create database if it doesn't exist
         if database_name is not None:
-            engine = create_engine(self._create_connection_string(database_name=None, table_name=None))
+            conn_str = self._create_connection_string(database_name=None, table_name=None)
+            engine = create_engine(conn_str)
 
             try:
                 engine.execute("CREATE DATABASE IF NOT EXISTS {0} ".format(database_name))
@@ -1440,6 +1441,8 @@ class DatabaseSourceMSSQLServer(DatabaseSourceSQL):
 
             # if table_name is not None:
             #    con_exp = con_exp + "::" + table_name
+        else:
+            con_exp = con_exp + "/"
 
         if constants.ms_sql_server_python_package == 'pyodbc':
             con_exp = con_exp + "?driver=" + constants.ms_sql_server_odbc_driver

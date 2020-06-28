@@ -5,11 +5,25 @@ services:
       context: .
       dockerfile: Dockerfile
       target: builder
+    environment:
+      - APP_ENV=docker
+    depends_on:
+      - redis
 
   jupyter:
     build:
       context: .
       dockerfile: binder/Dockerfile
       target: builder
+    environment:
+      - APP_ENV=docker
     ports:
       - 8888:8888
+    depends_on:
+      - redis
+
+  redis:
+    image: "redis:alpine"
+    command: redis-server --bind 0.0.0.0 --port 6379 --save ""
+    ports:
+      - 6379:6379

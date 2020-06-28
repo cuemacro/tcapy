@@ -13,7 +13,6 @@ RUN buildDeps='gcc g++ libsnappy-dev unixodbc-dev' && \
     # && \
     #apt-get purge -y --auto-remove $buildDeps
 
-
 COPY ./tcapy /tcapy/tcapy
 
 #### Here the test-configuration

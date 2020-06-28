@@ -22,3 +22,5 @@ USER $NB_UID
 
 RUN pip install --no-cache-dir /tmp/tcapy && \
     rm -rf /tmp/tcapy
+
+RUN ln -s /home/${NB_USER}/tcapy_notebooks /home/${NB_USER}/work/tcapy_notebooks
