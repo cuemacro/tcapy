@@ -5,8 +5,9 @@
 * No official releases yet
 
 ## Coding log
-* xx Jun 2020
+* 28 Jun 2020
     * Note, issues with Docker with credential error [fix](https://github.com/docker/compose/issues/6517)
+        * `~/.docker/config.json` - `credsStore` key may need to be removed with Docker Desktop
     * Fixed connection URL for Microsoft SQL Server
     * Added Redis to Docker compose
 * 17 Jun 2020
