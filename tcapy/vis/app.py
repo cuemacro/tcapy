@@ -24,7 +24,7 @@ server=Flask(__name__)
 # url_prefix = '' # for debugging when starting server directly
 debug_start_flask_server_directly = constants.debug_start_flask_server_directly
 
-# add a static image/css route that serves images from desktop
+# Add a static image/css route that serves images from desktop
 # be *very* careful here - you don't want to serve arbitrary files
 # from your computer or server
 if debug_start_flask_server_directly:
@@ -50,7 +50,7 @@ app.server.secret_key = constants.secret_key
 
 cur_directory = app.server.root_path
 
-# allow tcapy to be hosted on a different url eg. not on root
+# Allow tcapy to be hosted on a different url eg. not on root
 if debug_start_flask_server_directly:
     url_prefix = ''
 
@@ -65,7 +65,7 @@ else:
         'requests_pathname_prefix': constants.requests_pathname_prefix
     })
 
-# this loads up a user specific version of the layout and TCA application
+# This loads up a user specific version of the layout and TCA application
 if constants.tcapy_version == 'user':
     from tcapyuser.layoutuser import *; layout = LayoutImplUser(url_prefix=url_prefix)
     from tcapyuser.tcacalleruser import TCACallerImplUser as TCACaller
@@ -88,12 +88,12 @@ app.scripts.config.serve_locally = True # had issues fetching JS scripts remotel
 
 logger.info("Connected to volatile cache/Redis host")
 
-# create the HTML layout for the pages (note: this is in a separate file layout.py)
+# Create the HTML layout for the pages (note: this is in a separate file layout.py)
 app.layout = layout.page_content
 
 plain_css = open(os.path.join(os.path.dirname(os.path.realpath(__file__)), 'tcapy.css'), 'r').read()
 
-# create objects for caching data for clients sessions (and also internally for the server)
+# Create objects for caching data for clients sessions (and also internally for the server)
 glob_volatile_cache = Mediator.get_volatile_cache()
 
 ########################################################################################################################

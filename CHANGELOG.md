@@ -5,6 +5,8 @@
 * No official releases yet
 
 ## Coding log
+* 01 Jul 2020
+    * Fixed database host issue
 * 28 Jun 2020
     * Note, issues with Docker with credential error [fix](https://github.com/docker/compose/issues/6517)
         * `~/.docker/config.json` - `credsStore` key may need to be removed with Docker Desktop

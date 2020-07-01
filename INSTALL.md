@@ -19,7 +19,7 @@ versions of Python 3.
 
 # Docker Installation (working on!)
 
-I'm planning on making a Docker container to install tcapy (and potentionally also to have tcapy available in `pip`). It
+I'm planning on making a Docker container to install tcapy (and also to have tcapy available in `pip`). It
 has been included in the repo but still needs proper testing. Thanks to Thomas Schmelzer (@tschm) for working on this element 
 and helping me a lot on the Docker part.
 
@@ -210,11 +210,12 @@ and then install tcapy on VirtualBox/Linux
     * WSL is a compatibility layer for running Linux binary executables natively on Windows 10
     * makes it easier to run Linux under Windows compared to using a virtual machine application such as VirtualBox
     * some of the Linux distributions that can be installed relatively easily on WSL include Ubuntu
-    * instructions are [here](https://docs.microsoft.com/en-us/windows/wsl/install-win10) for WSL 1
-    * instructions are [here](https://docs.microsoft.com/en-us/windows/wsl/wsl2-install) for WSL 2
+    * instructions are [here](https://docs.microsoft.com/en-us/windows/wsl/install-win10) for WSL1
+    * instructions are [here](https://docs.microsoft.com/en-us/windows/wsl/wsl2-install) for WSL2
         * WSL2 is now officially released, and I now use that
         [generally available shortly in the full  Windows 10 version 2004](https://devblogs.microsoft.com/commandline/wsl2-will-be-generally-available-in-windows-10-version-2004/)
-        * WSL2 offers better compatibility with Linux and offers much faster IO
+        * WSL2 offers better compatibility with Linux and offers much faster IO (under certain circumstances
+        [Compare WSL1 vs WSL2](https://docs.microsoft.com/en-us/windows/wsl/compare-versions))
     * then follow the instructions earlier ie. *tcapy installation on Linux*
     * some dependencies may work, but they are not officially supported on WSL 
         * eg. MongoDB on WSL, although in this instance, there is a Windows version of MongoDB you could use
