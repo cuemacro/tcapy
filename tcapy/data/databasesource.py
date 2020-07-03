@@ -1004,6 +1004,8 @@ class DatabaseSourceSQL(DatabaseSource):
         try:
             df = pd.read_sql(sql_query, engine)  # , coerce_float=False)
 
+            engine.dispose()
+
             records = 0
 
             if df is not None:
@@ -1235,7 +1237,6 @@ class DatabaseSourceSQL(DatabaseSource):
 
         con = engine.connect()
 
-
         # Create an primary on the Date/id/ticker (will fail if there's already an index) for trade data
         # want to prevent a situation where someone mistakenly adds same trade/order again
         try:
@@ -1266,6 +1267,8 @@ class DatabaseSourceSQL(DatabaseSource):
         # This will fail if we try to insert the *SAME* trades/orders, which have the same dates/id/tickers
         df.to_sql(sqlalchemy_table_name_tick, engine, if_exists='append', index=True,
                   schema=schema, chunksize=self._sql_dump_record_chunksize)
+
+        engine.dispose()
 
     # def _write_df_to_sql(self, df, sqlalchemy_table_name_tick, engine, schema):
     #
@@ -2040,6 +2043,8 @@ class DatabaseSourceArctic(DatabaseSourceTickData):
         else:
             item = library.read(ticker, date_range=DateRange(start_date, finish_date))
 
+        engine.close()
+
         logger.debug("Extracted Arctic/MongoDB library: " + str(table_name) + " for ticker " + str(ticker) +
                      " between " + str(start_date) + " - " + str(finish_date) + " from " + self._arctic_lib_type)
 
@@ -2267,7 +2272,6 @@ class DatabaseSourceArctic(DatabaseSourceTickData):
 
                         if temp_df is not None:
                             if not (temp_df.empty):
-                                engine.close()
 
                                 err_msg = "In Arctic/MongoDB can't append overlapping data for " + ticker + \
                                           " in " + table_name + ". Has data between " + str(
@@ -2308,6 +2312,11 @@ class DatabaseSourceArctic(DatabaseSourceTickData):
                         library.write(ticker, df)
                 else:
                     logger.info('Nothing written in ' + self._arctic_lib_type)
+
+                try:
+                    engine.close()
+                except:
+                    pass
 
     def append_market_data(self, market_df, ticker, table_name=constants.arctic_market_data_database_table,
                            if_exists_table='append', if_exists_ticker='append', remove_duplicates=True,

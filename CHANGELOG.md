@@ -5,6 +5,9 @@
 * No official releases yet
 
 ## Coding log
+* 03 Jul 2020
+    * Fixed close connection issue with SQL and MongoDB
+    * Updated microstructure notebook
 * 01 Jul 2020
     * Fixed database host issue
 * 28 Jun 2020

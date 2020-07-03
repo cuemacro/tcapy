@@ -339,6 +339,10 @@ If you install an updated version of tcapy, it is recommended you go through all
 often likely to be new (or updated) dependencies, which may include additional/updated Python libraries or external
 applications
 
+# Freeing up RAM
+
+`echo 3 > /proc/sys/vm/drop_caches`, although this is not always a good idea https://serverfault.com/questions/597115/why-drop-caches-in-linux
+
     
 
 
