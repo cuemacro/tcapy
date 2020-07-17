@@ -14,14 +14,16 @@ Note you may need slight editing of `set_tcapy_env_vars.sh` for CentOS/Amazon Li
 in general it is easier to use. Furthermore, Ubuntu is also available on WSL (Windows Subsystem for Linux), which we
 discuss later.
 
-tcapy is tested for use with Python 3.6 and does not support any version of Python 2, and do not use it with earlier
+tcapy is tested for use with Python 3.6/3.7 and does not support any version of Python 2, and do not use it with earlier
 versions of Python 3.
 
-# Docker Installation (working on!)
+## Use pip 
 
-I'm planning on making a Docker container to install tcapy (and also to have tcapy available in `pip`). It
-has been included in the repo but still needs proper testing. Thanks to Thomas Schmelzer (@tschm) for working on this element 
-and helping me a lot on the Docker part.
+If you want to use parts of tcapy as a dependency in your own Python application, you could install it using pip
+
+    pip install git+https://www.github.com/cuemacro/tcapy
+   
+If you do this you'll still likely need to install all the various dependencies etc.
 
 ## Download tcapy to your machine
 
@@ -91,7 +93,8 @@ stored there. Whenever you clone a new version of tcapy, make sure to keep a bac
 into `/home/tcapyuser/cuemacro/tcapy/tcapy/conf/`.
 
 Below, we've put a heavily simplified example of `constantscred.py` (obviously make sure your passwords are stronger
-than these!)
+than these!). Alternatively, you can set a lot of these as environment variables in the `constants.py` file, which 
+tcapy will pick up later and this is how it is typically used by Docker.
 
 ```
 class ConstantsCred(object):
@@ -104,10 +107,111 @@ class ConstantsCred(object):
     
 ```
 
-## Install tcapy dependencies
+## Docker Installation of tcapy on Linux
 
-tcapy has many dependencies, which need to be installed after cloning the tcapy project locally. We discuss what you 
-should install below.
+Usually, when we run code, we need to install all the dependencies in our OS. This can be cumbersome, because our
+various apps may have conflicting dependencies. An alternative is that we run every app in its own sandbox, a separate 
+virtual machine with it's own operating system. The downside of this is that we are going to use lots more resources. 
+Docker containers enable us to run applications independently, with their own dependencies. However, the major plus is that
+we don't need to spin up a new OS for each container, thus making them more efficient compared to VM.
+
+I've made a Docker container to install tcapy (and will also to have tcapy available in `pip`) and all its various
+dependencies.
+
+Thanks to Thomas Schmelzer (@tschm) for working on this element 
+and helping me a lot on the Docker part.
+
+* Clone the tcapy project as described above from GitHub onto your local machine in a folder like `/home/tcapyuser/cuemacro/tcapy/`
+* Install Docker
+    * On Ubuntu/WSL2 download (Docker Desktop for Windows)[https://docs.docker.com/docker-for-windows/install/] 
+    * On Ubuntu (without WSL2) see (Docker's official instructions)[https://docs.docker.com/engine/install/ubuntu/]
+* On Ubuntu/WSL2, you may have issues with Docker's path
+    * `rm ~/.docker/config.json` may fix the problem
+    * see https://github.com/docker/compose/issues/7495 for other fixes and an explanation
+
+Let's create the following folders on our host machine. These will be linked to our containers. This will allow
+us to persist data. We have deliberately chosen different folders to the standard ones for MongoDB and MySQL. We 
+want to avoid the situation where these folders are shared between our containers and databases in the host machine.
+
+`sudo mkdir -p /data/db_mongodb`
+`sudo chown -R mongodb:mongodb /data/db_mongodb`
+`sudo mkdir -p /data/db_mysql`
+`sudo chown -R mysql:mysql /data/db_mysql`
+
+In `/home/tcapyuser/cuemacro/tcapy` create a `.tcapy.env` file that has environment variables to be used by the various
+Docker containers. In particular this will be useful for holding the usernames and passwords. If this isn't used
+defaults from `constants.py` will be used instead, which won't be as secure. Here is a sample `.tcapy.env` file below:
+
+    MYSQL_USER=tcapyuser
+    MYSQL_PASSWORD=blah_blah_
+    MYSQL_ROOT_PASSWORD=blah_blah_
+    MYSQL_DATABASE=trade_database
+    MONGO_INITDB_ROOT_USERNAME=admin_root
+    MONGO_INITDB_ROOT_PASSWORD=blah_blah_
+
+Also make sure to create a `log` folder
+under `/home/tcapyuser/cuemacro/tcapy`:
+
+`sudo mkdir -p log`
+
+`docker-compose.yml` defines all the various containers which will need to be installed. For some of these images 
+they'll also need to run the `Dockerfile`, this will for example setup the Python environment, and copy the various 
+tcapy files to the container. At present the Docker version doesn't currently include the dependencies necessary 
+for creating PDF reports. Below, we list the containers created by `docker-compose.yml`:
+
+* nginx - web server sitting front of gunicorn
+* gunicorn_tcapy - web server for main tcapy web GUI
+* gunicorn_tcapyboard - web server for trade CSV drag & drop tcapy web GUI
+* jupyter - Jupyter notebook server
+* celery - distributed task manager
+* redis - in-memory key/value store for caching and Celery message broker
+* memcached - in-memory key/value store for Celery results back end
+* mongo - NoSQL database for storing market tick data
+* mysql - SQL database for storing trade/order data
+
+In the folder `/home/tcapyuser/cuemacro/tcapy/` run the following commands:
+
+* `docker-compose build` - this will build all the various tcapy services, it might take a while, because it will 
+involve a lot of downloading of all the dependencies and collecting them.
+* `docker-compose up` - this can be used to run all the containers
+
+We can then get access to many of the services from our host machine:
+
+* `http://localhost:9000/tcapy` - main tcapy web gui
+* `http://localhost:9000/tcapyboard/` - tcapy web gui for uploading trade CSVs
+* `http://localhost:8888` - Jupyter notebook with tcapy
+* `localhost:6379` - Redis
+* `localhost:3306` - MySQL
+* `localhost:27017` - MongoDB
+* `localhost:11211` - MemCached
+
+Note, that to get full benefit of tcapy, we'll need to populate the market data (mongo) and trade/order data (mysql)
+databases, which you'll likely do via your own host machine. Alternatively, if these already exist and are 
+running elsewhere, you'll need to make tcapy point to them and also remove these dependencies from the 
+`docker-compose.yml` file.
+
+You can also for example use the databases on your host OS, if these are already setup, but again you'll need to change
+the IP address to `host.docker.internal` which Docker will recognise within the container as being the host IP.
+
+Here are some useful commands for managing Docker containers:
+
+* `docker ps` - see all the containers running
+* `docker kill $(docker ps -q)` - kill all Docker containers
+* `docker exec -it <container name> /bin/bash` - to log into a Docker container
+* `docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' <container name>` - get the IPs of a 
+container
+
+You might end up with problems if you are running the same databases/processes on your host OS and also in the containers
+as they will likely try to grab the same ports. 
+
+Running `/home/tcapyuser/cuemacro/tcapy/batch_scripts/linux/kill_tcapy.sh` before you kick off your Docker containers
+will help to kill any dependencies which might be running on your host OS, which could these conflicts such as MySQL
+or MongoDB.
+
+## Non-Docker Installation of tcapy on Linux
+
+If you do not use Docker, you'll need to install all tcapy dependencies directly on your host OS Linux instance. 
+tcapy has many dependencies, which need to be installed after cloning the tcapy project locally. We discuss what you should install below.
 
 * Anaconda Python - It is recommended you install the Anaconda distribution of Python first, if you don't already have it. 
 This includes `conda` installation manager, which tends to be easier to use when installing certain libraries, which are more
@@ -184,7 +288,7 @@ from CSV files. There are also scripts for populating the trade/orders database 
 organisations are likely to already have market tick and trade/orders databases, which are already installed and
 maintained.
 
-We are hoping to make the installation process simpler over time, by creating a Docker container.
+As you can see the Docker installation is somewhat quicker.
 
 From a firewall viewpoint, it is recommended to prevent Celery from being accessed by other machines 
 (which may send malicious pickled objects). Also make sure that Redis and Memcached are not accessible from other machines 
@@ -219,7 +323,7 @@ and then install tcapy on VirtualBox/Linux
     * then follow the instructions earlier ie. *tcapy installation on Linux*
     * some dependencies may work, but they are not officially supported on WSL 
         * eg. MongoDB on WSL, although in this instance, there is a Windows version of MongoDB you could use
-    * also WSL doesn't support all Linux functionality such as UI, although this will likely change in newer versions
+    * also WSL doesn't support all Linux functionality, although this will likely change in newer versions
     * it is easy to access files in WSL in Windows and vice versa
         * view WSL/Linux files on Windows by navigating to `\\wsl$`
         * view Windows files in WSL/Linux by navigating to `/mnt/c` (for example for C drive)

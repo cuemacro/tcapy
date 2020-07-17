@@ -39,7 +39,7 @@ if __name__ == '__main__':
     # Get the actual table names in the database which may differ from "nicknames"
     trade_order_mapping = constants.trade_order_mapping[sql_database]
 
-    database_source = DatabaseSource(trade_data_database_name=trade_data_database_name)
+    database_source = DatabaseSource(trade_data_database_name=trade_data_database_name, server_host='localhost')
 
     for key in csv_sql_table_trade_order_mapping.keys():
         database_source.convert_csv_to_table(

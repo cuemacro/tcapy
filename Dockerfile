@@ -14,6 +14,10 @@ RUN buildDeps='gcc g++ libsnappy-dev unixodbc-dev' && \
     #apt-get purge -y --auto-remove $buildDeps
 
 COPY ./tcapy /tcapy/tcapy
+COPY ./tcapygen /tcapy/tcapygen
+
+# Make sure tcapy on the PYTHONPATH
+ENV PYTHONPATH "${PYTHONPATH}:/tcapy"
 
 #### Here the test-configuration
 FROM builder as test

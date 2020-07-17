@@ -41,7 +41,7 @@ if [ $TCAPY_PYTHON_STARTER == "gunicorn" ]; then
     echo 'Start Gunicorn to interact with Flask/Dash app'
 
     # Always start default 'tcapy' web interface
-    gunicorn --bind 127.0.0.1:8080 --workers 4 --threads 6 --preload --chdir $TCAPY_CUEMACRO/tcapy/conf/ \
+    gunicorn --bind 127.0.0.1:8090 --workers 4 --threads 6 --preload --chdir $TCAPY_CUEMACRO/tcapy/conf/ \
     --access-logfile $TCAPY_CUEMACRO/log/gunicorn_tcapy_access.log \
     --error-logfile $TCAPY_CUEMACRO/log/gunicorn_tcapy_error.log \
     --log-level DEBUG \
@@ -50,7 +50,7 @@ if [ $TCAPY_PYTHON_STARTER == "gunicorn" ]; then
     # Start 'tcapy' RESTful API
     if [ $START_TCAPY_API == 1 ]; then
         echo 'Start Gunicorn for RESTful API...'
-        gunicorn --bind 127.0.0.1:8081 --workers 4 --threads 6 --preload --chdir $TCAPY_CUEMACRO/tcapy/conf/ \
+        gunicorn --bind 127.0.0.1:8091 --workers 4 --threads 6 --preload --chdir $TCAPY_CUEMACRO/tcapy/conf/ \
         --access-logfile $TCAPY_CUEMACRO/log/gunicorn_tcapy_access.log \
         --error-logfile $TCAPY_CUEMACRO/log/gunicorn_tcapy_error.log \
         --log-level DEBUG \
@@ -61,7 +61,7 @@ if [ $TCAPY_PYTHON_STARTER == "gunicorn" ]; then
     # Start 'tcapyboard' web interface
     if [ $START_TCAPY_BOARD == 1 ]; then
         echo 'Start Gunicorn for tcapyboard...'
-        gunicorn --bind 127.0.0.1:8082 --workers 4 --threads 6 --preload --chdir $TCAPY_CUEMACRO/tcapy/conf/ \
+        gunicorn --bind 127.0.0.1:8092 --workers 4 --threads 6 --preload --chdir $TCAPY_CUEMACRO/tcapy/conf/ \
         --access-logfile $TCAPY_CUEMACRO/log/gunicorn_tcapy_access.log \
         --error-logfile $TCAPY_CUEMACRO/log/gunicorn_tcapy_error.log \
         --log-level DEBUG \

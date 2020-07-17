@@ -105,7 +105,7 @@ supported it is possible to write an adapter for it.
 
 There are four ways to use tcapy, which are:
 
-* Via web GUI, built with Dash
+* Via web GUI, built with Dash (including one where you can drop & drop trade CSVs)
 * Programmatically
     * Via command prompt/IDE etc.
     * Via Jupyter notebook to do interactive research studies
@@ -173,6 +173,10 @@ A few things to note:
 # How do you install tcapy?
 
 Detailed installation instructions can be found [here](INSTALL.md) 
+
+There is now Dockerized version of tcapy, which makes it much easier to install tcapy and all its dependencies.
+
+You can also install it with pip if you want to use different parts of tcapy as dependencies in your own Python project.
 
 # What technologies does tcapy use?
 

@@ -5,6 +5,11 @@
 * No official releases yet
 
 ## Coding log
+* 17 Jul 2020
+    * Now added more services to Docker Compose, so tcapy can be fully deployed with Docker
+        * Includes web GUI (Nginx + Gunicorn), Celery, databases (MongoDB + MySQL), caching (Redis + MemCached) etc.
+    * Added way to add environment variables easily to `constants.py` (also to allow Docker specific variables)
+        * No longer have to create our own `constantscred.py` file to store usernames/passwords etc.
 * 03 Jul 2020
     * Fixed close connection issue with SQL and MongoDB
     * Updated microstructure notebook

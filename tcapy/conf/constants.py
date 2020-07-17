@@ -16,13 +16,30 @@ import pickle
 
 import ssl
 
-def docker_var(docker_var, normal_var):
+# We can specify different variables if we are in a Docker container or not
+# Also accepts environment variables which are denoted with dollar ($) symbols
+def docker_var(docker_var, normal_var, default_value=None):
+
+    if default_value is None:
+        default_value = normal_var
 
     try:
         if os.environ.get('APP_ENV') == 'docker':
+            if '$' in docker_var:
+                try:
+                    return os.environ.get(docker_var.replace('$', ''))
+                except:
+                    return default_value
+
             return docker_var
     except:
         pass
+
+    if '$' in normal_var:
+        try:
+            return os.environ.get(normal_var.replace('$', ''))
+        except:
+            return default_value
 
     return normal_var
 
@@ -35,7 +52,8 @@ class Constants(object):
     - constantsgen.py
     - constantsuser.py
 
-    For credentials and sensitive data (typically usernames and passwords), we recommend a separate file:
+    For credentials and sensitive data (typically usernames and passwords), we recommend a separate file (or setting them
+    as environment variables and referring to those here):
     - constantscredgen.py
     - constantscreduser.py
 
@@ -255,7 +273,7 @@ class Constants(object):
     # to run, with the randomised test data
 
     # Customise the types of assets traders, venues etc. (for testing purposes can just use the dummy variables above)
-    available_market_data = ['arctic-dukascopy', 'arctic-ncfx', 'kdb-ncfx']  # market data sources
+    available_market_data = ['arctic-dukascopy', 'arctic-ncfx', 'kdb-ncfx', 'dukascopy']  # market data sources
     available_tickers_dictionary = test_available_tickers_dictionary  # which tickers do we trade, and want to do TCA in
     available_venues_dictionary = test_venues_dictionary  # trading venues
     available_portfolios_dictionary = test_portfolios_dictionary  # portfolio IDs
@@ -301,7 +319,7 @@ class Constants(object):
 
     # Should usually specify our own sources (eg. CSV filenames)
     default_market_data_store = 'arctic-ncfx'  # The default database store for market data
-    default_trade_data_store = 'ms_sql_server'  # The default database store for trade data
+    default_trade_data_store = 'mysql'  # The default database store for trade data
 
     ### CSV defaults (we can override these)
     # market_data_database_csv = os.path.join(test_data_folder, "test_market_data.csv")
@@ -377,13 +395,14 @@ class Constants(object):
     postgres_password = 'TODO'
 
     ## MySQL
-    mysql_host = docker_var('mysql', 'localhost')
+    mysql_host = docker_var('mysql', '127.0.0.1')
     mysql_port = '3306'
 
-    mysql_trade_data_database_name = 'trade_database'
+    mysql_trade_data_database_name = docker_var('$MYSQL_DATABASE', 'trade_database')
 
-    mysql_username = 'OVERWRITE_IN_ConstantsCred'
-    mysql_password = 'OVERWRITE_IN_ConstantsCred'
+    # OVERWRITE_IN_ConstantsCred or set env var
+    mysql_username = docker_var("$MYSQL_USER", 'tcapyuser')
+    mysql_password = docker_var("$MYSQL_PASSWORD", 'tcapyuser')
 
     mysql_dump_record_chunksize = 10000    # Making the chunk size very big for MySQL can slow down inserts significantly
 
@@ -405,10 +424,12 @@ class Constants(object):
     pystore_market_data_database_table = 'market_data_table'
 
     ### Arctic/MongoDB
-    arctic_host = docker_var('mongodb', 'localhost')
+    arctic_host = docker_var('mongo', '127.0.0.1')
     arctic_port = 27017
-    arctic_username = 'OVERWRITE_IN_ConstantsCred'
-    arctic_password = 'OVERWRITE_IN_ConstantsCred'
+
+    # OVERWRITE_IN_ConstantsCred or set env var
+    arctic_username = docker_var("$MONGO_INITDB_ROOT_USERNAME", 'tcapyuser')
+    arctic_password = docker_var("$MONGO_INITDB_ROOT_PASSWORD", 'tcapyuser')
 
     arctic_ssl = False
     arctic_ssl_cert_reqs = ssl.CERT_NONE
@@ -560,7 +581,7 @@ class Constants(object):
     # as stored in Redis in a highly compressed fashion (as opposed to pickling these very large dataframes back and
     # forth, which can cause memory issues)
     #
-    # when returning trade or market data cache in Redis first, before returning as a handle
+    # When returning trade or market data cache in Redis first, before returning as a handle
     # use_cache_handles = True
 
     use_compression_with_handles = True

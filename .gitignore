@@ -9,6 +9,7 @@ __pycache__/
 *cred.py
 *credpro.py
 *creduser.py
+*.env
 
 # orca executable
 orca-1.2.1-x86_64.AppImage

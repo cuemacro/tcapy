@@ -51,7 +51,7 @@ fi
 
 # Start MySQL
 if [ $START_MYSQL == 1 ]; then
-  sudo service mysql start
+  sudo service mysql restart
   echo "Started MySQL"
 fi
 

@@ -48,7 +48,6 @@ source install_pip_python_packages.sh
 
 # Install nginx web server (primary web server supported by tcapy)
 source install_nginx.sh
-source install_tcapy_on_nginx_gunicorn.sh
 
 # Install database for tick data (MongoDB)
 # note that we can run MongoDB, MySQL and Redis on different computers
