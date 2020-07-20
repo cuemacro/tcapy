@@ -87,7 +87,7 @@ class BenchmarkMarketMid(BenchmarkMarket):
             # if field == 'bid/ask':
             market_df[field] = (market_df[bid].values + market_df[ask].values) / 2.0
         else:
-            LoggerManager().getLogger(__name__).warn(field + " not in market data")
+            LoggerManager().getLogger(__name__).warning(field + " not in market data")
 
         return market_df
 
@@ -198,7 +198,7 @@ class BenchmarkMarketSpreadToMid(BenchmarkMarket):
             # market_df[bid] = pd.eval('(market_df.mid) * (1.0 - bid_mid_bp / 10000.0)')
             # market_df[ask] = pd.eval('(market_df.mid) / (1.0 - ask_mid_bp / 10000.0)')
         else:
-            LoggerManager().getLogger(__name__).warn("Couldn't calculate spread from mid, check market data has appropriate fields.")
+            LoggerManager().getLogger(__name__).warning("Couldn't calculate spread from mid, check market data has appropriate fields.")
 
         return market_df
 
@@ -475,11 +475,11 @@ class BenchmarkWeighted(BenchmarkTrade):
                     self._benchmark_calculation(trade_order_df, bid_price, ask_price, date_start, date_end,
                                                 weights=self._generate_weights(market_df, weighting_field=weighting_field))
             except:
-                LoggerManager.getLogger(__name__).warn(
+                LoggerManager.getLogger(__name__).warning(
                     self._benchmark_name + " not calculated (check if has correct input fields)")
 
         else:
-            LoggerManager.getLogger(__name__).warn(
+            LoggerManager.getLogger(__name__).warning(
                 bid_benchmark + ", " + ask_benchmark + " " + weighting_field + " may not be in market data")
 
         return trade_order_df, market_df

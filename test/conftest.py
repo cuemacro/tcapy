@@ -78,7 +78,6 @@ def fill_market_trade_databases():
 
     replace_append = 'replace'
 
-
     # Fill market data
     for ticker in ticker_arctic:
         database_source = DatabaseSourceArctic(postfix='testharness', arctic_lib_type='CHUNK_STORE')

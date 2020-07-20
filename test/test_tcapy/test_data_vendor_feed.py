@@ -69,7 +69,7 @@ data_vendor_name_list = ['dukascopy'] # ['ncfx', 'dukascopy']
 database_populator_dict = {'dukascopy' : DatabasePopulatorDukascopy(), 'ncfx' : DatabasePopulatorNCFX()}
 database_source_dict = {'dukascopy' : DatabaseSourceDukascopy(), 'ncfx' : DatabaseSourceNCFX()}
 
-if constants.ncfx_url is None:
+if constants.ncfx_url is None and 'ncfx' in data_vendor_name_list:
     data_vendor_name_list.remove('ncfx')
 
 invalid_start_date = '01 Jan 1999'

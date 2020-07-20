@@ -130,38 +130,45 @@ and helping me a lot on the Docker part.
     * see https://github.com/docker/compose/issues/7495 for other fixes and an explanation
 
 Let's create the following folders on our host machine. These will be linked to our containers. This will allow
-us to persist data. We have deliberately chosen different folders to the standard ones for MongoDB and MySQL. We 
-want to avoid the situation where these folders are shared between our containers and databases in the host machine.
+us to persist data more easily (rather than having them hidden in the container). We have deliberately chosen different 
+folders to the standard ones for MongoDB and MySQL. We want to avoid the situation where these 
+folders are shared between our containers and databases in the host machine.
 
-`sudo mkdir -p /data/db_mongodb`
-`sudo chown -R mongodb:mongodb /data/db_mongodb`
-`sudo mkdir -p /data/db_mysql`
-`sudo chown -R mysql:mysql /data/db_mysql`
+    sudo mkdir -p /data/db_mongodb
+    sudo chown -R mongodb:mongodb /data/db_mongodb
+    sudo mkdir -p /data/db_mysql
+    sudo chown -R mysql:mysql /data/db_mysql
+    
+Also make sure to create a `log` folder, under `/home/tcapyuser/cuemacro/tcapy` and various temporary folders, that are
+specified in the `constants.py` file:
+
+    sudo mkdir -p log
+    sudo mkdir /tmp/csv
+    sudo mkdir /tmp/tcapy
 
 In `/home/tcapyuser/cuemacro/tcapy` create a `.tcapy.env` file that has environment variables to be used by the various
 Docker containers. In particular this will be useful for holding the usernames and passwords. If this isn't used
 defaults from `constants.py` will be used instead, which won't be as secure. Here is a sample `.tcapy.env` file below:
 
-    MYSQL_USER=tcapyuser
+    MYSQL_USER=root
     MYSQL_PASSWORD=blah_blah_
     MYSQL_ROOT_PASSWORD=blah_blah_
     MYSQL_DATABASE=trade_database
     MONGO_INITDB_ROOT_USERNAME=admin_root
     MONGO_INITDB_ROOT_PASSWORD=blah_blah_
-
-Also make sure to create a `log` folder
-under `/home/tcapyuser/cuemacro/tcapy`:
-
-`sudo mkdir -p log`
+    
+In practice, you may wish to use different users other than `root` for your databases, when you configure them to 
+minimize access.
 
 `docker-compose.yml` defines all the various containers which will need to be installed. For some of these images 
 they'll also need to run the `Dockerfile`, this will for example setup the Python environment, and copy the various 
 tcapy files to the container. At present the Docker version doesn't currently include the dependencies necessary 
-for creating PDF reports. Below, we list the containers created by `docker-compose.yml`:
+for creating PDF reports. Below, we list the containers created by `docker-compose.yml`, and we've also setup
+the appropriate Python environment for those containers running tcapy's Python code:
 
 * nginx - web server sitting front of gunicorn
-* gunicorn_tcapy - web server for main tcapy web GUI
-* gunicorn_tcapyboard - web server for trade CSV drag & drop tcapy web GUI
+* gunicorn_tcapy - WSGI application server for main tcapy web GUI
+* gunicorn_tcapyboard - WSGI application server for trade CSV drag & drop tcapy web GUI
 * jupyter - Jupyter notebook server
 * celery - distributed task manager
 * redis - in-memory key/value store for caching and Celery message broker
@@ -193,13 +200,43 @@ running elsewhere, you'll need to make tcapy point to them and also remove these
 You can also for example use the databases on your host OS, if these are already setup, but again you'll need to change
 the IP address to `host.docker.internal` which Docker will recognise within the container as being the host IP.
 
-Here are some useful commands for managing Docker containers:
+### Useful commands for managing Docker containers and images
 
-* `docker ps` - see all the containers running
-* `docker kill $(docker ps -q)` - kill all Docker containers
-* `docker exec -it <container name> /bin/bash` - to log into a Docker container
-* `docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' <container name>` - get the IPs of a 
-container
+Docker is a very useful tool. In order to use it, it's worth knowing a few simple Docker commands
+to help you manage your Docker images and containers, which we list below:
+
+* `docker images` 
+    * list all Docker images on disk
+* `docker ps`
+    * see all the containers running
+* `docker kill $(docker ps -q)`
+    * kill all running Docker containers
+* `docker exec -it <container name> /bin/bash`
+    * to get shell access into a Docker container
+    * can be useful for troubleshooting
+* `docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' <container name>` - 
+    * get the IP of a container
+* `docker image rm -f <service>` 
+    * forced removal of image
+* `docker rmi -f <service>` 
+    * forced removal of image
+* `docker system prune -a` 
+    * delete all containers
+    * warning, it will take a long time to build after this!
+
+Here are some commands focused on `docker-compose` options
+
+* `docker-compose rm -v mongo` 
+    * remove of anonymous volume of a service
+    * this can be necessary with databases if you're trying to change the password, switch to a host OS volume etc.
+* `docker-compose build --force-recreate` 
+    * builds but forces the recreation of images, rather than using cached versions
+* `docker-compose down` 
+    * spin down the services
+
+You might also try to login manually into your various containers from your host OS, for `mysql` or `mongo`:
+* `mysql -h localhost -P 3306 --protocol=tcp -u root` to login into the MySQL container
+* `mongo localhost:27017 -u tcapyuser -p yourpassword`
 
 You might end up with problems if you are running the same databases/processes on your host OS and also in the containers
 as they will likely try to grab the same ports. 
@@ -207,6 +244,23 @@ as they will likely try to grab the same ports.
 Running `/home/tcapyuser/cuemacro/tcapy/batch_scripts/linux/kill_tcapy.sh` before you kick off your Docker containers
 will help to kill any dependencies which might be running on your host OS, which could these conflicts such as MySQL
 or MongoDB.
+
+### Testing tcapy Docker containers
+
+Just as `docker-compose.yml` defines all the various containers for the production tcapy instance,
+`docker-compose.test.yml` defines the containers required to test tcapy. These containers include `mongo`, `mysql` 
+and `celery` to test the various database and distributed computation functionality of tcapy. The `sut` 
+service is the main test container. Note, when testing 
+
+In the folder `/home/tcapyuser/cuemacro/tcapy/` we can run tests on tcapy via containers by running:
+    
+    make test
+
+This is the equivalent of running `docker-compose -f docker-compose.test.yml run sut` and that
+will run all the tcapy tests. Note, that the test databases are deliberately not mapped to directories the host OS, to avoid
+any conflict between the production and test runs of tcapy. If you switch between production `docker-compose.yml`
+and `docker-compose.test.yml` you may need to delete the anonymous volumes of the databases. To build
+the test run `docker-compose -f docker-compose.test.yml build`
 
 ## Non-Docker Installation of tcapy on Linux
 

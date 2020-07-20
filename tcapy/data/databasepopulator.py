@@ -58,10 +58,10 @@ class DatabasePopulator(ABC):
         logger = LoggerManager().getLogger(__name__)
 
         if not(os.path.isdir(self.temp_data_folder)):
-            logger.warn("Temp data folder " + self.temp_data_folder + " does not exist")
+            logger.warning("Temp data folder " + self.temp_data_folder + " does not exist")
 
         if not(os.path.isdir(self.temp_large_data_folder)):
-            logger.warn("Temp large data folder " + self.temp_data_folder + " does not exist")
+            logger.warning("Temp large data folder " + self.temp_data_folder + " does not exist")
 
         if tickers is not None:
             self.tickers = tickers

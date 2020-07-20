@@ -38,6 +38,8 @@ services:
         --error-logfile /tcapy/log/gunicorn_tcapy_error.log tcapy_wsgi:application & "
     volumes:
       - ./log:/tcapy/log
+      - /tmp/csv:/tmp/csv
+      - /tmp/tcapy:/tmp/tcapy
     env_file: .tcapy.env
     environment:
       - APP_ENV=docker
@@ -61,6 +63,8 @@ services:
         --error-logfile /tcapy/log/gunicorn_tcapy_error.log tcapyboard_wsgi:application & "
     volumes:
       - ./log:/tcapy/log
+      - /tmp/csv:/tmp/csv
+      - /tmp/tcapy:/tmp/tcapy
     env_file: .tcapy.env
     environment:
       - APP_ENV=docker
@@ -83,6 +87,8 @@ services:
     command: "celery -A tcapy.conf.celery_calls worker --purge --discard --loglevel=debug -Q celery --concurrency=14 -f log/celery.log"
     volumes:
       - ./log:/tcapy/log
+      - /tmp/csv:/tmp/csv
+      - /tmp/tcapy:/tmp/tcapy
     env_file: .tcapy.env
     environment:
       - APP_ENV=docker

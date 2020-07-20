@@ -150,7 +150,7 @@ def test_write_market_data_arctic():
                 start_date=db_start_date, finish_date=db_finish_date, ticker=ticker)
 
             # Read back data from Arctic and compare with CSV
-            market_request = MarketRequest(start_date=db_start_date, finish_date=db_finish_date, ticker=tick,
+            market_request = MarketRequest(start_date=db_start_date, finish_date=db_finish_date, ticker=ticker,
                                            data_store=database_source, # test_harness_arctic_market_data_store,
                                            market_data_database_table=test_harness_arctic_market_data_table)
 

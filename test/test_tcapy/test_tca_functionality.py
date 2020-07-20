@@ -223,7 +223,8 @@ def test_metric_calculation(fill_market_trade_databases):
         slippage = trade_df['slippage'][i]
         market_slippage = trade_df['slippage_benchmark'][i]
 
-        market = market_df.ix[mid_index]['mid']
+        # market = market_df.ix[mid_index]['mid']
+        market = market_df['mid'][mid_index]
 
         # Do slippage calculation for comparison with our method
         slippage_comp = -side * (trade - market)
@@ -270,11 +271,14 @@ def test_metric_calculation(fill_market_trade_databases):
 
         if 'bid' in market_df.columns and 'ask' in market_df.columns:
             if side == 1:
-                market = market_df.ix[index]['ask']
+                # market = market_df.ix[index]['ask']
+                market = market_df.iloc[index]['ask']
             elif side == -1:
-                market = market_df.ix[index]['bid']
+                # market = market_df.ix[index]['bid']
+                market = market_df.iloc[index]['bid']
         else:
-            market = market_df.ix[index]['mid']
+            # market = market_df.ix[index]['mid']
+            market = market_df.iloc[index]['mid']
 
         market_transient_impact_benchmark = trade_df['transient_market_impact_benchmark'][i]
 
@@ -302,8 +306,10 @@ def test_benchmark_calculation(fill_market_trade_databases):
     ind_list = [0, 1, 2, -2 - 1]
 
     for i in ind_list:
-        if order_df.ix[i, 'notional'] > 1:
-            twap_price = order_df.ix[i, 'twap']
+        # order_df.ix[i, 'notional']
+        if order_df.iloc[i]['notional'] > 1:
+            # twap_price = order_df.ix[i, 'twap']
+            twap_price = order_df.iloc[i]['twap']
 
             market_prices = market_df[order_df.iloc[i]['benchmark_date_start']:order_df.iloc[i]['benchmark_date_end']]['mid']
 
@@ -318,8 +324,10 @@ def test_benchmark_calculation(fill_market_trade_databases):
     order_df, _ = BenchmarkVWAP().calculate_benchmark(trade_order_df=order_df, market_df=market_df, weighting_field='volume')
 
     for i in ind_list:
-        if order_df.ix[i, 'notional'] > 1:
-            vwap_price = order_df.ix[i, 'vwap']
+        # order_df.ix[i, 'notional']
+        if order_df.iloc[i]['notional'] > 1:
+            # vwap_price = order_df.ix[i, 'vwap']
+            vwap_price = order_df.iloc[i]['vwap']
 
             market_prices = market_df[order_df.iloc[i]['benchmark_date_start']:order_df.iloc[i]['benchmark_date_end']]['mid']
 
@@ -333,8 +341,10 @@ def test_benchmark_calculation(fill_market_trade_databases):
     order_df, _ = BenchmarkArrival().calculate_benchmark(trade_order_df=order_df, market_df=market_df)
 
     for i in ind_list:
-        if order_df.ix[i, 'notional'] > 1:
-            arrival_price = order_df.ix[i, 'arrival']
+        # order_df.ix[i, 'notional']
+        if order_df.iloc[i]['notional'] > 1:
+            # arrival_price = order_df.ix[i, 'arrival']
+            arrival_price = order_df.iloc[i]['arrival']
 
             # the arrival calculation uses a different implementation which is vectorizable (unlike get_loc)
             approx = market_df.index.get_loc(order_df.index[i], method='pad')
@@ -426,9 +436,12 @@ def test_executed_price_notional_calculation(fill_market_trade_databases):
     index_boundary.append(-1)
 
     for i in index_boundary:
-        if order_df.ix[i, 'notional'] > 1:
-            executed_price = order_df.ix[i, 'executed_price']
-            id = order_df.ix[i, 'id']
+        # order_df.ix[i, 'notional']
+        if order_df.iloc[i]['notional'] > 1:
+            # executed_price = order_df.ix[i, 'executed_price']
+            # id = order_df.ix[i, 'id']
+            executed_price = order_df.iloc[i]['executed_price']
+            id = order_df.iloc[i]['id']
 
             executed_price_trade = trade_df[trade_df['ancestor_pointer_id'] == id]['executed_price'].fillna(0)
             executed_notional_trade = trade_df[trade_df['ancestor_pointer_id'] == id]['executed_notional'].fillna(0)

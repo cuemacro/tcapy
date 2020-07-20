@@ -204,12 +204,12 @@ class TCATickerLoader(ABC):
 
                 else:
                     # Otherwise couldn't compute either from the USD legs or EUR legs
-                    logger.warn("Couldn't find market data for ticker: " + str(ticker))
+                    logger.warning("Couldn't find market data for ticker: " + str(ticker))
 
                     return None
             else:
                 # Otherwise couldn't find the non-FX ticker
-                logger.warn("Couldn't find market data for ticker: " + str(ticker))
+                logger.warning("Couldn't find market data for ticker: " + str(ticker))
 
                 return None
 
@@ -318,7 +318,7 @@ class TCATickerLoader(ABC):
                                                                          data=trade_df[n][terms_notionals].values *
                                                                               inversion_spot[terms_notionals].values)
                     else:
-                        logger.warn("Couldn't get spot data for " + inversion_ticker + " to invert notionals. Hence not returning trading data.")
+                        logger.warning("Couldn't get spot data for " + inversion_ticker + " to invert notionals. Hence not returning trading data.")
 
                 if terms_notionals.any():
                     trade_df['notional_currency'][terms_notionals] = trade_request.ticker[0:3]
@@ -353,7 +353,7 @@ class TCATickerLoader(ABC):
                             trade_df[c + '_in_reporting_currency'] = \
                                 trade_df['notional_reporting_currency_mid'].values * trade_df[c]
                 else:
-                    logger.warn(
+                    logger.warning(
                         "Couldn't get spot data to convert notionals into reporting currency. Hence not returning trading data.")
 
                     return None
@@ -486,11 +486,11 @@ class TCATickerLoader(ABC):
                 if trade_order_df_dict[t] is None:
                     t_remove.append(t)
 
-                    logger.warning(t + " is empty.. might cause problems later!")
+                    logger.warninging(t + " is empty.. might cause problems later!")
                 elif trade_order_df_dict[t].empty:
                     t_remove.append(t)
 
-                    logger.warning(t + " is empty.. might cause problems later!")
+                    logger.warninging(t + " is empty.. might cause problems later!")
 
             for t in t_remove:
                 trade_order_df_dict.pop(t)
@@ -647,11 +647,11 @@ class TCATickerLoader(ABC):
                         market_start_finish = "Market data is between " + str(
                             market_conversion_df.index[0]) + " - " + str(market_conversion_df.index[-1]) + ". "
 
-                    logger.warn(market_start_finish)
-                    logger.warn("Trade data is between " + str(trade_df.index[0]) + " - " + str(
+                    logger.warning(market_start_finish)
+                    logger.warning("Trade data is between " + str(trade_df.index[0]) + " - " + str(
                         trade_df.index[-1]) + ".")
 
-                    logger.warn(
+                    logger.warning(
                         "Couldn't get spot data to convert notionals currency. Hence not returning trading data.")
 
         return reporting_spot, trade_df
@@ -775,7 +775,7 @@ class TCATickerLoader(ABC):
             err_msg = "No market data between selected dates for " + ticker + " between " + str(start_date) + " - " \
                       + str(finish_date)
 
-            logger.warn(err_msg)
+            logger.warning(err_msg)
 
             # raise DataMissingException(err_msg)
 
@@ -796,7 +796,7 @@ class TCATickerLoader(ABC):
             err_msg = "No trade/order data between selected dates for " + ticker + " between " + str(start_date) + " - " \
                       + str(finish_date)
 
-            logger.warn(err_msg)
+            logger.warning(err_msg)
 
             # raise DataMissingException(err_msg)
 
@@ -882,7 +882,7 @@ class TCATickerLoader(ABC):
         logger = LoggerManager.getLogger(__name__)
 
         if trade_df is None:
-            logger.warn(
+            logger.warning(
                 "Missing trade data for " + tca_request.ticker + " between " + str(start_date) + " - " + str(
                     finish_date) + " in "
                 + trade_order_type)
@@ -890,7 +890,7 @@ class TCATickerLoader(ABC):
             return True
 
         elif trade_df.empty:
-            logger.warn(
+            logger.warning(
                 "Missing trade data for " + tca_request.ticker + " between " + str(start_date) + " - " + str(
                     finish_date) + " in "
                 + trade_order_type)

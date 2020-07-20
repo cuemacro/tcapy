@@ -5,6 +5,11 @@
 * No official releases yet
 
 ## Coding log
+* 20 Jul 2020
+    * Docker tests now pass, fixed docker-compose.test.yml
+    * Removed logger.warn in project which is deprecated
+    * Added extra documentation around Docker installation of tcapy
+    * Many other small fixes
 * 17 Jul 2020
     * Now added more services to Docker Compose, so tcapy can be fully deployed with Docker
         * Includes web GUI (Nginx + Gunicorn), Celery, databases (MongoDB + MySQL), caching (Redis + MemCached) etc.

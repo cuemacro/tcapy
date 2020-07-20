@@ -39,6 +39,18 @@ logger.info('Make sure you have created folder ' + constants.csv_folder + ' & ' 
 
 Mediator.get_volatile_cache().clear_cache()
 
+# Market data parameters for tables/databases
+test_harness_arctic_market_data_table = 'market_data_table_test_harness'
+test_harness_arctic_market_data_store = 'arctic-testharness'
+
+# Trade data parameters
+test_harness_ms_sql_server_trade_data_database = 'trade_database_test_harness'
+test_harness_ms_sql_server_trade_data_store = 'ms_sql_server'
+test_harness_mysql_trade_data_database = 'trade_database_test_harness'
+test_harness_mysql_trade_data_store = 'mysql'
+test_harness_sqlite_trade_data_database = resource('trade_database_test_harness.db')
+test_harness_sqlite_trade_data_store = 'sqlite'
+
 ########################################################################################################################
 
 # You can change the test_data_harness_folder to one on your own machine with real data
@@ -53,11 +65,14 @@ if use_market_data_test_csv:
 def test_randomized_trade_data_generation(fill_market_trade_databases):
     """Tests randomized trade generation data (and writing to database)
     """
-    data_test_creator = DataTestCreator(write_to_db=False)
+    data_test_creator = DataTestCreator(market_data_postfix=postfix, write_to_db=False,
+                                        arctic_market_data_database_table=test_harness_arctic_market_data_table,
+                                        trade_data_database_name=test_harness_mysql_trade_data_database)
 
     # Use database source as Arctic for market data (assume we are using market data as a source)
     if use_market_data_test_csv:
         data_test_creator._database_source_market = DatabaseSourceCSV(market_data_database_csv=market_data_store)
+        data_test_creator._market_data_source = market_data_store
     else:
         data_test_creator._database_source_market = DatabaseSourceArctic(postfix=postfix)
 

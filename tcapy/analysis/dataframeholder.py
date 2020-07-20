@@ -136,7 +136,7 @@ class DataFrameHolder(object):
                 is_data_frame_key = False
 
             if is_data_frame_key is None:
-                logger.warn('Cannot guess key type for ' + key + ', assuming DataFrame')
+                logger.warning('Cannot guess key type for ' + key + ', assuming DataFrame')
 
                 is_data_frame_key = True
 
@@ -240,11 +240,11 @@ class DataFrameHolder(object):
 
                 for t in df_dict.keys():
                     if df_dict[t] is None:
-                        logger.warn("Market/trade/order data not in " + t)
+                        logger.warning("Market/trade/order data not in " + t)
                         t_remove.append(t)
                     else:
                         if df_dict[t].empty:
-                            logger.warn("Market/trade/order data not in " + t)
+                            logger.warning("Market/trade/order data not in " + t)
                             t_remove.append(t)
 
                 for t in t_remove:

@@ -94,7 +94,7 @@ class DataFactory(object):
             pass
 
         if df is not None and df.empty:
-            logger.warn('Dataframe empty for ticker ' + ticker)
+            logger.warning('Dataframe empty for ticker ' + ticker)
 
         return df
 

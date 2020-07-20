@@ -5,18 +5,75 @@ services:
       context: .
       dockerfile: Dockerfile
       target: test
-
     volumes:
       - ./tcapy:/tcapy/tcapy:ro
-      - ./tests:/tcapy/test:ro
-      - ./artifacts:/antarctic/artifacts
+      - ./tcapygen:/tcapy/tcapygen:ro
+      - ./artifacts:/tcapy/artifacts
       - ./source:/source:ro
     environment:
-      - Maffay=1
+      - APP_ENV=docker
+      - MONGO_AUTH_SOURCE=admin
+      - MONGO_INITDB_ROOT_USERNAME=tcapyuser
+      - MONGO_INITDB_ROOT_PASSWORD=tcapyuser
+      - MYSQL_USER=root
+      - MYSQL_PASSWORD=tcapyuser
+      - MYSQL_ROOT_PASSWORD=tcapyuser
     depends_on:
-      - influx
+      - celery
+      - redis
+      - memcached
+      - mongo
+      - mysql
 
-  influx:
-      image: influxdb:1.8.0
+  celery:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: test
+    working_dir: /tcapy
+    command: "celery -A tcapy.conf.celery_calls worker --purge --discard --loglevel=debug -Q celery --concurrency=14"
+    environment:
+      - APP_ENV=docker
+      - C_FORCE_ROOT=true
+      - MONGO_AUTH_SOURCE=admin
+      - MONGO_INITDB_ROOT_USERNAME=tcapyuser
+      - MONGO_INITDB_ROOT_PASSWORD=tcapyuser
+      - MYSQL_USER=root
+      - MYSQL_PASSWORD=tcapyuser
+      - MYSQL_ROOT_PASSWORD=tcapyuser
+    depends_on:
+      - redis
+      - mongo
+      - mysql
+      - memcached
 
+  redis:
+    image: "redis:alpine"
+    command: redis-server --port 6379 --save ""
+    ports:
+      - 6379:6379
 
+  memcached:
+    image: memcached
+    ports:
+      - 11211:11211
+
+  mongo:
+    image: mongo:latest
+    environment:
+      - MONGO_AUTH_SOURCE=admin
+      - MONGO_INITDB_ROOT_USERNAME=tcapyuser
+      - MONGO_INITDB_ROOT_PASSWORD=tcapyuser
+    ports:
+      - 27017:27017
+
+  mysql:
+    image: mysql
+    command: --default-authentication-plugin=mysql_native_password
+    environment:
+      - MYSQL_USER=tcapyuser
+      - MYSQL_PASSWORD=tcapyuser
+      - MYSQL_ROOT_PASSWORD=tcapyuser
+      - MYSQL_DATABASE=trade_database_test_harness
+    ports:
+      - 3306:3306

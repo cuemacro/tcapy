@@ -34,7 +34,11 @@ class DataTestCreator(object):
 
     """
 
-    def __init__(self, market_data_postfix='dukascopy', csv_market_data=None, write_to_db=True, sql_trade_database_type='ms_sql_server'):
+    def __init__(self, market_data_postfix='dukascopy', csv_market_data=None, write_to_db=True, sql_trade_database_type='mysql',
+                 arctic_market_data_database_name=constants.arctic_market_data_database_name,
+                 arctic_market_data_database_table=constants.arctic_market_data_database_table,
+                 trade_data_database_name=constants.mysql_trade_data_database_name
+                 ):
         if csv_market_data is None:
             self._market_data_source = 'arctic-' + market_data_postfix
         else:
@@ -46,15 +50,15 @@ class DataTestCreator(object):
         if write_to_db:
             self._database_source_market = DatabaseSourceArctic(postfix=market_data_postfix) # market data source
 
-            self._market_data_database_name = constants.arctic_market_data_database_name
-            self._market_data_database_table = constants.arctic_market_data_database_table
+            self._market_data_database_name = arctic_market_data_database_name
+            self._market_data_database_table = arctic_market_data_database_table
 
             if sql_trade_database_type == 'ms_sql_server':
-                self._database_source_trade = DatabaseSourceMSSQLServer()                        # trade data source
-                self._trade_data_database_name = constants.ms_sql_server_trade_data_database_name
+                self._database_source_trade = DatabaseSourceMSSQLServer()                  # trade data source
+                self._trade_data_database_name = trade_data_database_name
             elif sql_trade_database_type == 'mysql':
                 self._database_source_trade = DatabaseSourceMySQL()                        # trade data source
-                self._trade_data_database_name = constants.mysql_trade_data_database_name
+                self._trade_data_database_name = trade_data_database_name
 
         self.time_series_ops = TimeSeriesOps()
         self.rand_time_series = RandomiseTimeSeries()
@@ -120,7 +124,7 @@ class DataTestCreator(object):
             # Allow for writing of trades + orders each to a different database table
             if isinstance(csv_trade_data, dict):
                 for key in csv_trade_data.keys():
-                    # csv file name, trade/order name (eg. trade_df)
+                    # csv file name, trade/order name is key (eg. trade_df)
                     self._database_source_trade.convert_csv_to_table(
                         csv_trade_data[key], None, key, database_name=self._trade_data_database_name,
                         if_exists_table=if_exists_trade_table)

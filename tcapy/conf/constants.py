@@ -65,7 +65,7 @@ class Constants(object):
 
     env = 'default'
 
-    tcapy_version = 'gen'  # 'user' for user specific or 'gen' for generic version (also for future usage 'tcapy_test')
+    tcapy_version = 'gen'  # 'user' for user specific or 'gen' for generic version (also for future usage 'test_tcapy')
     tcapy_provider = 'internal_tcapy' # Will add external providers
 
     root_folder = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -94,7 +94,7 @@ class Constants(object):
     parquet_engine = 'fastparquet'
 
     ###### FOR TEST HARNESS ONLY
-    test_data_harness_folder = os.path.join(os.path.dirname(root_folder), 'tests/resources')
+    test_data_harness_folder = os.path.join(os.path.dirname(root_folder), 'test/resources')
     test_harness_sql_trade_data_database_name = 'trade_database_test_harness'
     test_harness_tickers = {'EURUSD' : 'EURUSD', 'USDJPY' : 'USDJPY'}
 
@@ -138,8 +138,8 @@ class Constants(object):
     ncfx_chunk_min_size = 60     # Minute size for downloading NCFX
     ncfx_data_store = 'arctic-ncfx'
 
-    csv_folder = '/tmp/csv/'
-    temp_data_folder = '/tmp/tcapy/'
+    csv_folder = docker_var('/tmp/csv/', '/tmp/csv/')
+    temp_data_folder = docker_var('/tmp/tcapy/', '/tmp/tcapy/')
 
     ### Dukascopy tickers
     dukascopy_tickers = {'EURUSD' : 'EURUSD',
@@ -432,7 +432,7 @@ class Constants(object):
     arctic_password = docker_var("$MONGO_INITDB_ROOT_PASSWORD", 'tcapyuser')
 
     arctic_ssl = False
-    arctic_ssl_cert_reqs = ssl.CERT_NONE
+    arctic_tlsAllowInvalidCertificates = True
 
     # NOTE: database name not currently used in Arctic
     arctic_market_data_database_name = 'fx'

@@ -15,16 +15,34 @@ RUN buildDeps='gcc g++ libsnappy-dev unixodbc-dev' && \
 
 COPY ./tcapy /tcapy/tcapy
 COPY ./tcapygen /tcapy/tcapygen
+COPY ./test /tcapy/test
 
 # Make sure tcapy on the PYTHONPATH
 ENV PYTHONPATH "${PYTHONPATH}:/tcapy"
 
-#### Here the test-configuration
+#### Here's the test-configuration
 FROM builder as test
 
-# We install flask here to test some
+# We install some extra libraries purely for testing
 RUN pip install --no-cache-dir httpretty pytest pytest-cov pytest-html sphinx mongomock requests-mock
 
 WORKDIR /tcapy
 
-CMD py.test --cov=tcapy  --cov-report html:artifacts/html-coverage --cov-report term --html=artifacts/html-report/report.html test
+# For temp caching for the tests
+RUN mkdir -p /tmp/csv
+RUN mkdir -p /tmp/tcapy
+
+# Run the pytest
+CMD py.test --cov=tcapy  --cov-report html:artifacts/html-coverage --cov-report term \
+    --html=artifacts/html-report/report.html test
+
+# Example to run a specific test script
+# CMD py.test --cov=tcapy  --cov-report html:artifacts/html-coverage --cov-report term \
+#    --html=artifacts/html-report/report.html test/test_tcapy/test_trade_data_generation.py
+
+# Example to run an individual test function
+# CMD py.test --cov=tcapy  --cov-report html:artifacts/html-coverage --cov-report term \
+#    --html=artifacts/html-report/report.html test/test_tcapy/test_data_read_write.py::test_write_trade_data_sql
+
+# For debugging to keep container going
+# CMD tail -f /dev/null

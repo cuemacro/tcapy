@@ -529,7 +529,7 @@ class DatabaseSource(ABC):
                     empty_no = (df[c] == '').sum()
 
                     if empty_no > 0:
-                        logger.warn('Column ' + c + ' has ' + str(empty_no) + " entries, can cause problems with "
+                        logger.warning('Column ' + c + ' has ' + str(empty_no) + " entries, can cause problems with "
                                                                               "filtering! Recommend to fill with 'NA'.")
                     else:
                         logger.debug("No empty strings in column " + c)
@@ -1247,13 +1247,13 @@ class DatabaseSourceSQL(DatabaseSource):
                          + '_PK_trade PRIMARY KEY ('+ self._reserved_keywords('date') + ', id, ticker)'))
         except Exception as e:
             print(str(e))
-            logger.warn("Primary key already exists...")
+            logger.warning("Primary key already exists...")
 
         try:
             result = con.execute(
                 text('CREATE INDEX ' + table_name_tick + '_idx_date ON ' + table_name_tick + '('+ self._reserved_keywords('date') + ' ASC)'))
         except:
-            logger.warn("Index already exists...")
+            logger.warning("Index already exists...")
 
         con.close()
 
@@ -1296,7 +1296,7 @@ class DatabaseSourceSQL(DatabaseSource):
                 engine.execute("CREATE DATABASE IF NOT EXISTS {0} ".format(database_name))
             except:
                 logger = LoggerManager.getLogger(__name__)
-                logger.warn("Could not create database " + database_name)
+                logger.warning("Could not create database " + database_name)
 
     @abc.abstractmethod
     def _create_connection_string(self):
@@ -1673,7 +1673,7 @@ class DatabaseSourceTickData(DatabaseSource):
                         err_msg = "No data for ticker " + ticker + " in " + csv_file + \
                                   ". No data to copy to tick database! What about earlier chunks?"
 
-                        logger.warn(err_msg)
+                        logger.warning(err_msg)
 
                         # raise DataMissingException(err_msg)
 
@@ -1789,7 +1789,7 @@ class DatabaseSourceTickData(DatabaseSource):
             later_chunk = False
 
             if len(mini_csv_file) == 0:
-                logger.warn('No files to read in ' + csv_file[i])
+                logger.warning('No files to read in ' + csv_file[i])
 
             # If the "CSV file" has a wildcard this could be a big loop
             for m in range(0, len(mini_csv_file)):
@@ -1933,12 +1933,12 @@ class DatabaseSourceArctic(DatabaseSourceTickData):
         #         self._host != host or self._port != port or self._username != username or self._password != password:
 
         ssl = constants.arctic_ssl
-        ssl_cert_reqs = constants.arctic_ssl_cert_reqs
+        tlsAllowInvalidCertificates = constants.arctic_tlsAllowInvalidCertificates
 
         self._engine = pymongo.MongoClient(host, port=port, connect=False,
                                            username=username,
                                            password=password,
-                                           ssl=ssl, ssl_cert_reqs=ssl_cert_reqs)
+                                           ssl=ssl, tlsAllowInvalidCertificates=tlsAllowInvalidCertificates)
 
         self._store = \
             Arctic(self._engine, socketTimeoutMS=self.socketTimeoutMS, serverSelectionTimeoutMS=self.socketTimeoutMS,
@@ -2101,7 +2101,7 @@ class DatabaseSourceArctic(DatabaseSourceTickData):
         #
         # ticker = ticker + self.postfix
         #
-        # # logger.warn("Only use Arctic/MongoDB database for extracting test trade data, does not contain actual trade data")
+        # # logger.warning("Only use Arctic/MongoDB database for extracting test trade data, does not contain actual trade data")
         #
         # engine, store = self._get_database_engine(table_name=table_name)
         #
@@ -2299,7 +2299,7 @@ class DatabaseSourceArctic(DatabaseSourceTickData):
                     try:
                         library.delete(ticker)
                     except:
-                        logger.warn("Tried to delete " + ticker + " but couldn't.. did not exist?")
+                        logger.warning("Tried to delete " + ticker + " but couldn't.. did not exist?")
 
                     # For tick store need a timezone (causes problems with version_store)
                     if self._arctic_lib_type == 'TICK_STORE':
@@ -2994,7 +2994,7 @@ class DatabaseSourceInfluxDB(DatabaseSourceTickData):
                     try:
                         engine.query("drop measurement \"%s\"..\"%s\""(table_name, ticker))
                     except Exception as e:
-                        logger.warn("Didn't delete anything from table %s for ticker %s" % (table_name, ticker))
+                        logger.warning("Didn't delete anything from table %s for ticker %s" % (table_name, ticker))
 
                 chunk_size = constants.influxdb_chunksize
 
@@ -3145,7 +3145,7 @@ class DatabaseSourceInfluxDB(DatabaseSourceTickData):
             engine.query(
                 "delete from \"%s\"..\"%s\" where Time >= '%s' and Time <= '%s'" % (table_name, ticker, start_date_str, finish_date_str))
         except:
-            logger.warn("Error deleting data between " + start_date_str + " " + finish_date_str)
+            logger.warning("Error deleting data between " + start_date_str + " " + finish_date_str)
 
 
 ########################################################################################################################
@@ -3344,7 +3344,7 @@ class DatabaseSourceKDB(DatabaseSourceTickData):
                         engine.sendSync('%s: get `:%s/%s' % (ticker, table_name, ticker))
                         engine.sendSync("hdel `%s" % (ticker))
                     except Exception as e:
-                        logger.warn("Didn't delete anything from table %s for ticker %s" % (table_name, ticker))
+                        logger.warning("Didn't delete anything from table %s for ticker %s" % (table_name, ticker))
 
                     df.index = np.array(df.index, dtype=np.datetime64)
                     df.index.name = 'Date'
@@ -3514,7 +3514,7 @@ class DatabaseSourceKDB(DatabaseSourceTickData):
             # Persist deleted changes to disk
             engine.sendSync('`:%s/%s set %s' % (table_name, ticker, ticker))
         except:
-            logger.warn("Error deleting data between " + start_date_str + " " + finish_date_str)
+            logger.warning("Error deleting data between " + start_date_str + " " + finish_date_str)
 
         engine.close()
 
@@ -3644,7 +3644,7 @@ class DatabaseSourceNCFX(DatabaseSource):
         start_date_hist, finish_date_hist = self._util_func.remove_weekend_points(start_date_hist, finish_date_hist)
 
         if start_date_hist == [] and finish_date_hist == []:
-            logger.warn("Didn't attempt to download " + ticker + " from " + str(start_date) + " - " +
+            logger.warning("Didn't attempt to download " + ticker + " from " + str(start_date) + " - " +
                         str(finish_date) + ". Likely entire period is when market is closed (eg. weekend).")
 
             return None
@@ -3667,12 +3667,12 @@ class DatabaseSourceNCFX(DatabaseSource):
             df = pd.concat(df_list)
 
         if df is None:
-            logger.warn("Failed to download from NCFX for " + ticker + " from " + str(start_date) + " - " +
+            logger.warning("Failed to download from NCFX for " + ticker + " from " + str(start_date) + " - " +
                         str(finish_date) + ". Check if network problem?")
 
             return None
         elif df.empty:
-            logger.warn("Download from NCFX for " + ticker + " from " + str(start_date) + " - " +
+            logger.warning("Download from NCFX for " + ticker + " from " + str(start_date) + " - " +
                         str(finish_date) + " is empty. Data doesn't exist for that time.")
 
             return None
@@ -3738,7 +3738,7 @@ class DatabaseSourceNCFX(DatabaseSource):
 
                     return df
                 else:
-                    logger.warn("Problem downloading data from NCFX: " + str(s))
+                    logger.warning("Problem downloading data from NCFX: " + str(s))
 
             return None
 
@@ -3759,7 +3759,7 @@ class DatabaseSourceNCFX(DatabaseSource):
 
                 break
             except Exception as e:
-                logger.warn("Retrying... for " + str(i) + " time " + str(e) + " from URL " + constants.ncfx_url)
+                logger.warning("Retrying... for " + str(i) + " time " + str(e) + " from URL " + constants.ncfx_url)
 
                 time.sleep(constants.ncfx_sleep_seconds)
 
@@ -3809,7 +3809,7 @@ class DatabaseSourceExternalDownloader(DatabaseSource):
             finish_date = pd.Timestamp(finish_date)
 
             if self._util_func.is_weekday_point(start_date, finish_date): #start_date.dayofweek != 5 and finish_date.dayofweek != 6:
-                logger.warn("Failed to download from " + self._data_provider() + " for " + ticker + " from " + str(start_date) + " - " +
+                logger.warning("Failed to download from " + self._data_provider() + " for " + ticker + " from " + str(start_date) + " - " +
                             str(finish_date) + ". Check if network problem?")
             else:
                 logger.info("Didn't get data from " + self._data_provider() + " for " + ticker + " from " + str(start_date) + " - " +
@@ -3818,7 +3818,7 @@ class DatabaseSourceExternalDownloader(DatabaseSource):
             return None
 
         elif df.empty:
-            logger.warn("Download from" + self._data_provider() + " for " + ticker + " from " + str(start_date) + " - " +
+            logger.warning("Download from" + self._data_provider() + " for " + ticker + " from " + str(start_date) + " - " +
                         str(finish_date) + " is empty. Data doesn't exist for that time.")
 
             return None
