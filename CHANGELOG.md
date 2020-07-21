@@ -5,6 +5,8 @@
 * No official releases yet
 
 ## Coding log
+* 21 Jul 2020
+    * Remove stress test by default because of out-of-memory messages on GitHub CI
 * 20 Jul 2020
     * Docker tests now pass, fixed docker-compose.test.yml
     * Removed logger.warn in project which is deprecated

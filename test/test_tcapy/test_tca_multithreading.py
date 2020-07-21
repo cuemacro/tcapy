@@ -63,7 +63,8 @@ use_market_test_csv = False
 dump_csv_output = True  # Can slow down testing, but is useful for debugging purposes
 
 # Do a stress test, calling several large TCA requests in quick succession
-stress_test = True
+# On GitHub can't run stress test given lack of memory on those machines
+stress_test = False
 
 Mediator.get_volatile_cache().clear_cache()
 
