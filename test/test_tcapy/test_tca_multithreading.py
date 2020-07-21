@@ -60,7 +60,7 @@ invalid_finish_date = '05 May 2001'
 use_trade_test_csv = False
 use_market_test_csv = False
 
-dump_csv_output = True  # Can slow down testing, but is useful for debugging purposes
+dump_csv_output = False  # Can slow down testing, but is useful for debugging purposes
 
 # Do a stress test, calling several large TCA requests in quick succession
 # On GitHub can't run stress test given lack of memory on those machines
@@ -151,10 +151,9 @@ def test_multithreading_full_basic_tca(fill_market_trade_databases):
                         df1.columns = [x + '_single' for x in df1.columns]
 
                         df = df.join(pd.DataFrame(df1), how='outer')
+                        df_large = single_df.join(multi_df, lsuffix='_single', rsuffix='_multi', how='outer')
 
                         df.to_csv(k + "_test.csv")
-
-                        df_large = single_df.join(multi_df, lsuffix='_single', rsuffix='_multi', how='outer')
                         df_large.to_csv(k + "_test_full.csv")
 
                     assert all(exec_multi - exec_single < eps)
