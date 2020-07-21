@@ -25,6 +25,7 @@ jobs:
       #- name: test
       - run: make test
         env:
+          # Run part of the tests, avoiding the multithreading part which runs out of memory on GitHub
           RUN_PART: 1
 
       #- name: artifacts

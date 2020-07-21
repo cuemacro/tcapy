@@ -8,3 +8,4 @@ docker-compose rm -v -f mysql
 docker-compose rm -v -f mongo
 docker-compose rm -v -f celery
 docker-compose rm -v -f redis
+docker-compose rm -v -f memcached

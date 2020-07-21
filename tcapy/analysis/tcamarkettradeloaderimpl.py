@@ -272,7 +272,7 @@ class TCAMarketTradeLoaderImpl(TCAMarketTradeLoader):
 
                 i = i + 1
 
-                logger.warn("Failed with " + parallel_library + ", trying again for " + str(i) + " time: " + str(e) + ", " + str(traceback.format_exc()))
+                logger.warning("Failed with " + parallel_library + ", trying again for " + str(i) + " time: " + str(e) + ", " + str(traceback.format_exc()))
 
         logger.debug("Finished parallel computation")
 

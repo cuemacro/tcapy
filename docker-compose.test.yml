@@ -31,7 +31,7 @@ services:
       dockerfile: Dockerfile
       target: test
     working_dir: /tcapy
-    command: "celery -A tcapy.conf.celery_calls worker --purge --discard --loglevel=debug -Q celery --concurrency=1"
+    command: "celery -A tcapy.conf.celery_calls worker --purge --discard --loglevel=debug -Q celery --concurrency=14"
     environment:
       - APP_ENV=docker
       - C_FORCE_ROOT=true

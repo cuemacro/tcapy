@@ -1,6 +1,9 @@
 # Set the base image to Ubuntu, use a public image
 FROM python:3.7.7-slim-stretch as builder
 
+# To build tests run
+# docker-compose -f docker-compose.test.yml build
+
 # File Author / Maintainer
 # MAINTAINER Thomas Schmelzer "thomas.schmelzer@gmail.com"
 
@@ -32,16 +35,21 @@ WORKDIR /tcapy
 RUN mkdir -p /tmp/csv
 RUN mkdir -p /tmp/tcapy
 
+CMD echo "${RUN_PART}"
+
 # Run the pytest
 # If RUN_PART is not defined, we're not running on GitHub CI, we're running tests locally
 # Otherwise if RUN_PART is defined, it's likely we're running on GitHub, so we avoid running multithreading tests which run
 # out of memory (machines have limited memory)
-CMD if [ -z "${RUN_PART}" ]; \
-    then py.test --cov=tcapy  --cov-report html:artifacts/html-coverage --cov-report term \
-        --html=artifacts/html-report/report.html test; \
+CMD if [ "${RUN_PART}" = 1 ]; \
+    then py.test --cov=tcapy  --cov-report html:artifacts/html-coverage --cov-report term --html=artifacts/html-report/report.html --ignore-glob='*multithreading*.py'; \
     else py.test --cov=tcapy  --cov-report html:artifacts/html-coverage --cov-report term \
-        --html=artifacts/html-report/report.html --ignore=test/test_tcapy/test_tca_multithreading.py test; \
+        --html=artifacts/html-report/report.html; \
     fi
+
+# Run everything
+#CMD py.test --cov=tcapy  --cov-report html:artifacts/html-coverage --cov-report term \
+#        --html=artifacts/html-report/report.html --ignore-glob='*multithreading*.py' ;
 
 # Example to run a specific test script
 # CMD py.test --cov=tcapy  --cov-report html:artifacts/html-coverage --cov-report term \
