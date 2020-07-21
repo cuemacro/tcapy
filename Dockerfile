@@ -41,11 +41,11 @@ CMD echo "${RUN_PART}"
 # If RUN_PART is not defined, we're not running on GitHub CI, we're running tests locally
 # Otherwise if RUN_PART is defined, it's likely we're running on GitHub, so we avoid running multithreading tests which run
 # out of memory (machines have limited memory)
-CMD if [ "${RUN_PART}" = 1 ]; \
-    then py.test --cov=tcapy  --cov-report html:artifacts/html-coverage --cov-report term --html=artifacts/html-report/report.html --ignore-glob='*multithreading*.py'; \
-    else py.test --cov=tcapy  --cov-report html:artifacts/html-coverage --cov-report term \
-        --html=artifacts/html-report/report.html; \
-    fi
+#CMD if [ "${RUN_PART}" = 1 ]; \
+#    then py.test --cov=tcapy  --cov-report html:artifacts/html-coverage --cov-report term --html=artifacts/html-report/report.html --ignore-glob='*multithreading*.py'; \
+#    else py.test --cov=tcapy  --cov-report html:artifacts/html-coverage --cov-report term \
+#        --html=artifacts/html-report/report.html; \
+#    fi
 
 # Run everything
 #CMD py.test --cov=tcapy  --cov-report html:artifacts/html-coverage --cov-report term \
@@ -56,8 +56,8 @@ CMD if [ "${RUN_PART}" = 1 ]; \
 #    --html=artifacts/html-report/report.html test/test_tcapy/test_tca_multithreading.py
 
 # Example to run an individual test function
-# CMD py.test --cov=tcapy  --cov-report html:artifacts/html-coverage --cov-report term \
-#    --html=artifacts/html-report/report.html test/test_tcapy/test_data_read_write.py::test_write_trade_data_sql
+ CMD py.test --cov=tcapy  --cov-report html:artifacts/html-coverage --cov-report term \
+    --html=artifacts/html-report/report.html test/test_tcapy/test_data_read_write.py::test_write_trade_data_sql
 
 # For debugging to keep container going
 # CMD tail -f /dev/null
