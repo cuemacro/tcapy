@@ -24,6 +24,8 @@ jobs:
       # Runs a single command using the runners shell
       #- name: test
       - run: make test
+      - env:
+          - RUN_PART: 1
 
       #- name: artifacts
       - uses: actions/upload-artifact@v2

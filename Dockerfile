@@ -33,10 +33,10 @@ RUN mkdir -p /tmp/csv
 RUN mkdir -p /tmp/tcapy
 
 # Run the pytest
-# If CI is not defined, we're not running on GitHub CI, we're running tests locally
-# Otherwise if CI is defined, it's likely we're running on GitHub, so we avoid running multithreading tests which run
+# If RUN_PART is not defined, we're not running on GitHub CI, we're running tests locally
+# Otherwise if RUN_PART is defined, it's likely we're running on GitHub, so we avoid running multithreading tests which run
 # out of memory (machines have limited memory)
-CMD if [ -z "${CI}"]; \
+CMD if [ -z "${RUN_PART}"]; \
     then py.test --cov=tcapy  --cov-report html:artifacts/html-coverage --cov-report term \
         --html=artifacts/html-report/report.html test; \
     else py.test --cov=tcapy  --cov-report html:artifacts/html-coverage --cov-report term \
