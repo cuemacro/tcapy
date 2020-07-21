@@ -33,12 +33,18 @@ RUN mkdir -p /tmp/csv
 RUN mkdir -p /tmp/tcapy
 
 # Run the pytest
-CMD py.test --cov=tcapy  --cov-report html:artifacts/html-coverage --cov-report term \
-    --html=artifacts/html-report/report.html test
+# If CI is true, we're running on GitHub CI, so avoid multithreaded tests which runs out of memory
+# We can run the multithreading tests locally
+CMD if [ "${CI}" == "true" ]; \
+    then py.test --cov=tcapy  --cov-report html:artifacts/html-coverage --cov-report term \
+        --html=artifacts/html-report/report.html --ignore=test/test_tcapy/test_tca_multithreading.py test; \
+    else py.test --cov=tcapy  --cov-report html:artifacts/html-coverage --cov-report term \
+        --html=artifacts/html-report/report.html test; \
+    fi
 
 # Example to run a specific test script
-# CMD py.test --cov=tcapy  --cov-report html:artifacts/html-coverage --cov-report term \
-#    --html=artifacts/html-report/report.html test/test_tcapy/test_trade_data_generation.py
+#CMD py.test --cov=tcapy  --cov-report html:artifacts/html-coverage --cov-report term \
+#    --html=artifacts/html-report/report.html test/test_tcapy/test_tca_multithreading.py
 
 # Example to run an individual test function
 # CMD py.test --cov=tcapy  --cov-report html:artifacts/html-coverage --cov-report term \
