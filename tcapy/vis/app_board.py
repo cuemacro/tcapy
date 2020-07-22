@@ -17,14 +17,19 @@ __author__ = 'saeedamen' # Saeed Amen / saeed@cuemacro.com
 
 from tcapy.vis.app_imports import *
 
-# create Flask object and create Dash instance on top of it
-# sharing=True,
-server=Flask(__name__)
-# add a static image/css route that serves images from desktop
+# Create Flask object and create Dash instance on top of it
+server = Flask(__name__)
+
+debug_start_flask_server_directly = constants.debug_start_flask_server_directly
+
+# Add a static image/css route that serves images from desktop
 # be *very* careful here - you don't want to serve arbitrary files
 # from your computer or server
-url_prefix = 'tcapyboard' # eg. if hosted on "http://localhost/tcapyboard" (can also be empty)
-# url_prefix = constants.url_prefix # eg. if hosted on "http://localhost/tcapy" (can also be empty)
+if debug_start_flask_server_directly:
+    url_prefix = ''
+else:
+    url_prefix = 'tcapyboard' # eg. if hosted on "http://localhost/tcapyboard" (can also be empty)
+    # url_prefix = constants.url_prefix # eg. if hosted on "http://localhost/tcapy" (can also be empty)
 
 stylesheets = ['tcapy.css']
 
@@ -34,6 +39,7 @@ else:
     static_css_route = '/' + url_prefix + '/static/'
 
 stylesheets_path = []
+
 for css in stylesheets:
     # app.css.append_css({"external_url": static_css_route + css})
     stylesheets_path.append(static_css_route + css)
@@ -42,12 +48,8 @@ app = dash.Dash(name='tcapyboard', server=server, suppress_callback_exceptions=T
 app.title = 'tcapyboard'
 app.server.secret_key = constants.secret_key
 
-# url_prefix = '' # for debugging when starting server directly
-debug_start_flask_server_directly = False
-
 # allow tcapy to be hosted on a different url eg. not on root
 if debug_start_flask_server_directly:
-    url_prefix = ''
 
     app.config.update({
         'routes_pathname_prefix': '/',
@@ -61,7 +63,7 @@ else:
     })
 
 callback_dict = {}
-callback_dict['aggregated'] = ['csv-uploadbox']
+callback_dict['aggregated'] = ['csv-uploadbox', 'market-data-val', 'calculation-button']
 
 # this loads up a user specific version of the layout and TCA application
 if False:
@@ -91,19 +93,19 @@ app.scripts.config.serve_locally = True # had issues fetching JS scripts remotel
 
 logger.info("Connected to volatile cache/Redis host")
 
-# add a static image/css route that serves images from desktop
+# Add a static image/css route that serves images from desktop
 # be *very* careful here - you don't want to serve arbitrary files
 # from your computer or server
 cur_directory = app.server.root_path
 stylesheets = ['tcapy.css']
 
-if url_prefix == '':
-    static_css_route = '/static/'
-else:
-    static_css_route = '/' + url_prefix + '/static/'
-
-for css in stylesheets:
-    app.css.append_css({"external_url": static_css_route + css})
+# if url_prefix == '':
+#     static_css_route = '/static/'
+# else:
+#     static_css_route = '/' + url_prefix + '/static/'
+#
+# for css in stylesheets:
+#     app.css.append_css({"external_url": static_css_route + css})
 
 # create the HTML layout for the pages (note: this is in a separate file layout.py)
 app.layout = layout.page_content

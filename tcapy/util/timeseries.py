@@ -1117,7 +1117,7 @@ class TimeSeriesOps(object):
 
         np_dt64 = np.datetime64(pd.Timestamp(date))
 
-        timestamps = np.array(df.index)
+        timestamps = np.array(df.index, dtype="datetime64[ns]")
 
         upper_index = bisect(timestamps, np_dt64,
                              hi=len(timestamps) - 1)  # Find the upper index of the closest time stamp

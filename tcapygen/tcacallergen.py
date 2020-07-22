@@ -76,7 +76,7 @@ class TCACallerImplGen(TCACaller):
 
             old_clicks = self._session_manager.get_session_clicks(tag)
 
-            # make sure none of the other charts/links are plotted till we have completed this!
+            # Make sure none of the other charts/links are plotted till we have completed this!
             self._session_manager.set_session_flag(
                 [self._plot_flags['aggregated'], self._plot_flags['detailed'], self._plot_flags['compliance']], False)
             

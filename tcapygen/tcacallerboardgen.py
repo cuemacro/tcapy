@@ -78,22 +78,26 @@ class TCACallerImplBoardGen(TCACaller):
             logger = LoggerManager.getLogger(__name__)
             logger.debug('Triggered click ' + tca_type)
 
-            # old_clicks = self._session_manager.get_session_clicks(_tag)
+            old_clicks = self._session_manager.get_session_clicks(tag)
 
-            # make sure none of the other charts are plotted till we have completed this!
+            # Make sure none of the other charts are plotted till we have completed this!
+            self._session_manager.set_session_flag(
+                [self._plot_flags['aggregated']], False)
 
             if tca_type == 'aggregated':
-                uploadbox = args
 
-                if uploadbox is not None:
+                uploadbox, market_data_val, n_clicks = args
 
-                    if isinstance(uploadbox, tuple):
-                        uploadbox = uploadbox[0]
+                # Catch cases where users repeatedly click, which can cause misalignment in clicks
+                self._session_manager.set_session_clicks(tag, n_clicks, old_clicks=old_clicks)
 
+                logger.debug(self.create_generate_button_msg(old_clicks, n_clicks))
+
+                if uploadbox is not None and market_data_val != '' and n_clicks > old_clicks:
                     # Assume that the user uploaded a binary CSV file
                     trade_df = DatabaseSourceCSVBinary(trade_data_database_csv=uploadbox).fetch_trade_order_data()
 
-                    data_frame_trade_order_mapping = OrderedDict([('trade_df', trade_df)])
+                    data_frame_trade_order_mapping = {'trade_df' : trade_df}
 
                     start_date = trade_df.index[0];
                     finish_date = trade_df.index[-1]
@@ -153,7 +157,7 @@ class TCACallerImplBoardGen(TCACaller):
                                 tca_request=
                                     TCARequest(start_date=start_date, finish_date=finish_date, ticker=ticker_val,
                                                tca_type='aggregated',
-                                               market_data_store='arctic-ncfx', trade_data_store='dataframe',
+                                               market_data_store=market_data_val, trade_data_store='dataframe',
                                                trade_order_mapping=data_frame_trade_order_mapping,
                                                metric_calcs=[MetricSlippage(), MetricMarkout(trade_order_list=['trade_df'])],
                                                results_form=results_form, dummy_market=True, use_multithreading=True)

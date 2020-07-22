@@ -109,8 +109,9 @@ class LayoutImplGen(Layout):
             html.Div(id='page-content')
         ])
 
-        link_bar_dict = OrderedDict([('Detailed', 'detailed'), ('Aggregated', 'aggregated'),
-                                     ('Compliance', 'compliance')])
+        link_bar_dict = {'Detailed' : 'detailed',
+                         'Aggregated' : 'aggregated',
+                         'Compliance' : 'compliance'}
 
         trade_outliers_cols = ['Date', 'ticker', 'side', 'notional cur', 'benchmark', 'exec not',
                                'exec not in rep cur', 'slippage']
@@ -127,8 +128,8 @@ class LayoutImplGen(Layout):
 
             # Dropdown selection boxes
             html.Div([
-                self.drop_down(caption='Start Date', id=OrderedDict([('start-date-val', self.available_dates),
-                                                                     ('start-time-val', self.available_times)]),
+                self.drop_down(caption='Start Date', id={'start-date-val' : self.available_dates,
+                                                         'start-time-val' : self.available_times},
                                prefix_id='detailed'),
                 self.drop_down(caption='Finish Date', id=OrderedDict([('finish-date-val', self.available_dates),
                                                                       ('finish-time-val', self.available_times)]),

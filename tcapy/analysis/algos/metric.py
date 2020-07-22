@@ -711,9 +711,10 @@ class MetricMarkout(MetricDisplay):
                 # if ix_price[-1] > len(market_df.index): ix_price[-1] = ix_price[-1] - 1
                 # ix_price[ix_price > len(market_df.index)] = len(market_df.index) - 1
 
-                # now fill the column with the market price at the shifted time
-                metric_df.ix[is_side, str(window) + self._markout_unit_of_measure] = market_df.ix[
-                    ix_price, benchmark].values.T
+                # Now fill the column with the market price at the shifted time
+                # metric_df.ix[is_side, str(window) + self._markout_unit_of_measure] = market_df.ix[
+                #     ix_price, benchmark].values.T
+                metric_df[str(window) + self._markout_unit_of_measure][is_side] = market_df[benchmark][ix_price].values.T
 
         return metric_df
 

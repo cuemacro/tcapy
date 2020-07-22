@@ -222,52 +222,52 @@ class Constants(object):
 
     ##### Assets & venues etc ##########################################################################################
 
-    test_available_tickers_dictionary = OrderedDict([
-        ('All', ['EURUSD', 'GBPUSD', 'AUDUSD', 'NZDUSD', 'USDCAD', 'USDCHF', 'USDJPY', 'AUDJPY', 'NZDCAD', 'AUDSEK', 'EURJPY',
-                 'EURSEK', 'SEKJPY', 'GBPSEK', 'USDSEK']),
-        ('G10', ['EURUSD', 'GBPUSD', 'AUDUSD', 'NZDUSD', 'USDCAD', 'USDCHF', 'USDJPY', 'AUDJPY', 'NZDCAD', 'AUDSEK', 'EURJPY',
-                 'EURSEK', 'SEKJPY', 'GBPSEK', 'USDSEK']),
-        ('EM',  ['USDZAR', 'USDTRY'])
-    ])
+    test_available_tickers_dictionary = {
+        'All' : ['EURUSD', 'GBPUSD', 'AUDUSD', 'NZDUSD', 'USDCAD', 'USDCHF', 'USDJPY', 'AUDJPY', 'NZDCAD', 'AUDSEK', 'EURJPY',
+                 'EURSEK', 'SEKJPY', 'GBPSEK', 'USDSEK'],
+        'G10' : ['EURUSD', 'GBPUSD', 'AUDUSD', 'NZDUSD', 'USDCAD', 'USDCHF', 'USDJPY', 'AUDJPY', 'NZDCAD', 'AUDSEK', 'EURJPY',
+                 'EURSEK', 'SEKJPY', 'GBPSEK', 'USDSEK'],
+        'EM'  :  ['USDZAR', 'USDTRY']
+    }
 
     test_venues_dictionary = \
-        OrderedDict([
-            ('All', ['venue1', 'venue2', 'venue3', 'venue4']),
-            ('Venue Group', ['venue1', 'venue2']),
-            ('Venue Group 2', ['venue3', 'venue4'])
-        ])
+        {
+            'All' : ['venue1', 'venue2', 'venue3', 'venue4'],
+            'Venue Group' : ['venue1', 'venue2'],
+            'Venue Group 2' : ['venue3', 'venue4']
+        }
 
-    test_portfolios_dictionary = OrderedDict([
-        ('All', ['portfolio1', 'portfolio2', 'portfolio3', 'portfolio4', 'portfolio5'])
-    ])
+    test_portfolios_dictionary = {
+        'All' : ['portfolio1', 'portfolio2', 'portfolio3', 'portfolio4', 'portfolio5']
+    }
 
-    test_brokers_dictionary = OrderedDict([
-        ('All', ['broker1', 'broker2', 'broker3', 'broker4', 'broker5', 'broker6']),
-        ('Broker Group', ['broker1', 'broker2', 'broker3']),
-        ('Broker Group 2', ['broker4', 'broker5', 'broker6'])
-    ])
+    test_brokers_dictionary = {
+        'All' : ['broker1', 'broker2', 'broker3', 'broker4', 'broker5', 'broker6'],
+        'Broker Group' : ['broker1', 'broker2', 'broker3'],
+        'Broker Group 2' : ['broker4', 'broker5', 'broker6']
+    }
 
-    test_sub_brokers_dictionary = OrderedDict([
-        ('All', ['subbroker1', 'subbroker2', 'subbroker3', 'subbroker4', 'subbroker5', 'subbroker6'])
-    ])
+    test_sub_brokers_dictionary = {
+        'All' : ['subbroker1', 'subbroker2', 'subbroker3', 'subbroker4', 'subbroker5', 'subbroker6']
+    }
 
-    test_portfolio_managers_dictionary = OrderedDict([
-        ('All', ['pm1', 'pm2', 'pm3', 'pm4', 'pm5', 'pm6'])
-    ])
+    test_portfolio_managers_dictionary = {
+        'All' : ['pm1', 'pm2', 'pm3', 'pm4', 'pm5', 'pm6']
+    }
 
-    test_traders_dictionary = OrderedDict([
-        ('All', ['trader1', 'trader2', 'trader3', 'trader4', 'trader5', 'trader6'])
-    ])
+    test_traders_dictionary = {
+        'All' : ['trader1', 'trader2', 'trader3', 'trader4', 'trader5', 'trader6']
+    }
 
-    test_accounts_dictionary = OrderedDict([
-        ('All', ['account1', 'account2', 'account3', 'account4', 'account5', 'account6'])
-    ])
+    test_accounts_dictionary = {
+        'All' : ['account1', 'account2', 'account3', 'account4', 'account5', 'account6']
+    }
 
-    test_algos_dictionary = OrderedDict([
-        ('All', ['algo1', 'algo2', 'algo3', 'algo4', 'algo5', 'algo6', 'algo7']),
-        ('Algo Group', ['algo1', 'algo2', 'algo3']),
-        ('Algo Group 2', ['algo4', 'algo5', 'algo6'])
-    ])
+    test_algos_dictionary = {
+        'All' : ['algo1', 'algo2', 'algo3', 'algo4', 'algo5', 'algo6', 'algo7'],
+        'Algo Group' : ['algo1', 'algo2', 'algo3'],
+        'Algo Group 2' : ['algo4', 'algo5', 'algo6']
+    }
 
     # Recommend overriding these for production in your cred file, these dictionaries need to be set this way for tests
     # to run, with the randomised test data
@@ -318,8 +318,8 @@ class Constants(object):
     default_data_store = 'csv'  # 'sql', 'csv'
 
     # Should usually specify our own sources (eg. CSV filenames)
-    default_market_data_store = 'arctic-ncfx'  # The default database store for market data
-    default_trade_data_store = 'mysql'  # The default database store for trade data
+    default_market_data_store = 'arctic-dukascopy'  # The default database store for market data
+    default_trade_data_store = 'mysql'              # The default database store for trade data
 
     ### CSV defaults (we can override these)
     # market_data_database_csv = os.path.join(test_data_folder, "test_market_data.csv")
@@ -381,9 +381,9 @@ class Constants(object):
 
     ms_sql_server_trade_data_database_name = 'trade_database'
 
-    ms_sql_server_trade_order_mapping = OrderedDict(
-        [('trade_df', '[dbo].[trade]'),  # Name of table which has broker messages to client
-         ('order_df', '[dbo].[order]')])  # Name of table which has orders from client
+    ms_sql_server_trade_order_mapping = \
+        {'trade_df' : '[dbo].[trade]',  # Name of table which has broker messages to client
+         'order_df' : '[dbo].[order]'}  # Name of table which has orders from client
 
     ## Postgres specific
     postgres_host = docker_var('postgres', 'localhost')
@@ -406,16 +406,16 @@ class Constants(object):
 
     mysql_dump_record_chunksize = 10000    # Making the chunk size very big for MySQL can slow down inserts significantly
 
-    mysql_trade_order_mapping = OrderedDict(
-        [('trade_df', 'trade_database.trade'),     # Name of the table which holds broker messages to clients
-         ('order_df', 'trade_database.order')])    # Name of the table which has orders from client
+    mysql_trade_order_mapping = \
+        {'trade_df' : 'trade_database.trade',     # Name of the table which holds broker messages to clients
+         'order_df' : 'trade_database.order'}     # Name of the table which has orders from client
 
     ## sqlite
     sqlite_trade_data_database_name = '/home/tcapyuser/db/trade_database.db'
 
-    sqlite_trade_order_mapping = OrderedDict(
-        [('trade_df', 'trade_table'),   # Name of the table which holds broker messages to clients
-         ('order_df', 'order_table')])  # Name of the table which has orders from client
+    sqlite_trade_order_mapping = \
+        {'trade_df' : 'trade_table',    # Name of the table which holds broker messages to clients
+         'order_df' : 'order_table'}    # Name of the table which has orders from client
 
     ### PyStore settings
     pystore_path = '/home/tcapyuser/pystore'

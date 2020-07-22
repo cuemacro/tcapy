@@ -5,8 +5,12 @@
 * No official releases yet
 
 ## Coding log
+* 22 Jul 2020
+    * Fixed problem collecting trade CSV from tcapyboard GUI and refactored layout
+    * Removed use of many deprecated Pandas features like `.ix`
 * 21 Jul 2020
     * Remove stress test by default because of out-of-memory messages on GitHub CI
+    * Tests pass locally on Docker (still not yet on GitHub CI)
 * 20 Jul 2020
     * Docker tests now pass, fixed docker-compose.test.yml
     * Removed logger.warn in project which is deprecated

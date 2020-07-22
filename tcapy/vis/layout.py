@@ -183,13 +183,13 @@ class Layout(ABC):
             id = prefix_id + '-' + id
 
         area = dcc.Upload(id=id, children=html.Div([caption + ': Drag and Drop or ', html.A('Select Files')],
-                                                   style={'borderWidth': '1px', 'width' : '350px', 'borderStyle': 'dashed', 'borderRadius': '5px'}))
+                                                   style={'borderWidth': '1px', 'width' : '980px', 'borderStyle': 'dashed', 'borderRadius': '5px'}))
 
         if className is None:
 
             return html.Div([
                 area
-            ], style={'width': '350px', 'display': 'inline-block', 'marginBottom': 0, 'marginTop': 0, 'marginLeft': 5,
+            ], style={'width': '980px', 'display': 'inline-block', 'marginBottom': 0, 'marginTop': 0, 'marginLeft': 5,
                       'marginRight': 5})
 
         else:
@@ -197,7 +197,7 @@ class Layout(ABC):
 
             return html.Div([
                 area, " "
-            ], style={'width': '800px', 'display': 'inline-block', 'marginBottom': 0, 'marginTop': 0, 'marginLeft': 5,
+            ], style={'width': '980px', 'display': 'inline-block', 'marginBottom': 0, 'marginTop': 0, 'marginLeft': 5,
                       'marginRight': 5})
 
     def plot(self, caption=None, id=None, prefix_id='', element_add=None, downloadplot_caption=None,

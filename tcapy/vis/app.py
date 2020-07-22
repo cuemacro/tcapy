@@ -17,11 +17,9 @@ __author__ = 'saeedamen' # Saeed Amen / saeed@cuemacro.com
 
 from tcapy.vis.app_imports import *
 
-# create Flask object and create Dash instance on top of it
-# sharing=True,
+# Create Flask object and create Dash instance on top of it
 server=Flask(__name__)
 
-# url_prefix = '' # for debugging when starting server directly
 debug_start_flask_server_directly = constants.debug_start_flask_server_directly
 
 # Add a static image/css route that serves images from desktop
@@ -52,7 +50,6 @@ cur_directory = app.server.root_path
 
 # Allow tcapy to be hosted on a different url eg. not on root
 if debug_start_flask_server_directly:
-    url_prefix = ''
 
     app.config.update({
         'routes_pathname_prefix': '/',

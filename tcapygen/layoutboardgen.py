@@ -21,8 +21,6 @@ import pandas as pd
 import datetime
 from datetime import timedelta
 
-from collections import OrderedDict
-
 from pandas.tseries.offsets import *
 
 ## For program constants
@@ -106,7 +104,7 @@ class LayoutImplBoardGen(Layout):
             html.Div(id='page-content')
         ])
 
-        link_bar_dict = OrderedDict([('Aggregated', '/aggregated')])
+        link_bar_dict = {'Aggregated' : '/aggregated'}
 
         markout_cols = self._util_func.flatten_list_of_lists(
             ['Date', 'exec not', 'not cur', 'side',
@@ -123,34 +121,21 @@ class LayoutImplBoardGen(Layout):
             self.header_bar('FX: Aggregated - Trader Analysis'),
             self.link_bar(link_bar_dict),
             self.width_cel(html.B("Status: ok", id='aggregated-status'), margin_left=5),
-            # self.horizontal_bar(),
-            #
-            # # dropdown selection boxes
-            # html.Div([
-            #     # self.drop_down(caption='Start Date', id='start-date-val', prefix_id='aggregated',
-            #     #                drop_down_values=self.available_dates),
-            #     # self.drop_down(caption='Finish Date', id='finish-date-val', prefix_id='aggregated',
-            #     #                drop_down_values=self.available_dates),
-            #     # self.drop_down(caption='Ticker', id='ticker-val', prefix_id='aggregated',
-            #     #                drop_down_values=self.available_grouped_tickers, multiselect=True),
-            #     # self.drop_down(caption='Broker', id='broker-val', prefix_id='aggregated',
-            #     #                drop_down_values=self.available_grouped_brokers, multiselect=True),
-            #     # self.drop_down(caption='Algo', id='algo-val', prefix_id='aggregated',
-            #     #                drop_down_values=self.available_grouped_algos, multiselect=True),
-            #     # self.drop_down(caption='Venue', id='venue-val', prefix_id='aggregated',
-            #     #                drop_down_values=self.available_grouped_venues, multiselect=True),
-            #     # self.drop_down(caption='Reload', id='reload-val', prefix_id='aggregated',
-            #     #                drop_down_values=self.available_reload),
-            #     # self.drop_down(caption='Market Data', id='market-data-val', prefix_id='aggregated',
-            #     #                drop_down_values=self.available_market_data),
-            #     # self.drop_down(caption='Event Type', id='event-type-val', prefix_id='aggregated',
-            #     #                drop_down_values=self.available_event_types),
-            #     # self.drop_down(caption='Metric', id='metric-val', prefix_id='aggregated',
-            #     #                drop_down_values=self.available_metrics),
-            # ]),
+
 
             self.horizontal_bar(),
-            self.uploadbox(caption='Upload trade CSV', id='csv-uploadbox', prefix_id='aggregated'),
+
+            # dropdown selection boxes
+            html.Div([
+                self.drop_down(caption='Market Data', id='market-data-val', prefix_id='aggregated',
+                               drop_down_values=self.available_market_data),
+            ]),
+
+            self.horizontal_bar(),
+            self.uploadbox(caption='Aggregated trade CSV', id='csv-uploadbox', prefix_id='aggregated'),
+
+            self.horizontal_bar(),
+            self.button(caption='Calculate', id='calculation-button', prefix_id='aggregated'),
 
             # , msg_id='aggregated-status'),
             self.horizontal_bar(),
