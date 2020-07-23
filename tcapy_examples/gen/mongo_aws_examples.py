@@ -1,14 +1,12 @@
-"""Tests functions for loading market and trade/order data (CSVs, SQL, Arctic, InfluxDB and KDB). Check that your database has
-market and trade data for these before running the test. test_data_write will write data into a test database first
-and then read - so that can be used instead, if your production market and trade databases are not yet populated.
+"""This shows how we can connect to an instance of MongoDB Atlas to read/write market tick data
 
-This will also involve setting your database IP, username, password etc.
+Note, that you will need to get a MongoDB Atlas cloud account, and change the connection string below for it to work
 """
 
 __author__ = 'saeedamen'  # Saeed Amen / saeed@cuemacro.com
 
 #
-# Copyright 2017 Cuemacro Ltd. - http//www.cuemacro.com / @cuemacro
+# Copyright 2020 Cuemacro Ltd. - http//www.cuemacro.com / @cuemacro
 #
 # See the License for the specific language governing permissions and limitations under the License.
 #
@@ -19,13 +17,9 @@ import time
 from tcapy.util.loggermanager import LoggerManager
 from tcapy.conf.constants import Constants
 
-from tcapy.analysis.tcarequest import TCARequest
-from tcapy.data.datafactory import MarketRequest, TradeRequest
+from tcapy.data.datafactory import MarketRequest
 
-from tcapy.data.databasesource import DatabaseSourceCSVBinary as DatabaseSourceCSV
-from tcapy.data.databasesource import \
-    DatabaseSourceMSSQLServer, DatabaseSourceMySQL, DatabaseSourceSQLite, \
-    DatabaseSourceArctic, DatabaseSourceKDB, DatabaseSourceInfluxDB, DatabaseSourcePyStore
+from tcapy.data.databasesource import DatabaseSourceArctic
 
 from tcapy.util.mediator import Mediator
 from tcapy.util.customexceptions import *
