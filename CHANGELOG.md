@@ -5,6 +5,8 @@
 * No official releases yet
 
 ## Coding log
+* 23 Jul 2020
+    * Added support for MongoDB Atlas instances (can specify connection string directly now)
 * 22 Jul 2020
     * Fixed problem collecting trade CSV from tcapyboard GUI and refactored layout
     * Removed use of many deprecated Pandas features like `.ix`

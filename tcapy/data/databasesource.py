@@ -1902,7 +1902,8 @@ class DatabaseSourceArctic(DatabaseSourceTickData):
 
     socketTimeoutMS = constants.arctic_timeout_ms
 
-    def __init__(self, postfix=None, host=constants.arctic_host, port=constants.arctic_port,
+    def __init__(self, postfix=None, connection_string=constants.arctic_connection_string,
+                 host=constants.arctic_host, port=constants.arctic_port,
                  username=constants.arctic_username, password=constants.arctic_password,
                  arctic_lib_type=constants.arctic_lib_type):
         """Initialise the Arctic object with our selected market data type (Arctic library type)
@@ -1912,6 +1913,13 @@ class DatabaseSourceArctic(DatabaseSourceTickData):
         postfix : str
             Postfix can be used to identify different market data sources (eg. 'ncfx' or 'dukascopy'), if we only use
             one market data source, this is not necessary
+
+        connection_string : str
+            Connection string for MongoDB, you can use this instead of specifiying the host directly eg. if you are
+            accessing MongoDB Atlas, it will be of the form below. If a connection string is provided, tcapy will ignore
+            all the various other paramaters like host, username, password etc.
+
+            mongodb+srv://<username>:<password>@cluster0.blah-blah.mongodb.net/?retryWrites=true&w=majority
 
         host : str
             MongoDB server hostname/IP
@@ -1932,13 +1940,22 @@ class DatabaseSourceArctic(DatabaseSourceTickData):
         #     if self._engine is None or self._store is None or arctic_lib_type != self._arctic_lib_type or \
         #         self._host != host or self._port != port or self._username != username or self._password != password:
 
-        ssl = constants.arctic_ssl
-        tlsAllowInvalidCertificates = constants.arctic_tlsAllowInvalidCertificates
+        if connection_string is not None:
+            # Assume short connection strings are invalid
+            if len(connection_string) < 10:
+                connection_string = None
 
-        self._engine = pymongo.MongoClient(host, port=port, connect=False,
-                                           username=username,
-                                           password=password,
-                                           ssl=ssl, tlsAllowInvalidCertificates=tlsAllowInvalidCertificates)
+        if connection_string is None:
+            ssl = constants.arctic_ssl
+            tlsAllowInvalidCertificates = constants.arctic_tlsAllowInvalidCertificates
+
+            self._engine = pymongo.MongoClient(host, port=port, connect=False,
+                                               username=username,
+                                               password=password,
+                                               ssl=ssl, tlsAllowInvalidCertificates=tlsAllowInvalidCertificates)
+
+        else:
+            self._engine = pymongo.MongoClient(connection_string)
 
         self._store = \
             Arctic(self._engine, socketTimeoutMS=self.socketTimeoutMS, serverSelectionTimeoutMS=self.socketTimeoutMS,

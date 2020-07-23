@@ -35,11 +35,12 @@ def docker_var(docker_var, normal_var, default_value=None):
     except:
         pass
 
-    if '$' in normal_var:
-        try:
-            return os.environ.get(normal_var.replace('$', ''))
-        except:
-            return default_value
+    if normal_var is not None:
+        if '$' in normal_var:
+            try:
+                return os.environ.get(normal_var.replace('$', ''))
+            except:
+                return default_value
 
     return normal_var
 
@@ -360,13 +361,13 @@ class Constants(object):
     sql_dump_record_chunksize = 100000
 
     ## SQL Server specific
-    ms_sql_server_host = 'localhost'
+    ms_sql_server_host = docker_var('$MS_SQL_SERVER_HOST', 'localhost')
     ms_sql_server_port = '1433'
 
     ms_sql_server_odbc_driver = "ODBC+Driver+17+for+SQL+Server"
 
-    ms_sql_server_username = "OVERWRITE_IN_ConstantsCred"
-    ms_sql_server_password = "OVERWRITE_IN_ConstantsCred"  # ms_sql_server
+    ms_sql_server_username = docker_var('$MS_SQL_SERVER_USER', 'tcapyuser')
+    ms_sql_server_password = docker_var('$MS_SQL_SERVER_PASSWORD', 'tcapyuser')
 
     ms_sql_server_python_package = 'pyodbc'  # 'pyodbc' or 'pymssql'
 
@@ -430,6 +431,9 @@ class Constants(object):
     # OVERWRITE_IN_ConstantsCred or set env var
     arctic_username = docker_var("$MONGO_INITDB_ROOT_USERNAME", 'tcapyuser')
     arctic_password = docker_var("$MONGO_INITDB_ROOT_PASSWORD", 'tcapyuser')
+
+    # Set this if you want to use an external MongoDB instance, eg. MongoDB Atlas
+    arctic_connection_string = docker_var("$MONGO_CONNECTION_STRING", None)
 
     arctic_ssl = False
     arctic_tlsAllowInvalidCertificates = True

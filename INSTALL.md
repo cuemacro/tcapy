@@ -157,6 +157,11 @@ defaults from `constants.py` will be used instead, which won't be as secure. Her
     MONGO_INITDB_ROOT_USERNAME=admin_root
     MONGO_INITDB_ROOT_PASSWORD=blah_blah_
     
+If you are using an external instance of MongoDB (eg. MongoDB Atlas), set the connection string, so this instance is used
+instead of MongoDB spawned by Docker (you should also edit docker-compose.yml so the mongo service no longer starts): 
+
+    MONGO_CONNECTION_STRING=mongodb+srv://<username>:<password>@cluster0.blah-blah.mongodb.net/?retryWrites=true&w=majority
+    
 In practice, you may wish to use different users other than `root` for your databases, when you configure them to 
 minimize access.
 
