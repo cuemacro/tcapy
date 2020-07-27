@@ -10,14 +10,9 @@ services:
       - ./tcapygen:/tcapy/tcapygen:ro
       - ./artifacts:/tcapy/artifacts
       - ./source:/source:ro
+    env_file: .tcapy.env
     environment:
       - APP_ENV=docker
-      - MONGO_AUTH_SOURCE=admin
-      - MONGO_INITDB_ROOT_USERNAME=tcapyuser
-      - MONGO_INITDB_ROOT_PASSWORD=tcapyuser
-      - MYSQL_USER=tcapyuser
-      - MYSQL_PASSWORD=tcapyuser
-      - MYSQL_ROOT_PASSWORD=tcapyuser
     depends_on:
       - celery
       - redis
@@ -32,15 +27,10 @@ services:
       target: test
     working_dir: /tcapy
     command: "celery -A tcapy.conf.celery_calls worker --purge --discard --loglevel=debug -Q celery --concurrency=14 -f test_celery.log"
+    env_file: .tcapy.env
     environment:
       - APP_ENV=docker
       - C_FORCE_ROOT=true
-      - MONGO_AUTH_SOURCE=admin
-      - MONGO_INITDB_ROOT_USERNAME=tcapyuser
-      - MONGO_INITDB_ROOT_PASSWORD=tcapyuser
-      - MYSQL_USER=root
-      - MYSQL_PASSWORD=tcapyuser
-      - MYSQL_ROOT_PASSWORD=tcapyuser
     depends_on:
       - redis
       - mongo
@@ -60,20 +50,15 @@ services:
 
   mongo:
     image: mongo:latest
-    environment:
-      - MONGO_AUTH_SOURCE=admin
-      - MONGO_INITDB_ROOT_USERNAME=tcapyuser
-      - MONGO_INITDB_ROOT_PASSWORD=tcapyuser
+    env_file: .tcapy.env
     ports:
       - 27017:27017
 
   mysql:
     image: mysql
     command: --default-authentication-plugin=mysql_native_password
+    env_file: .tcapy.env
     environment:
-      - MYSQL_USER=tcapyuser
-      - MYSQL_PASSWORD=tcapyuser
-      - MYSQL_ROOT_PASSWORD=tcapyuser
       - MYSQL_DATABASE=trade_database_test_harness
     ports:
       - 3306:3306

@@ -14,6 +14,8 @@ help:
 	@echo "       Build the docker image."
 	@echo "make test"
 	@echo "       Build the docker image for testing and run them."
+	@echo "make test_local"
+	@echo "       Build the docker image for testing and run them on a local environment/settings."
 	@echo "make doc"
 	@echo "       Construct the documentation."
 	@echo "make tag"
@@ -27,9 +29,11 @@ build:
 jupyter:
 	docker-compose build jupyter
 
-
 test:
 	docker-compose -f docker-compose.test.yml run sut
+
+test_local:
+	docker-compose -f docker-compose.local.test.yml run sut
 
 doc:
 	docker-compose -f docker-compose.test.yml run sut sphinx-build /source artifacts/build
