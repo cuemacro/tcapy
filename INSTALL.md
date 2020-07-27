@@ -144,7 +144,8 @@ In `/home/tcapyuser/cuemacro/tcapy` create a `.tcapy.env` file that has environm
 Docker containers. In particular this will be useful for holding the usernames and passwords. 
 
 If it's an empty file, the defaults from `constants.py` will be used instead, which won't be as secure. To create an empty
-`.tcapy.env` file, simply run `touch .tcapy.env` in the folder `/home/tcapuser/cuemacro/tcapy`.
+`.tcapy.env` file, simply run `touch .tcapy.env` in the folder `/home/tcapuser/cuemacro/tcapy`. Note, you need to make
+sure you have a `.tcapy.env` file even if it is empty!
  
 Here is a sample `.tcapy.env` file below:
 
