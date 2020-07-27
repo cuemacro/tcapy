@@ -116,39 +116,37 @@ Docker containers enable us to run applications independently, with their own de
 we don't need to spin up a new OS for each container, thus making them more efficient compared to VM.
 
 I've made a Docker container to install tcapy (and will also to have tcapy available in `pip`) and all its various
-dependencies.
+dependencies. We'll assume that the Linux user is `tcapyuser`.
 
 Thanks to Thomas Schmelzer (@tschm) for working on this element 
 and helping me a lot on the Docker part.
 
+* First you need to have installed Ubuntu/WSL2 or have access to a Ubuntu box (eg. on AWS)
 * Clone the tcapy project as described above from GitHub onto your local machine in a folder like `/home/tcapyuser/cuemacro/tcapy/`
 * Install Docker
     * On Ubuntu/WSL2 download (Docker Desktop for Windows)[https://docs.docker.com/docker-for-windows/install/] 
     * On Ubuntu (without WSL2) see (Docker's official instructions)[https://docs.docker.com/engine/install/ubuntu/]
-* On Ubuntu/WSL2, you may have issues with Docker's path
-    * `rm ~/.docker/config.json` may fix the problem
-    * see https://github.com/docker/compose/issues/7495 for other fixes and an explanation
+* On Ubuntu/WSL2, you may have issues with Docker's Desktop for Windows path
+    * `rm ~/.docker/config.json` usually fixes the problem
+    * See https://github.com/docker/compose/issues/7495 for other fixes and an explanation
 
-Let's create the following folders on our host machine. These will be linked to our containers. This will allow
+We need to create many folders on our host machine, for Docker and non-Docker versions, to store data. 
+These will be linked to our containers. This will allow
 us to persist data more easily (rather than having them hidden in the container). We have deliberately chosen different 
 folders to the standard ones for MongoDB and MySQL. We want to avoid the situation where these 
-folders are shared between our containers and databases in the host machine.
+folders are shared between our containers and databases in the host machine. Also make sure to create a `log` folder, under `/home/tcapyuser/cuemacro/tcapy` 
+and various temporary folders, that are specified in the `constants.py` file. The script `create_tcapy_working_folder.sh` can be
+run to create these.
 
-    sudo mkdir -p /data/db_mongodb
-    sudo chown -R mongodb:mongodb /data/db_mongodb
-    sudo mkdir -p /data/db_mysql
-    sudo chown -R mysql:mysql /data/db_mysql
-    
-Also make sure to create a `log` folder, under `/home/tcapyuser/cuemacro/tcapy` and various temporary folders, that are
-specified in the `constants.py` file:
-
-    sudo mkdir -p log
-    sudo mkdir /tmp/csv
-    sudo mkdir /tmp/tcapy
+    ./home/$USER/cuemacro/tcapy/batch_scripts/linux/installation/create_tcapy_working_folders.sh
 
 In `/home/tcapyuser/cuemacro/tcapy` create a `.tcapy.env` file that has environment variables to be used by the various
-Docker containers. In particular this will be useful for holding the usernames and passwords. If this isn't used
-defaults from `constants.py` will be used instead, which won't be as secure. Here is a sample `.tcapy.env` file below:
+Docker containers. In particular this will be useful for holding the usernames and passwords. 
+
+If it's an empty file, the defaults from `constants.py` will be used instead, which won't be as secure. To create an empty
+`.tcapy.env` file, simply run `touch .tcapy.env` in the folder `/home/tcapuser/cuemacro/tcapy`.
+ 
+Here is a sample `.tcapy.env` file below:
 
     MYSQL_USER=root
     MYSQL_PASSWORD=blah_blah_
@@ -156,6 +154,10 @@ defaults from `constants.py` will be used instead, which won't be as secure. Her
     MYSQL_DATABASE=trade_database
     MONGO_INITDB_ROOT_USERNAME=admin_root
     MONGO_INITDB_ROOT_PASSWORD=blah_blah_
+ 
+You can also add additional fields here, if you edit `constants.py` to pick up these environment variables. When using
+Docker `constantscred.py` is ignored. This allows you to have a different configuration when running via Docker vs.
+running directly. Also, your username/passwords won't be put in the container this way, by using a `.env` file.
     
 If you are using an external instance of MongoDB (eg. MongoDB Atlas), set the connection string, so this instance is used
 instead of MongoDB spawned by Docker (you should also edit docker-compose.yml so the mongo service no longer starts): 
@@ -219,6 +221,7 @@ to help you manage your Docker images and containers, which we list below:
 * `docker exec -it <container name> /bin/bash`
     * to get shell access into a Docker container
     * can be useful for troubleshooting
+    * if we want to run a Python script, we could run it in the Jupyter container
 * `docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' <container name>` - 
     * get the IP of a container
 * `docker image rm -f <service>` 
@@ -491,6 +494,16 @@ of dependencies and is often easier to setup, as you won't need to run Celery wo
 For Windows, if you want to kick off Celery workers for newer versions (4.x), it isn't supported, although there is a workaround 
 (see https://www.distributedpython.com/2018/08/21/celery-4-windows/) - so we'd recommend avoid attempting to kick off the Celery
 backend on Windows. Note, that calculations can be quite slow if Celery is not used (it will also reduce the caching opportunities)/
+
+# Amazon Linux onpremises
+
+If you'd like to run tcapy on the cloud, it is likely that you might want to use Amazon Linux. It is possible
+to run this locally using a virtual machine, if you're trying to do testing, before deploying to AWS. Below are instructions:
+
+* You can download it run a number of virtual machines applications including VMware and VirtualBox
+* Running Amazon Linux 2 as a virtual machine onpremises https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/amazon-linux-2-virtual-machine.html
+* Setting up a password on Amazon Linux local https://medium.com/shehuawwal/download-and-run-amazon-linux-2-ami-locally-on-your-virtualbox-or-vmware-b554a98dcb1c
+* Adding sudo rights for a user https://serverfault.com/questions/599357/how-does-amazon-ec2-user-get-its-sudo-rights
 
 # Archiving log files
 

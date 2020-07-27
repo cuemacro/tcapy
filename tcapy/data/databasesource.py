@@ -1162,6 +1162,8 @@ class DatabaseSourceSQL(DatabaseSource):
 
         con = engine.connect();
 
+        metadata = MetaData(bind=engine)
+
         # To try see if we can get the current columns in this database table (if it exists)
         try:
             metadata = MetaData(con)
@@ -1173,8 +1175,6 @@ class DatabaseSourceSQL(DatabaseSource):
             columns_already_in_db = [m.key for m in table.columns]
         except:
             pass
-
-        metadata = MetaData(bind=engine)
 
         # Make sure date column is 'date' not 'Date', mismatches cause problems!
         df = df.rename(columns={'Date': 'date'})
@@ -1210,11 +1210,15 @@ class DatabaseSourceSQL(DatabaseSource):
             if c.name in must_have_columns:
                 c.nullable = False
 
+        # Clear the metadata, so we don't have problems when redefining the table
+        # See https://stackoverflow.com/questions/37908767/table-roles-users-is-already-defined-for-this-metadata-instance
+        metadata.clear()
+
         table = Table(sqlalchemy_table_name_tick, metadata,
                       *cols, schema=schema
                       )
 
-        # if the user has wanted to replace the table, we dump any existing data in it
+        # If the user has wanted to replace the table, we dump any existing data in it
         if if_exists_table == 'replace':
             try:
                 metadata.drop_all(engine)

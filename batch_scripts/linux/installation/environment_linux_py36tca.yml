@@ -283,6 +283,7 @@ dependencies:
     - jdcal==1.4.1
     - jeepney==0.4.3
     - jupyter-dash==0.2.1
+    - kaleido==0.0.1
     - keyring==21.2.1
     - kombu==4.6.7
     - multidict==4.7.6
@@ -292,7 +293,7 @@ dependencies:
     - oauthlib==3.1.0
     - openpyxl==3.0.3
     - pandas-datareader==0.8.1
-    - plotly==4.8.0
+    - plotly==4.9.0
     - protobuf==3.6.1
     - pyphen==0.9.5
     - pystore==0.1.15

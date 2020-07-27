@@ -19,7 +19,8 @@ from tcapy.conf.constants import *
 from tcapy.util.timeseries import TimeSeriesOps, RandomiseTimeSeries
 from tcapy.util.utilfunc import UtilFunc
 
-from tcapy.data.databasesource import DatabaseSourceArctic, DatabaseSourceMSSQLServer, DatabaseSourceMySQL
+from tcapy.data.databasesource import DatabaseSourceArctic, DatabaseSourceKDB, DatabaseSourceInfluxDB, \
+    DatabaseSourceMSSQLServer, DatabaseSourceMySQL, DatabaseSourceSQLite
 
 from tcapy.analysis.tcarequest import MarketRequest
 from tcapy.util.loggermanager import LoggerManager
@@ -34,13 +35,18 @@ class DataTestCreator(object):
 
     """
 
-    def __init__(self, market_data_postfix='dukascopy', csv_market_data=None, write_to_db=True, sql_trade_database_type='mysql',
-                 arctic_market_data_database_name=constants.arctic_market_data_database_name,
-                 arctic_market_data_database_table=constants.arctic_market_data_database_table,
+    def __init__(self, market_data_postfix='dukascopy', csv_market_data=None, write_to_db=True,
+                 market_data_source='arctic',
+                 sql_trade_database_type='mysql',
+                 market_data_database_name=constants.arctic_market_data_database_name,
+                 market_data_database_table=constants.arctic_market_data_database_table,
                  trade_data_database_name=constants.mysql_trade_data_database_name
                  ):
         if csv_market_data is None:
-            self._market_data_source = 'arctic-' + market_data_postfix
+            if market_data_source in ['arctic', 'kdb', 'influxdb']:
+                self._market_data_source = market_data_source + '-' + market_data_postfix
+            else:
+                self._market_data_source = market_data_postfix
         else:
             self._market_data_source = csv_market_data
 
@@ -48,16 +54,25 @@ class DataTestCreator(object):
 
         # Assumes MongoDB for tick data and MSSQL for trade/order data
         if write_to_db:
-            self._database_source_market = DatabaseSourceArctic(postfix=market_data_postfix) # market data source
 
-            self._market_data_database_name = arctic_market_data_database_name
-            self._market_data_database_table = arctic_market_data_database_table
+            if market_data_source == 'arctic':
+                self._database_source_market = DatabaseSourceArctic(postfix=market_data_postfix) # market data source
+            elif market_data_source == 'kdb':
+                self._database_source_market = DatabaseSourceKDB(postfix=market_data_postfix)  # market data source
+            elif market_data_source == 'influxdb':
+                self._database_source_market = DatabaseSourceInfluxDB(postfix=market_data_postfix)  # market data source
+
+            self._market_data_database_name = market_data_database_name
+            self._market_data_database_table = market_data_database_table
 
             if sql_trade_database_type == 'ms_sql_server':
                 self._database_source_trade = DatabaseSourceMSSQLServer()                  # trade data source
                 self._trade_data_database_name = trade_data_database_name
             elif sql_trade_database_type == 'mysql':
                 self._database_source_trade = DatabaseSourceMySQL()                        # trade data source
+                self._trade_data_database_name = trade_data_database_name
+            elif sql_trade_database_type == 'sqlite':
+                self._database_source_trade = DatabaseSourceSQLite()                        # trade data source
                 self._trade_data_database_name = trade_data_database_name
 
         self.time_series_ops = TimeSeriesOps()

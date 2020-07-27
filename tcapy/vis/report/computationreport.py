@@ -167,18 +167,20 @@ class JinjaRenderer(Renderer):
     Reference: https://pbpython.com/pdf-reports.html
     """
 
-    def __init__(self, html_template='clean_report.html', logo_path=constants.root_folder + "/vis/report/templates/cuemacro_logo.png"):
+    def __init__(self, html_template='clean_report.html', logo_file='cuemacro_logo.png',
+                 template_folder=constants.root_folder + "/vis/report/templates/"):
+
         super(JinjaRenderer, self).__init__()
+
         self._html_template = html_template
-        self._logo_path = logo_path
+        self._logo_path = template_folder + logo_file
+        self._template_folder = template_folder
 
     def render_elements(self, elements_to_render_dict, title=None, output_filename=None, output_format='html',
                         pdf_converter='weasyprint', offline_js=False,
                         extra_head_code=None):
 
-        path = constants.root_folder + "/vis/report/templates/"
-
-        env = Environment(loader=FileSystemLoader(searchpath=path))
+        env = Environment(loader=FileSystemLoader(searchpath=self._template_folder))
 
         template = env.get_template(self._html_template)
 

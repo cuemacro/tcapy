@@ -31,7 +31,6 @@ constants = Constants()
 # Compatible with Python 2 *and* 3:
 ABC = abc.ABCMeta('ABC', (object,), {'__slots__': ()})
 
-
 binary_format=constants.binary_default_dump_format # 'hdf5' or 'parquet'
 
 if binary_format == 'hdf5':
@@ -604,7 +603,8 @@ class DatabasePopulator(ABC):
         df = time_series_ops.localize_as_UTC(df)
         util_func.write_dataframe_to_binary(df, filename, format=binary_format)
 
-    def write_df_to_db(self, tickers=None, remove_duplicates=True, if_exists_table='append', if_exists_ticker='replace'):
+    def write_df_to_db(self, tickers=None, remove_duplicates=True, if_exists_table='append', if_exists_ticker='replace',
+                       use_multithreading=constants.use_multithreading):
         """Loads up a large HDF5/Parquet file from disk into a pd DataFrame and then dumps locally.
         Uses use_multithreading to speed it up, by using a thread for each different ticker.
 
@@ -624,6 +624,9 @@ class DatabasePopulator(ABC):
             'append' - if ticker already exists in the database, append to it
             'replace' - replace any data for this ticker
 
+        use_multithreading : bool
+            Uses multithreading or not
+
         Returns
         -------
 
@@ -636,7 +639,7 @@ class DatabasePopulator(ABC):
         if not (isinstance(tickers, list)):
             tickers = [tickers]
 
-        if constants.use_multithreading:
+        if use_multithreading:
 
             swim = Swim(parallel_library=constants.database_populator_threading_library)
             pool = swim.create_pool(thread_no=self._get_threads())

@@ -37,16 +37,8 @@ finish_date = '25 May 2017'
 
 trade_data_store = 'mysql'
 trade_data_database_name = 'trade_database_test_harness'
-trade_order_mapping = {
-    'ms_sql_server' :   {'trade_df' : '[dbo].[trade]',      # Name of table which has broker messages to client
-                         'order_df' : '[dbo].[order]'},     # Name of table which has orders from client
-    'mysql':            {'trade_df': 'trade_database_test_harness.trade',   # Name of table which has broker messages to client
-                         'order_df': 'trade_database_test_harness.order'},  # Name of table which has orders from client
-    'sqlite':           {'trade_df': 'trade_table',  # Name of table which has broker messages to client
-                         'order_df': 'order_table'}  # Name of table which has orders from client
-}
 
-trade_order_mapping = trade_order_mapping[trade_data_store]
+trade_order_mapping = sql_trade_order_mapping[trade_data_store]
 
 market_data_store = 'arctic-testharness'
 market_data_database_table = 'market_data_table_test_harness'
@@ -56,28 +48,7 @@ reporting_currency = 'USD'
 tca_type = 'aggregated'
 venue_filter = 'venue1'
 
-# So we are not specifically testing the database of tcapy - can instead use CSV in the test harness folder
-use_trade_test_csv = False
-use_market_test_csv = False
-
-use_multithreading = False
-
 ########################################################################################################################
-
-eps = 10 ** -5
-
-if use_market_test_csv:
-    market_data_store = resource('small_test_market_df.parquet')
-
-if use_trade_test_csv:
-    trade_data_store = 'csv'
-
-    trade_order_mapping = OrderedDict([('trade_df', resource('small_test_trade_df.csv')),
-                                       ('order_df', resource('small_test_order_df.csv'))])
-    venue_filter = 'venue1'
-else:
-    # Define your own trade order mapping
-    pass
 
 def test_overlapping_full_detailed_tca_calculation():
     """Tests a detailed TCA calculation works with caching and overlapping dates, checking that it has the right tables returned.

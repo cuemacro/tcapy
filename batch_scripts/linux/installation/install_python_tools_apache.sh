@@ -35,7 +35,7 @@ elif [ $DISTRO == "redhat"  ]; then
     sudo subscription-manager repos --enable=rhel-7-server-rpms
 
     sudo yum update
-    sudo yum install --yes \
+    sudo yum -y install \
       https://dl.fedoraproject.org/pub/epel/epel-release-latest-$(rpm -E '%{rhel}').noarch.rpm \
       python-setuptools python-devel python-pip git \
       gcc gcc-c++ wget make \

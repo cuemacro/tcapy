@@ -23,23 +23,23 @@ def docker_var(docker_var, normal_var, default_value=None):
     if default_value is None:
         default_value = normal_var
 
-    try:
+    # For cases where we are running from Docker
+    if 'APP_ENV' in os.environ:
         if os.environ.get('APP_ENV') == 'docker':
-            if '$' in docker_var:
-                try:
+            if '$' in str(docker_var):
+                if docker_var.replace('$', '') in os.environ:
                     return os.environ.get(docker_var.replace('$', ''))
-                except:
+                else:
                     return default_value
 
             return docker_var
-    except:
-        pass
 
+    # Other cases
     if normal_var is not None:
-        if '$' in normal_var:
-            try:
+        if '$' in str(normal_var):
+            if normal_var.replace('$', '') in os.environ:
                 return os.environ.get(normal_var.replace('$', ''))
-            except:
+            else:
                 return default_value
 
     return normal_var
@@ -66,8 +66,8 @@ class Constants(object):
 
     env = 'default'
 
-    tcapy_version = 'gen'  # 'user' for user specific or 'gen' for generic version (also for future usage 'test_tcapy')
-    tcapy_provider = 'internal_tcapy' # Will add external providers
+    tcapy_version = docker_var('$TCAPY_VERSION', 'gen')  # 'user' for user specific or 'gen' for generic version (also for future usage 'test_tcapy')
+    tcapy_provider = docker_var('$TCAPY_PROVIDER', 'internal_tcapy') # Will add external providers
 
     root_folder = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     log_folder = os.path.join(os.path.join(os.path.dirname(root_folder), 'log'))
@@ -118,11 +118,11 @@ class Constants(object):
     ##### Tickers for external data providers ##############################################################################
 
     ### NCFX
-    ncfx_url = None  # "OVERWRITE_IN_ConstantsCred"
+    ncfx_url = docker_var('$NCFX_URL', None)  # "OVERWRITE_IN_ConstantsCred"
 
     # sample format for NCFX data - 0112 2016100002;0112 2016100003;EURGBP;,CSV,username,password
-    ncfx_username = None  # "OVERWRITE_IN_ConstantsCred"
-    ncfx_password = None  # "OVERWRITE_IN_ConstantsCred"
+    ncfx_username = docker_var('$NCFX_USER', None)   # "OVERWRITE_IN_ConstantsCred"
+    ncfx_password = docker_var('$NCFX_PASS', None)  # "OVERWRITE_IN_ConstantsCred"
     ncfx_tickers = {'EURUSD': 'EURUSD',  # tcapy ticker name vs. NCFX ticker name (should generally be the same)
                     'GBPUSD': 'GBPUSD',
                     'AUDUSD': 'AUDUSD',
@@ -274,7 +274,7 @@ class Constants(object):
     # to run, with the randomised test data
 
     # Customise the types of assets traders, venues etc. (for testing purposes can just use the dummy variables above)
-    available_market_data = ['arctic-dukascopy', 'arctic-ncfx', 'kdb-ncfx', 'dukascopy']  # market data sources
+    available_market_data = ['arctic-dukascopy', 'arctic-ncfx', 'kdb-ncfx', 'dukascopy', 'ncfx']  # market data sources
     available_tickers_dictionary = test_available_tickers_dictionary  # which tickers do we trade, and want to do TCA in
     available_venues_dictionary = test_venues_dictionary  # trading venues
     available_portfolios_dictionary = test_portfolios_dictionary  # portfolio IDs
@@ -361,8 +361,8 @@ class Constants(object):
     sql_dump_record_chunksize = 100000
 
     ## SQL Server specific
-    ms_sql_server_host = docker_var('$MS_SQL_SERVER_HOST', 'localhost')
-    ms_sql_server_port = '1433'
+    ms_sql_server_host = docker_var('$MS_SQL_SERVER_HOST', 'localhost', default_value='sqlserver')
+    ms_sql_server_port = docker_var('$MS_SQL_SERVER_HOST', '1433')
 
     ms_sql_server_odbc_driver = "ODBC+Driver+17+for+SQL+Server"
 
@@ -387,8 +387,8 @@ class Constants(object):
          'order_df' : '[dbo].[order]'}  # Name of table which has orders from client
 
     ## Postgres specific
-    postgres_host = docker_var('postgres', 'localhost')
-    postgres_port = '1033'
+    postgres_host = docker_var('$POSTGRES_HOST', 'localhost')
+    postgres_port = docker_var('$POSTGRES_PORT', '1033')
 
     postgres_trade_data_database_name = 'trade_database'
 
@@ -396,8 +396,8 @@ class Constants(object):
     postgres_password = 'TODO'
 
     ## MySQL
-    mysql_host = docker_var('mysql', '127.0.0.1')
-    mysql_port = '3306'
+    mysql_host = docker_var('$MYSQL_HOST', '127.0.0.1', default_value='mysql')
+    mysql_port = docker_var('$MYSQL_PORT', '3306')
 
     mysql_trade_data_database_name = docker_var('$MYSQL_DATABASE', 'trade_database')
 
@@ -412,21 +412,21 @@ class Constants(object):
          'order_df' : 'trade_database.order'}     # Name of the table which has orders from client
 
     ## sqlite
-    sqlite_trade_data_database_name = '/home/tcapyuser/db/trade_database.db'
+    sqlite_trade_data_database_name = '/data/sqlite/trade_database.db'
 
     sqlite_trade_order_mapping = \
         {'trade_df' : 'trade_table',    # Name of the table which holds broker messages to clients
          'order_df' : 'order_table'}    # Name of the table which has orders from client
 
     ### PyStore settings
-    pystore_path = '/home/tcapyuser/pystore'
+    pystore_path = '/data/pystore'
 
     pystore_data_store = 'tcapy_store'
     pystore_market_data_database_table = 'market_data_table'
 
     ### Arctic/MongoDB
-    arctic_host = docker_var('mongo', '127.0.0.1')
-    arctic_port = 27017
+    arctic_host = docker_var("$MONGO_HOST", '127.0.0.1', default_value='mongo')
+    arctic_port = docker_var("$MONGO_PORT", 27017, default_value=27017)
 
     # OVERWRITE_IN_ConstantsCred or set env var
     arctic_username = docker_var("$MONGO_INITDB_ROOT_USERNAME", 'tcapyuser')
@@ -543,8 +543,8 @@ class Constants(object):
     volatile_cache_engine = 'redis' # 'redis' (TODO 'plasma')
 
     # Redis settings (for internal usage - not Celery message broker - those settings need to be specified seperately)
-    volatile_cache_host_redis = docker_var('redis', 'localhost')
-    volatile_cache_port_redis = '6379'
+    volatile_cache_host_redis = docker_var('$REDIS_HOST', 'localhost', default_value='redis')
+    volatile_cache_port_redis = docker_var('$REDIS_PORT', '6379', default_value='6379')
     volatile_cache_timeout_redis = 3000
     volatile_cache_redis_internal_database = 1  # For storing tcapy data (as opposed to for message broker reasons with Celery)
     volatile_cache_redis_password = None  # Can set optional password (Redis doesn't have username)
@@ -573,10 +573,10 @@ class Constants(object):
     # Using Redis as both can result in race conditions, because tcapy extensively uses Redis to cache datasets
     # alternatively: amqp/RabbitMQ as the result_backend, but this is deprecated on Celery and is more difficult to configure
 
-    celery_broker_url = docker_var('redis://redis:6379/0', 'redis://localhost:6379/0')
-    celery_result_backend = docker_var("cache+memcached://memcached:11211/", "cache+memcached://localhost:11211/")
-
-    # celery_result_backend = "amqp://tcapy:tcapy@localhost:5672//" # RabbitMQ
+    celery_broker_url = docker_var('$CELERY_BROKER_URL', 'redis://localhost:6379/0',
+                                   default_value='redis://redis:6379/0')
+    celery_result_backend = docker_var("$CELERY_RESULT_BACKEND", "cache+memcached://localhost:11211/",
+                                       default_value='cache+memcached://memcached:11211/')
 
     # You might need to adjust this depending on the size of tasks you end up running
     celery_timeout_seconds = 600

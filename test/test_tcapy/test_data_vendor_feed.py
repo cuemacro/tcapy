@@ -72,11 +72,12 @@ database_source_dict = {'dukascopy' : DatabaseSourceDukascopy(), 'ncfx' : Databa
 if constants.ncfx_url is None and 'ncfx' in data_vendor_name_list:
     data_vendor_name_list.remove('ncfx')
 
+if constants.ncfx_url is not None and 'ncfx' in data_vendor_name_list:
+    if len(constants.ncfx_url) < 10:
+        data_vendor_name_list.remove('ncfx')
+
 invalid_start_date = '01 Jan 1999'
 invalid_finish_date = '01 Feb 1999'
-
-csv_market_data_store = resource('small_test_market_df.parquet')
-csv_reverse_market_data_store = resource('small_test_market_df_reverse.parquet')
 
 use_multithreading = False
 

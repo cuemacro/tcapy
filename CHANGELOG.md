@@ -5,6 +5,13 @@
 * No official releases yet
 
 ## Coding log
+* 27 Jul 2020
+    * Added support for Plotly static image plot + write PDF reports in Docker
+    * Refactored upload trades and market tick data to a new class DataDumper
+    * Added more support for environmental variables
+    * Added extra documentation for installation using Docker
+    * Refactored tests to reduce duplicated code
+    * Bug fix for SQLAlchemy table wrapper
 * 23 Jul 2020
     * Added support for MongoDB Atlas instances (can specify connection string directly now)
 * 22 Jul 2020

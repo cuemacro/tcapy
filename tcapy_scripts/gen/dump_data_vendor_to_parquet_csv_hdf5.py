@@ -21,30 +21,25 @@ if __name__ == '__main__':
     data_vendor = 'dukascopy' # 'ncfx' or 'dukascopy'
     write_large_csv = False
     write_large_hdf5_parquet = True
-    return_df = True # returns the dataframe (DO NOT DO this for large datasets, as it will cause you to run out of memory)
+    return_df = False # returns the dataframe (DO NOT DO this for large datasets, as it will cause you to run out of memory)
     remove_duplicates = False   # Removes duplicate data points (the vast proportion of datapoints will be duplicates
                                 # this will make the CSV files much bigger, which is ok for archival purposes
                                 # however, when finally copying to the Arctic database, we recommend removing duplicates
                                 # otherwise, it quickly results in going out of memory
 
-    csv_folder = '/home/tcapyuser/csv_dump/' + data_vendor + '/'
+    csv_folder = '/data/csv_dump/' + data_vendor + '/'
     constants = Constants()
 
-    # Where should we dump the temporary FX data mini files and large H5 files
+    # Where should we dump the temporary FX data mini files and large H5/Parquet files
     # sometimes we might want to specify just a small section to download and specific tickers
-    # temp_data_folder = 'E:/tcapy_tests_data/temp_01Jun2018'; temp_large_data_folder = 'E:/tcapy_tests_data/temp_01Jun2018/large'
-    # temp_data_folder = 'E:/tcapy_tests_data/temp'; temp_large_data_folder = 'E:/tcapy_tests_data/large'
-    # tickers = {'EURUSD' : 'EURUSD'}
-    # start_date = '04 Nov 2017'; finish_date = '04 Nov 2017 09:00'
-    # delete_cached_files = True
 
     # Usual default parameters
     start_date = None; finish_date = None
 
     # You may need to change these folders
     temp_data_folder = constants.temp_data_folder; temp_large_data_folder = constants.temp_large_data_folder
-    temp_data_folder = '/home/tcapyuser/csv_dump/temp/'
-    temp_large_data_folder = '/home/tcapyuser/csv_dump/temp/large/'
+    temp_data_folder = '/data/csv_dump/temp/'
+    temp_large_data_folder = '/data/csv_dump/temp/large/'
 
     start_date_csv = '01 Apr 2016'; finish_date_csv = '01 May 2020'; split_size = 'monthly' # 'daily' or 'monthly'
     # start_date_csv = '01 Jan 2020'; finish_date_csv = '01 Jun 2020';

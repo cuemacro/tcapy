@@ -22,11 +22,18 @@ services:
       target: builder
     environment:
       - APP_ENV=docker
+    env_file: .tcapy.env
     ports:
       - 8888:8888
     depends_on:
       - redis
       - celery
+    volumes:
+      - /tmp/csv:/tmp/csv
+      - /tmp/tcapy:/tmp/tcapy
+      - /data/csv_dump:/data/csv_dump
+      - ./tcapy_notebooks:/home/jovyan/tcapy_notebooks
+      - ./tcapy_scripts:/home/jovyan/tcapy_scripts
 
   gunicorn_tcapy:
     build:
@@ -40,6 +47,7 @@ services:
       - ./log:/tcapy/log
       - /tmp/csv:/tmp/csv
       - /tmp/tcapy:/tmp/tcapy
+      - /data/csv_dump:/data/csv_dump
     env_file: .tcapy.env
     environment:
       - APP_ENV=docker
@@ -65,6 +73,7 @@ services:
       - ./log:/tcapy/log
       - /tmp/csv:/tmp/csv
       - /tmp/tcapy:/tmp/tcapy
+      - /data/csv_dump:/data/csv_dump
     env_file: .tcapy.env
     environment:
       - APP_ENV=docker
@@ -89,6 +98,7 @@ services:
       - ./log:/tcapy/log
       - /tmp/csv:/tmp/csv
       - /tmp/tcapy:/tmp/tcapy
+      - /data/csv_dump:/data/csv_dump
     env_file: .tcapy.env
     environment:
       - APP_ENV=docker
@@ -113,12 +123,11 @@ services:
   mongo:
     image: mongo:latest
     env_file: .tcapy.env
-    environment:
-      - MONGO_AUTH_SOURCE=admin
     ports:
       - 27017:27017
     volumes:
       - /data/db_mongodb:/data/db
+      - ./log/:/var/log/mongodb/
 
   mysql:
     image: mysql

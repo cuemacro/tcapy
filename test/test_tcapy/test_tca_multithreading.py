@@ -49,8 +49,6 @@ missing_ticker = 'AUDSEK'
 
 from collections import OrderedDict
 
-trade_order_mapping = ['trade_df', 'order_df']
-
 # start_date = '01 Oct 2017'; finish_date = '15 Nov 2017'; ticker = 'GBPUSD'
 
 invalid_start_date = '02 May 2000';
@@ -70,31 +68,19 @@ Mediator.get_volatile_cache().clear_cache()
 
 ########################################################################################################################
 
-trade_order_mapping = {
-    'ms_sql_server' :   {'trade_df' : '[dbo].[trade]',      # Name of table which has broker messages to client
-                         'order_df' : '[dbo].[order]'},     # Name of table which has orders from client
-    'mysql':            {'trade_df': 'trade_database_test_harness.trade',   # Name of table which has broker messages to client
-                         'order_df': 'trade_database_test_harness.order'},  # Name of table which has orders from client
-    'sqlite':           {'trade_df': 'trade_table',  # Name of table which has broker messages to client
-                         'order_df': 'order_table'}  # Name of table which has orders from client
-}
-trade_order_mapping = trade_order_mapping[trade_data_store]
-
 eps = 10 ** -3
 
 if use_market_test_csv:
     # Only contains limited amount of EURUSD and USDJPY in Apr/Jun 2017
-    market_data_store = resource('small_test_market_df.parquet')
+    market_data_store = csv_market_data_store
 
 if use_trade_test_csv:
     trade_data_store = 'csv'
 
-    trade_order_mapping = OrderedDict([('trade_df', resource('small_test_trade_df.csv')),
-                                       ('order_df', resource('small_test_order_df.csv'))])
+    trade_order_mapping = csv_trade_order_mapping
 
 else:
-    # Define your own trade order mapping
-    pass
+    trade_order_mapping = sql_trade_order_mapping[trade_data_store]
 
 # Test various TCA types with/without use_multithreading
 # Note: to test multithreading you need to have a Celery instance running

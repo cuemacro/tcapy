@@ -1,5 +1,5 @@
 """Dumps a small dataset of test market and trade data (fetched from Arctic) which can be used to test tcapy in
-compressed CSV format and H5 and will place it in the test harness folder. Test trade/order data already exists from the
+compressed CSV format and Parquet and will place it in the test harness folder. Test trade/order data already exists from the
 repo, however, you will need to download the market data from Dukascopy to run many of the CSV based tests.
 
 eg. /home/tcapyuser/cuemacro/tcapy/tests_harness_data
@@ -71,14 +71,14 @@ def create_market_trade_data():
     market_df.to_csv(os.path.join(folder, 'small_test_market_df.csv.gz'), compression='gzip')
 
     # Also write to disk as HDF5 file (easier to load up later)
-    util_func.write_dataframe_to_binary(market_df, os.path.join(folder, 'small_test_market_df.h5'))
+    util_func.write_dataframe_to_binary(market_df, os.path.join(folder, 'small_test_market_df.gzip'))
 
     # Create a spot file in reverse order
     market_df.sort_index(ascending=False)\
         .to_csv(os.path.join(folder, 'small_test_market_df_reverse.csv.gz'), compression='gzip')
 
-    # Also write to disk as HDF5 file (easier to load up later)
-    util_func.write_dataframe_to_binary(market_df, os.path.join(folder, 'small_test_market_df_reverse.h5'))
+    # Also write to disk as Parquet file (easier to load up later)
+    util_func.write_dataframe_to_binary(market_df, os.path.join(folder, 'small_test_market_df_reverse.parquet'))
 
     if create_trade_order_data:
         # Use the market data we just downloaded to CSV, and perturb it to generate the trade data

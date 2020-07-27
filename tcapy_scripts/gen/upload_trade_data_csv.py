@@ -1,6 +1,7 @@
 """Script to copy trade/order CSVs from disk and dump them into a SQL database. Note, that by default, they will replace
 any existing tables (this can be changed to 'append')
 
+Uses DataDumper underneath to access the various databases (via DatabaseSource)
 """
 
 from __future__ import division, print_function
@@ -14,34 +15,33 @@ __author__ = 'saeedamen'  # Saeed Amen / saeed@cuemacro.com
 #
 
 from tcapy.conf.constants import Constants
+import os
 
 constants = Constants()
 
 if __name__ == '__main__':
     # 'ms_sql_server' or 'mysql' or 'sqlite'
-    sql_database = 'mysql'
+    sql_database_type = 'mysql'
     trade_data_database_name = 'trade_database'
-
-    if sql_database == 'ms_sql_server':
-        from tcapy.data.databasesource import DatabaseSourceMSSQLServer as DatabaseSource
-    elif sql_database == 'mysql':
-        from tcapy.data.databasesource import DatabaseSourceMySQL as DatabaseSource
-    elif sql_database == 'sqlite':
-        from tcapy.data.databasesource import DatabaseSourceSQLite as DatabaseSource
-
-    # 'replace' or 'append'
-    if_exists_trade_table = 'replace'
+    trade_order_path = '/data/csv_dump/trade_order/'
 
     # Where are the trade/order CSVs stored, and how are they mapped?
     # This assumes you have already generated these files!
-    csv_sql_table_trade_order_mapping = {'trade' : 'trade_df_dump.csv', 'order' : 'order_df_dump.csv'}
 
-    # Get the actual table names in the database which may differ from "nicknames"
-    trade_order_mapping = constants.trade_order_mapping[sql_database]
+    # eg. 'trade' is the SQL table name, rather than the nickname we use
+    csv_sql_table_trade_order_mapping = {'trade' : os.path.join(trade_order_path, 'trade_df_dump.csv'),
+                                         'order' : os.path.join(trade_order_path, 'order_df_dump.csv')}
 
-    database_source = DatabaseSource(trade_data_database_name=trade_data_database_name, server_host='localhost')
+    # If no server host is specified then the default one from constants will be returned
+    server_host = None
 
-    for key in csv_sql_table_trade_order_mapping.keys():
-        database_source.convert_csv_to_table(
-            csv_sql_table_trade_order_mapping[key], None, key, database_name=trade_data_database_name,
-            if_exists_table=if_exists_trade_table)
+    # 'replace' or 'append' existing database table (replace will totally wipe it!)
+    if_exists_trade_table = 'replace'
+
+    from tcapy.data.datadumper import DataDumper
+
+    data_dumper = DataDumper()
+    data_dumper.upload_trade_data_flat_file(sql_database_type=sql_database_type, trade_data_database_name=trade_data_database_name,
+                      csv_sql_table_trade_order_mapping=csv_sql_table_trade_order_mapping,
+                      server_host=server_host, if_exists_trade_table=if_exists_trade_table)
+

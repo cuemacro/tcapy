@@ -49,14 +49,6 @@ finish_filter_date = '23:59:59 03 May 2017'
 
 trade_data_store = 'mysql'
 trade_data_database_name = 'trade_database_test_harness'
-trade_order_mapping = {
-    'ms_sql_server' :   {'trade_df' : '[dbo].[trade]',      # Name of table which has broker messages to client
-                         'order_df' : '[dbo].[order]'},     # Name of table which has orders from client
-    'mysql':            {'trade_df': 'trade_database_test_harness.trade',   # Name of table which has broker messages to client
-                         'order_df': 'trade_database_test_harness.order'},  # Name of table which has orders from client
-    'sqlite':           {'trade_df': 'trade_table',  # Name of table which has broker messages to client
-                         'order_df': 'order_table'}  # Name of table which has orders from client
-}
 
 market_data_store = 'arctic-testharness'
 market_data_database_table = 'market_data_table_test_harness'
@@ -82,24 +74,17 @@ use_multithreading = False
 # you can change the test_data_harness_folder to one on your own machine with real data
 folder = constants.test_data_harness_folder
 
-eps = 10 ** -5
-
-trade_order_mapping = trade_order_mapping[trade_data_store]
-
 if use_market_test_csv:
-
     # Only contains limited amount of EURUSD and USDJPY in Apr/Jun 2017
-    market_data_store = resource('small_test_market_df.parquet')
+    market_data_store = csv_market_data_store
 
 if use_trade_test_csv:
     trade_data_store = 'csv'
 
-    trade_order_mapping = OrderedDict([('trade_df', resource('small_test_trade_df.csv')),
-                                       ('order_df', resource('small_test_order_df.csv'))])
+    trade_order_mapping = csv_trade_order_mapping
     venue_filter = 'venue1'
 else:
-    # Define your own trade order mapping
-    pass
+    trade_order_mapping = sql_trade_order_mapping[trade_data_store]
 
 def get_sample_data(ticker_spec=None):
     if ticker_spec is None: ticker_spec = ticker
@@ -120,8 +105,8 @@ def get_sample_data(ticker_spec=None):
 
     trade_order_results_df_dict = tca_engine.calculate_tca(tca_request)
 
-    return trade_order_results_df_dict[ticker_spec + "_df"], trade_order_results_df_dict['trade_df'], \
-           trade_order_results_df_dict['order_df']
+    return trade_order_results_df_dict[ticker_spec + "_df"], trade_order_results_df_dict[trade_order_list[0]], \
+           trade_order_results_df_dict[trade_order_list[1]]
 
 
 def test_full_detailed_tca_calculation(fill_market_trade_databases):

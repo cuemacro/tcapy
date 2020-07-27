@@ -29,8 +29,8 @@ data_vendor = 'dukascopy'
 file_extension = 'parquet'
 resample_freq = '1min'
 
-csv_folder = '/home/tcapyuser/csv_dump/' + data_vendor + '/'
-csv_output = '/home/tcapyuser/csv_output/'
+csv_folder = '/data/csv_dump/' + data_vendor + '/'
+csv_output = '/data/csv_output/'
 
 combined_file = 'fx_' + resample_freq + '_' + data_vendor + '.' + file_extension
 

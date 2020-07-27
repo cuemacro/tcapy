@@ -16,7 +16,7 @@ import os
 from chartpy import Chart
 from tcapy.data.databasesource import DatabaseSourceCSVBinary
 
-parquet_path = '/home/tcapyuser/csv_dump/dukascopy/'
+parquet_path = '/data/csv_dump/dukascopy/'
 
 filename = ['EURUSD_dukascopy_2020-05-01_00_00_00.096000+00_002020-05-31_23_59_59.084000+00_00.parquet']
 

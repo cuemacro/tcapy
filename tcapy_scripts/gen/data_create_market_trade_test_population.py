@@ -59,11 +59,11 @@ if __name__ == '__main__':
     ticker_trade = ['EURUSD', 'GBPUSD', 'AUDUSD', 'NZDUSD', 'USDCAD', 'USDCHF', 'EURNOK', 'EURSEK',
                     'USDJPY', 'AUDJPY', 'NZDCAD', 'EURJPY']
 
-    # folder = '/ext_data/tcapy_data/'
-    folder = None
+    market_data_folder = '/data/csv_dump/' + data_source
+    trade_order_folder = '/data/csv_dump/trade_order'
 
-    if folder is None:
-        folder = Constants().test_data_harness_folder
+    if trade_order_folder is None:
+        trade_order_folder = constants.test_data_harness_folder
 
     # Copy market data from flat files (can be either .csv or .h5 or .parquet file - much quicker to use .parquet files)
     # to Arctic market database
@@ -73,7 +73,7 @@ if __name__ == '__main__':
     # you may use any other data you'd like
     if COPY_MARKET_CSV_DATA:
         csv_file = ['test_market_' + x + '.parquet' for x in ticker]
-        csv_market_data = [os.path.join(folder, x) for x in csv_file]
+        csv_market_data = [os.path.join(market_data_folder, x) for x in csv_file]
 
         data_test_creator.populate_test_database_with_csv(csv_market_data=csv_market_data, ticker=ticker,
                                                           csv_trade_data=None,
@@ -85,8 +85,8 @@ if __name__ == '__main__':
     if GENERATE_RANDOM_TRADE_ORDER_CSV_DATA:
         # Store the test trade/order data in different CSV files (and database tables)
         csv_trade_data = \
-            {'trade_df': os.path.join(folder, csv_marker + '_trade_df_generated.csv'),
-             'order_df': os.path.join(folder, csv_marker + '_order_df_generated.csv'),
+            {'trade_df': os.path.join(trade_order_folder, csv_marker + '_trade_df_generated.csv'),
+             'order_df': os.path.join(trade_order_folder, csv_marker + '_order_df_generated.csv'),
              }
 
         trade_order = data_test_creator.create_test_trade_order(ticker_trade, start_date=start_date_trade_generation,
@@ -100,9 +100,10 @@ if __name__ == '__main__':
 
     if COPY_TRADE_ORDER_CSV_DATA:
         # Users may want to modify these paths to their own trade/order data, when running in production
-        # This will copy premade files in the tests folder
-        database_table_trade_mapping = {'trade': os.path.join(folder, csv_marker + '_trade_df.csv'),
-                                        'order': os.path.join(folder, csv_marker + '_order_df.csv'),
+        # This will copy premade files we just produced now
+        # In this case 'trade' and 'order' are the tables on the SQL database
+        database_table_trade_mapping = {'trade': os.path.join(trade_order_folder, csv_marker + '_trade_df_generated.csv'),
+                                        'order': os.path.join(trade_order_folder, csv_marker + '_order_df_generated.csv'),
                                         }
 
         # Should we append to our existing trade data, or should we replace it

@@ -49,23 +49,6 @@ trade_data_store = 'mysql'
 
 ########################################################################################################################
 
-trade_order_list = ['trade_df', 'order_df']
-
-trade_order_mapping = {
-    'mysql': {'trade_df': 'trade_database_test_harness.trade',  # Name of table which has broker messages to client
-              'order_df': 'trade_database_test_harness.order'},  # Name of table which has orders from client
-}
-eps = 10 ** -5
-
-invalid_start_date = '01 Jan 1999'
-invalid_finish_date = '01 Feb 1999'
-
-csv_market_data_store = resource('small_test_market_df.parquet')
-csv_reverse_market_data_store = resource('small_test_market_df_reverse.parquet')
-
-csv_trade_order_mapping = OrderedDict([('trade_df', resource('small_test_trade_df.csv')),
-                                       ('order_df', resource('small_test_order_df.csv'))])
-
 ########################################################################################################################
 #### FILLING MARKET AND TRADE DATABASES FOR LATER TESTS ################################################################
 ########################################################################################################################
@@ -78,9 +61,9 @@ def fill_market_trade_databases():
 
     replace_append = 'replace'
 
-    # Fill market data
+    # Fill market data (assume: CHUNK_STORE as our default format!)
     for ticker in ticker_arctic:
-        database_source = DatabaseSourceArctic(postfix='testharness', arctic_lib_type='CHUNK_STORE')
+        database_source = DatabaseSourceArctic(postfix='testharness', arctic_lib_type=arctic_lib_type)
 
         # Write CSV to Arctic
         database_source.convert_csv_to_table(csv_market_data_store, ticker,

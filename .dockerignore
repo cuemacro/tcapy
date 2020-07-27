@@ -8,7 +8,10 @@
 !test
 !tcapy
 !tcapy_notebooks
+!tcapy_scripts
+!tcapy_examples
 !tcapygen
+!tcapyuser
 !setup.py
 !README.md
 !requirements.txt

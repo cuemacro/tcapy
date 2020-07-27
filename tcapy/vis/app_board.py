@@ -66,12 +66,18 @@ callback_dict = {}
 callback_dict['aggregated'] = ['csv-uploadbox', 'market-data-val', 'calculation-button']
 
 # this loads up a user specific version of the layout and TCA application
-if False:
-    # user customised version (not currently available so disable)
-    from tcapyuser.layoutboarduser import *;
+if constants.tcapy_version == 'user':
+    try:
+        # user customised version (not currently available so disable)
+        from tcapyuser.layoutboarduser import *;
 
-    layout = LayoutImplBoardUser(url_prefix=url_prefix)
-    from tcapyuser.tcacallerboarduser import TCACallerImplBoardUser as TCACaller
+        layout = LayoutImplBoardUser(url_prefix=url_prefix)
+        from tcapyuser.tcacallerboarduser import TCACallerImplBoardUser as TCACaller
+    except:
+        from tcapygen.layoutboardgen import *;
+
+        layout = LayoutImplBoardGen(url_prefix=url_prefix)
+        from tcapygen.tcacallerboardgen import TCACallerImplBoardGen as TCACaller
 
 # this loads up a generic version of the layout and TCA application
 elif constants.tcapy_version == 'test_tcapy' or constants.tcapy_version == 'gen':

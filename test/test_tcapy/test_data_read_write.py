@@ -65,53 +65,6 @@ start_date = '26 Apr 2017'
 finish_date = '05 Jun 2017'
 ticker = 'EURUSD'
 
-# Market data parameters for tables/databases
-test_harness_arctic_market_data_table = 'market_data_table_test_harness'
-test_harness_arctic_market_data_store = 'arctic-testharness'
-
-test_harness_kdb_market_data_table = 'market_data_table_test_harness'
-test_harness_kdb_market_data_store = 'kdb-testharness'
-
-test_harness_influxdb_market_data_table = 'market_data_table_test_harness' # InfluxDB database
-test_harness_influxdb_market_data_store = 'influxdb-testharness' # InfluxDB measurement
-
-test_harness_pystore_market_data_table = 'market_data_table_test_harness' # PyStore
-test_harness_pystore_market_data_store = 'pystore-testharness' # PyStore folder
-
-# Default format is CHUNK_STORE, so should be last, so we can read in later
-arctic_lib_type = ['TICK_STORE', 'VERSION_STORE', 'CHUNK_STORE']
-
-# Trade data parameters
-test_harness_ms_sql_server_trade_data_database = 'trade_database_test_harness'
-test_harness_ms_sql_server_trade_data_store = 'ms_sql_server'
-test_harness_mysql_trade_data_database = 'trade_database_test_harness'
-test_harness_mysql_trade_data_store = 'mysql'
-test_harness_sqlite_trade_data_database = resource('trade_database_test_harness.db')
-test_harness_sqlite_trade_data_store = 'sqlite'
-
-########################################################################################################################
-
-trade_order_list = ['trade_df', 'order_df']
-
-sql_trade_order_mapping = {
-    'ms_sql_server' :   {'trade_df' : '[dbo].[trade]',      # Name of table which has broker messages to client
-                         'order_df' : '[dbo].[order]'},     # Name of table which has orders from client
-    'mysql':            {'trade_df': 'trade_database_test_harness.trade',   # Name of table which has broker messages to client
-                         'order_df': 'trade_database_test_harness.order'},  # Name of table which has orders from client
-    'sqlite':           {'trade_df': 'trade_table',  # Name of table which has broker messages to client
-                         'order_df': 'order_table'}  # Name of table which has orders from client
-}
-eps = 10 ** -5
-
-invalid_start_date = '01 Jan 1999'
-invalid_finish_date = '01 Feb 1999'
-
-csv_market_data_store = resource('small_test_market_df.parquet')
-csv_reverse_market_data_store = resource('small_test_market_df_reverse.parquet')
-
-csv_trade_order_mapping = OrderedDict([('trade_df', resource('small_test_trade_df.csv')),
-                                       ('order_df', resource('small_test_order_df.csv'))])
-
 ########################################################################################################################
 #### WRITING DATA ######################################################################################################
 ########################################################################################################################
