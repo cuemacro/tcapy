@@ -44,7 +44,7 @@ export START_TCAPY_BOARD=1      # Start Gunicorn tcapyboard web front-end
 
 ## Installation parameters #############################################################################################
 
-export CONDA_FROM_YAML=0 # Install tca py36tca environment from environment_py36tca.yml
+export CONDA_FROM_YAML=1 # Install tca py36tca environment from environment_py36tca.yml
 export COMPILE_REDIS_FROM_SOURCE=0 # Compiling from source is slower, instead we use Chris Rea's repo version of Redis
 
 ## Get Linux distribution ##############################################################################################
