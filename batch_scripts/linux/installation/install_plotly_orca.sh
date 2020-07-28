@@ -2,7 +2,10 @@
 
 # orca is an additional plotly application for converting Plotly charts to binary PNG images (so can be inlined on webpages)
 # it is only necessary to install if you wish to generate PDF reports (HTML reports do not need this) or want
-# to allow Plotly to create PNG
+# to allow Plotly to create PNG.
+#
+# Note: use of orca is deprecated in tcapy, given the introduction of https://github.com/plotly/Kaleido, which Plotly
+# now recommend
 #
 # If you install with conda you don't need to do this, you can just do something like...
 #   conda install -c plotly plotly-orca=1.3.1 --yes

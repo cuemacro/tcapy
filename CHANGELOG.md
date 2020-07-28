@@ -5,6 +5,9 @@
 * No official releases yet
 
 ## Coding log
+* 28 Jul 2020
+    * Updated conda environments with newer libraries
+    * Improved Excel support
 * 27 Jul 2020
     * Added support for Plotly static image plot + write PDF reports in Docker
     * Refactored upload trades and market tick data to a new class DataDumper

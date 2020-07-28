@@ -21,8 +21,8 @@ if %TCAPY_PYTHON_ENV_TYPE%==virtualenv (
         pyodbc==4.0.23 ^
         pytest==5.4.3 pytest-cov==2.5.1 ^
         mysql-connector-python==8.0.19 ^
-        chartpy==0.1.8 findatapy==0.1.11 IPython==7.14.0 dash-auth==1.4.0 ^
-        cufflinks==0.17.3 plotly==4.8.1 chart-studio==1.1.0 ^
+        chartpy==0.1.8 findatapy==0.1.12 IPython==7.14.0 dash-auth==1.4.0 ^
+        cufflinks==0.17.3 plotly==4.9.0 chart-studio==1.1.0 kaleido==0.0.2 ^
         dash==1.12.0 dash-html-components==1.0.3 dash-core-components==1.10.0 dash-table==4.7.0 jupyter-dash==0.2.1 dtale==1.8.1 ^
         qpython==2.0.0 influxdb==5.2.3 ^
         Flask-Session==0.3.1 ^
@@ -31,7 +31,6 @@ if %TCAPY_PYTHON_ENV_TYPE%==virtualenv (
         jupyterlab jupyter_contrib_nbextensions jupyter_nbextensions_configurator RISE bqplot WeasyPrint==51 ^
         dask==2.14.0 distributed==2.14.0 cloudpickle==1.3.0 python-snappy==0.5.4 bokeh==2.0.1 msgpack==1.0.0 pystore==0.1.15 ^
         fsspec==0.3.3
-
 
     REM Cannot install orca with pip (has to be done manually or via conda)
     REM https://github.com/plotly/orca has details on this
@@ -55,15 +54,12 @@ if %TCAPY_PYTHON_ENV_TYPE%==conda (
             dask=2.14.0 distributed=2.14.0 cloudpickle=1.3.0 python-snappy=0.5.4 bokeh=2.0.1 msgpack-python=1.0.0 --yes
 
         REM Install charting libraries for flash recording of session variables to allow celery to use Redis
-        call pip install mysql-connector-python==8.0.19 chartpy==0.1.8 findatapy==0.1.11 dash-auth==1.3.2 cufflinks==0.17.3 ^
-          plotly==4.8.1 chart-studio==1.1.0 ^
+        call pip install mysql-connector-python==8.0.19 chartpy==0.1.8 findatapy==0.1.12 dash-auth==1.3.2 cufflinks==0.17.3 ^
+          plotly==4.9.0 chart-studio==1.1.0 kaleido==0.0.2 ^
           dash==1.12.0 dash-html-components==1.0.3 dash-core-components==1.10.0 dash-table==4.7.0 jupyter-dash==0.2.1 dtale==1.8.1 ^
           qpython==2.0.0 influxdb==5.2.3 ^
           Flask-Session==0.3.1 ^
           celery==4.4.0 pytest-tap kombu==4.6.7 python-memcached==1.59 boto3==1.5.11 pdfkit==0.6.1 WeasyPrint==51 pystore==0.1.15 ^
           fsspec==0.3.3
-
-        REM to allow printing of Plotly to PDF
-        call conda install -c plotly plotly-orca=1.3.1 --yes
     )
 )
