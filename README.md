@@ -37,9 +37,7 @@ use case.
 
 # Video demo of tcapy
 
-Below we have a video demo of how to use tcapy via its web GUI, Excel or calling it programatically from a Jupyter notebook.
-
-<iframe width="1280" height="720" src="https://www.youtube.com/embed/kpi0d49j2Bc" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+We have a video demo on [YouTube](https://youtu.be/kpi0d49j2Bc) of how to use tcapy via its web GUI, Excel or calling it programatically from a Jupyter notebook.
 
 # What is TCA and why do traders need it?
 
