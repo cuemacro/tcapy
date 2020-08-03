@@ -30,7 +30,7 @@ if debug_start_flask_server_directly:
 else:
     url_prefix = constants.url_prefix # eg. if hosted on "http://localhost/tcapy" (can also be empty)
 
-stylesheets = ['tcapy.css']
+stylesheets = ['tcapy.css', dbc.themes.BOOTSTRAP]
 
 if url_prefix == '':
     static_css_route = '/static/'
@@ -42,7 +42,8 @@ for css in stylesheets:
     # app.css.append_css({"external_url": static_css_route + css})
     stylesheets_path.append(static_css_route + css)
 
-app = dash.Dash(name='tcapy', server=server, suppress_callback_exceptions=True, serve_locally=True, external_stylesheets=stylesheets_path)
+app = dash.Dash(name='tcapy', server=server, suppress_callback_exceptions=True, serve_locally=True, external_stylesheets=stylesheets_path,
+                 meta_tags=[{"name": "viewport", "content": "width=1000px"}])
 app.title = 'tcapy'
 app.server.secret_key = constants.secret_key
 

@@ -5,6 +5,9 @@
 * No official releases yet
 
 ## Coding log
+* 03 Aug 2020
+    * Adding link for YouTube demo
+    * Added dash bootstrap components as a dependency (haven't yet created GUI with them)
 * 28 Jul 2020
     * Updated conda environments with newer libraries
     * Improved Excel support

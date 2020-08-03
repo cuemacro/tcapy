@@ -34,6 +34,7 @@ plotly==4.9.0
 kaleido
 chart-studio==1.1.0
 dash==1.12.0
+dash-bootstrap-components==0.10.3
 dash-html-components==1.0.3
 dash-core-components==1.10.0
 dash-table==4.7.0

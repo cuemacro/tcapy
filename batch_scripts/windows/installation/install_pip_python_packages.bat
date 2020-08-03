@@ -22,7 +22,7 @@ if %TCAPY_PYTHON_ENV_TYPE%==virtualenv (
         pytest==5.4.3 pytest-cov==2.5.1 ^
         mysql-connector-python==8.0.19 ^
         chartpy==0.1.8 findatapy==0.1.12 IPython==7.14.0 dash-auth==1.4.0 ^
-        cufflinks==0.17.3 plotly==4.9.0 chart-studio==1.1.0 kaleido==0.0.2 ^
+        cufflinks==0.17.3 plotly==4.9.0 chart-studio==1.1.0 kaleido==0.0.2 dash-bootstrap-components==0.10.3 ^
         dash==1.12.0 dash-html-components==1.0.3 dash-core-components==1.10.0 dash-table==4.7.0 jupyter-dash==0.2.1 dtale==1.8.1 ^
         qpython==2.0.0 influxdb==5.2.3 ^
         Flask-Session==0.3.1 ^
@@ -55,7 +55,7 @@ if %TCAPY_PYTHON_ENV_TYPE%==conda (
 
         REM Install charting libraries for flash recording of session variables to allow celery to use Redis
         call pip install mysql-connector-python==8.0.19 chartpy==0.1.8 findatapy==0.1.12 dash-auth==1.3.2 cufflinks==0.17.3 ^
-          plotly==4.9.0 chart-studio==1.1.0 kaleido==0.0.2 ^
+          plotly==4.9.0 chart-studio==1.1.0 kaleido==0.0.2 dash-bootstrap-components==0.10.3 ^
           dash==1.12.0 dash-html-components==1.0.3 dash-core-components==1.10.0 dash-table==4.7.0 jupyter-dash==0.2.1 dtale==1.8.1 ^
           qpython==2.0.0 influxdb==5.2.3 ^
           Flask-Session==0.3.1 ^

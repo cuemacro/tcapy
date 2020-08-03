@@ -35,6 +35,12 @@ makes the TCA totally transparent. If you are doing TCA for regulatory reasons, 
 be fully open, rather than a black box. Having an open source library, makes it easier to make changes and fitting it to your 
 use case.
 
+# Video demo of tcapy
+
+Below we have a video demo of how to use tcapy via its web GUI, Excel or calling it programatically from a Jupyter notebook.
+
+<iframe width="1280" height="720" src="https://www.youtube.com/embed/kpi0d49j2Bc" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+
 # What is TCA and why do traders need it?
 
 At its very simplest TCA can involve working out the spread (slippage) you paid. It is also important to understand metrics such as 

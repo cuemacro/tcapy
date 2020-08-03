@@ -52,6 +52,7 @@ import flask
 from flask import Flask
 
 import dash
+import dash_bootstrap_components as dbc
 from dash.dependencies import Output, Input
 
 ## for getting paths and general file operations
