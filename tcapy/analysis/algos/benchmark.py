@@ -375,7 +375,7 @@ class BenchmarkArrival(BenchmarkTrade):
             trade_order_df[self._benchmark_name][is_side] = benchmark
 
             # # find the nearest price as arrival
-            # series, dt = self.time_series_ops.vlookup_style_data_frame(market_trade_order_df.index, market_df, field)
+            # series, dt = self._time_series_ops.vlookup_style_data_frame(market_trade_order_df.index, market_df, field)
             #
             # market_trade_order_df['arrival'] = series
 

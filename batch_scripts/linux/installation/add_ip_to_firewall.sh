@@ -10,13 +10,13 @@
 # careful ONLY add the IPs of trader/compliance machines you want to have access
 # do not expose to the whole network!
 
-# only these browsers will able to access the applications which are on these IPs (port 80)
+# only these browsers will able to access the applications which are on these IPs (server_port 80)
 sudo firewall-cmd --permanent --zone=public --add-rich-rule='rule family="ipv4" source address="192.168.82.85/32" port protocol="tcp" port="80" accept'
 
 # for https
 sudo firewall-cmd --permanent --zone=public --add-rich-rule='rule family="ipv4" source address="192.168.82.85/32" port protocol="tcp" port="443" accept'
 
-# for MongoDB access (only add IP for systems where we are running tcapy) - port 27017
+# for MongoDB access (only add IP for systems where we are running tcapy) - server_port 27017
 sudo firewall-cmd --permanent --zone=public --add-rich-rule='rule family="ipv4" destination address="192.168.1.192/32" port protocol="tcp" port="27017" accept'
 sudo firewall-cmd --reload
 

@@ -55,7 +55,7 @@ if __name__ == '__main__':
     ticker = ['EURUSD', 'GBPUSD', 'AUDUSD', 'NZDUSD', 'USDCAD', 'USDCHF', 'USDNOK', 'USDSEK', 'EURNOK', 'EURSEK',
               'USDTRY', 'USDJPY']
 
-    # Generate trades/orders for these tickers
+    # Generate trades/orders for these _tickers
     ticker_trade = ['EURUSD', 'GBPUSD', 'AUDUSD', 'NZDUSD', 'USDCAD', 'USDCHF', 'EURNOK', 'EURSEK',
                     'USDJPY', 'AUDJPY', 'NZDCAD', 'EURJPY']
 
@@ -93,7 +93,7 @@ if __name__ == '__main__':
                                                                 finish_date=finish_date_trade_generation)
 
         # We do not need to specify the ticker
-        # We assume that each of the following (with multiple tickers)
+        # We assume that each of the following (with multiple _tickers)
         # is stored in a table by itself, trade_df or order_df
         for c in csv_trade_data.keys():
             trade_order[c].to_csv(csv_trade_data[c])

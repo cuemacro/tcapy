@@ -21,7 +21,7 @@ tcapy_version = constants.tcapy_version
 
 class DataFrameHolder(object):
     """DataFrameHolder can be used to store DataFrames which contain trading executions and orders (or market data
-    for indiviudal tickers) etc. We can store different DataFrames for trades and orders (or for different market data tickers)
+    for indiviudal _tickers) etc. We can store different DataFrames for trades and orders (or for different market data _tickers)
 
     """
 

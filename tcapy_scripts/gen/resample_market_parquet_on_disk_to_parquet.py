@@ -25,54 +25,53 @@ from tcapy.util.utilfunc import UtilFunc
 util_func = UtilFunc()
 calculations = Calculations()
 
-data_vendor = 'dukascopy'
 file_extension = 'parquet'
-resample_freq = '1min'
 
-csv_folder = '/data/csv_dump/' + data_vendor + '/'
 csv_output = '/data/csv_output/'
-
-combined_file = 'fx_' + resample_freq + '_' + data_vendor + '.' + file_extension
 
 ticker_mkt = ['EURUSD', 'GBPUSD', 'AUDUSD', 'NZDUSD', 'USDCAD', 'USDCHF', 'EURNOK', 'EURSEK', 'USDJPY']
 
-ticker_mkt = ['EURUSD', 'GBPUSD', 'AUDUSD', 'NZDUSD', 'USDCAD', 'USDJPY']
 ticker_combined_mkt = ['EURUSD', 'GBPUSD', 'AUDUSD', 'NZDUSD', 'USDCAD', 'USDJPY']
 
-def create_resampled_spot_data():
+def create_resampled_spot_data(resample_freq='1min', data_vendor='dukascopy'):
+
     logger = LoggerManager.getLogger(__name__)
+    csv_input_folder = '/data/csv_dump/' + data_vendor + '/'
 
     for ticker in ticker_mkt:
 
-        logger.info("Processing for " + ticker)
+        logger.info("Processing for " + ticker  + " resample freq " + resample_freq + " data vendor " + data_vendor)
 
-        flat_file = csv_folder + ticker + '_' + data_vendor + '_*.' + file_extension
+        flat_file = csv_input_folder + ticker + '_' + data_vendor + '_*.' + file_extension
 
         df_dd = dd.read_parquet(flat_file).compute()['mid']
 
-        logger.info("About to resample OHLC for " + ticker)
+        logger.info("About to resample OHLC for " + ticker + " resample freq " + resample_freq + " data vendor " + data_vendor)
 
-        df_dd_ohlc = df_dd.resample(resample_freq).ohlc()
+        resampler = df_dd.resample(resample_freq)
+        df_dd_ohlc = resampler.ohlc()
 
         print(df_dd_ohlc.columns)
 
         logger.info("About to resample count for " + ticker)
-        df_dd_count = df_dd.resample(resample_freq).count()
+        df_dd_count = resampler.count()
         df_dd_count.name = 'tickcount'
 
-        df_dd = df_dd_ohlc.join(df_dd_count)
+        df_dd = pd.concat([df_dd_ohlc, df_dd_count], axis=1)
         df_dd.columns = [ticker + '.' + x for x in df_dd.columns]
 
         df_dd = df_dd.dropna()
         df_dd.to_parquet(csv_output + ticker + '_' + resample_freq + '_' + data_vendor + '.' + file_extension)
 
-def combine_resampled_spot_data_into_single_dataframe_usd_base():
+        df_dd = None
+
+def combine_resampled_spot_data_into_single_dataframe_usd_base(resample_freq='1min', data_vendor='dukascopy'):
     df_list = []
 
     logger = LoggerManager.getLogger(__name__)
 
     for ticker in ticker_combined_mkt:
-        logger.info("Reading " + ticker)
+        logger.info("Reading " + ticker + " resample freq " + resample_freq + " data vendor " + data_vendor)
 
         df = pd.read_parquet(csv_output + ticker + '_' + resample_freq + '_' + data_vendor + '.' + file_extension)
 
@@ -96,6 +95,7 @@ def combine_resampled_spot_data_into_single_dataframe_usd_base():
 
         df_list.append(df)
 
+    logger.info("Combining all tickers with resample freq " + resample_freq + " data vendor " + data_vendor)
     df = pd.DataFrame(index=df.index)
 
     df['USDUSD.close'] = 1.0
@@ -104,11 +104,17 @@ def combine_resampled_spot_data_into_single_dataframe_usd_base():
     df = calculations.pandas_outer_join(df_list)
     df = df.dropna()
 
+    combined_file = 'fx_' + resample_freq + '_' + data_vendor + '.' + file_extension
+
     df.to_parquet(csv_output + combined_file)
 
 if __name__ == '__main__':
-    create_resampled_spot_data()
-    combine_resampled_spot_data_into_single_dataframe_usd_base()
+    data_vendor_list = ['dukascopy']
+    resample_freq_list = ['1s', '1min']
 
+    for data_vendor in data_vendor_list:
+        for resample_freq in resample_freq_list:
+            create_resampled_spot_data(resample_freq=resample_freq, data_vendor=data_vendor)
+            combine_resampled_spot_data_into_single_dataframe_usd_base(resample_freq=resample_freq, data_vendor=data_vendor)
 
 

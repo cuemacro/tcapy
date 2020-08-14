@@ -30,7 +30,7 @@ constants = Constants()
 postfix = 'dukascopy'
 
 # if already dumped in database (need to use this, if we want to calculate cross rates eg. EURJPY from EURUSD and USDJPY)
-# data_store = 'arctic-dukascopy'
+# _data_store = 'arctic-dukascopy'
 data_store = 'dukascopy'            # if downloading from Dukascopy externally
 
 ticker = ['EURUSD', 'USDJPY']

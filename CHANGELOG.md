@@ -5,6 +5,15 @@
 * No official releases yet
 
 ## Coding log
+
+* 14 Aug 2020
+    * Starting to add ClickHouse support (not finished yet)
+    * Refactored variables in DatabasePopulator
+    * Added NCFX parameters in AccessControl
+    * DataDumper now takes AccessControl for username/password for databases
+    * Changed default web GUI port to 9500 (so no clash with ClickHouse default port)
+    * Uses Arrow as default instead of Msgpack (which is deprecated in Pandas) for storing data in Redis
+    * Replace Plotly Orca (deprecated) with Plotly kaleido for generating PNG from Plotly
 * 03 Aug 2020
     * Adding link for YouTube demo
     * Added dash bootstrap components as a dependency (haven't yet created GUI with them)

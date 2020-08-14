@@ -96,7 +96,7 @@ class TCACallerImplGen(TCACaller):
                         finish_date_val != '' and finish_time_val != '' and market_data_val != '' and broker_val != '' and \
                         algo_val != '' and n_clicks > old_clicks:
 
-                    # Expand tickers/broker fields etc, in case for example 'All' has been specified or any other groups
+                    # Expand _tickers/broker fields etc, in case for example 'All' has been specified or any other groups
                     broker_val = self._util_func.populate_field(broker_val, constants.available_brokers_dictionary, exception_fields='All')
                     algo_val = self._util_func.populate_field(algo_val, constants.available_algos_dictionary, exception_fields='All')
                     venue_val = self._util_func.populate_field(venue_val, constants.available_venues_dictionary, exception_fields='All')
@@ -201,7 +201,7 @@ class TCACallerImplGen(TCACaller):
                         and finish_date_val != '' and reload_val != '' and event_type_val != '' and metric_val != '' and \
                         n_clicks > old_clicks:
 
-                    # Expand tickers/broker fields etc, in case for example 'All' has been specified or any other groups
+                    # Expand _tickers/broker fields etc, in case for example 'All' has been specified or any other groups
                     ticker_val_list = self._util_func.populate_field(ticker_val, constants.available_tickers_dictionary)
                     broker_val_list = self._util_func.populate_field(broker_val, constants.available_brokers_dictionary)
                     algo_val_list = self._util_func.populate_field(algo_val, constants.available_algos_dictionary)

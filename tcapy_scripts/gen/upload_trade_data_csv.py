@@ -32,7 +32,7 @@ if __name__ == '__main__':
     csv_sql_table_trade_order_mapping = {'trade' : os.path.join(trade_order_path, 'trade_df_dump.csv'),
                                          'order' : os.path.join(trade_order_path, 'order_df_dump.csv')}
 
-    # If no server host is specified then the default one from constants will be returned
+    # If no server server_host is specified then the default one from constants will be returned
     server_host = None
 
     # 'replace' or 'append' existing database table (replace will totally wipe it!)

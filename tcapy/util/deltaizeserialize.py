@@ -17,6 +17,7 @@ from plotly.utils import PlotlyJSONEncoder
 import plotly.graph_objs as go
 
 from tcapy.conf.constants import Constants
+from tcapy.util.utilfunc import UtilFunc
 from tcapy.util.timeseries import TimeSeriesOps
 from tcapy.util.loggermanager import LoggerManager
 
@@ -33,6 +34,7 @@ class DeltaizeSerialize(object):
 
     def __init__(self):
         self._time_series_ops = TimeSeriesOps()
+        self._util_func = UtilFunc()
 
     def convert_python_to_binary(self, obj, key):
         """

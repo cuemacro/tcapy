@@ -344,7 +344,7 @@ class ComputationRequest(object):
 class TCARequest(TradeRequest, ComputationRequest):
     """Defines the parameters which specify the type of TCA we would like to compute, including such parameters like:
     - start/finish dates
-    - tickers we wish to analyse (note: TCAAggregatedEngine, allows multi-ticker, TCADetailedEngine is only for a single ticker)
+    - _tickers we wish to analyse (note: TCAAggregatedEngine, allows multi-ticker, TCADetailedEngine is only for a single ticker)
     - the benchmarks
 
     TCARequest is a lightweight object which can be pickled
@@ -411,7 +411,7 @@ class TCARequest(TradeRequest, ComputationRequest):
 
         self.start_date = start_date  # start date of computation
         self.finish_date = finish_date  # finish date of computation
-        self.ticker = ticker  # which tickers to do TCA on?
+        self.ticker = ticker  # which _tickers to do TCA on?
         self.venue = venue  # which venues do we want to analyse?
         self.market_data_store = market_data_store  # what is the dataset for market data?
         self.trade_data_store = trade_data_store  # what is the dataset for trade data?
@@ -665,7 +665,7 @@ class ValidateRequest(object):
                 self._raise_validation_error("Ticker " + str(t) + " is not in the correct format.")
             elif t not in constants.available_tickers_dictionary.keys() \
                     and t not in constants.available_tickers_dictionary['All']:
-                self._raise_validation_error("Ticker " + str(t) + " is not in the available list of tickers!")
+                self._raise_validation_error("Ticker " + str(t) + " is not in the available list of _tickers!")
 
         venue = request.venue
 

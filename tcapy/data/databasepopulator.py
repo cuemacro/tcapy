@@ -18,6 +18,7 @@ import os
 import glob
 
 from tcapy.conf.constants import Constants
+from tcapy.data.databasesource import AccessControl
 from tcapy.util.timeseries import TimeSeriesOps
 from tcapy.util.loggermanager import LoggerManager
 
@@ -45,25 +46,26 @@ class DatabasePopulator(ABC):
 
     def __init__(self, temp_data_folder=constants.temp_data_folder,
                  temp_large_data_folder=constants.temp_large_data_folder,
-                 tickers=None, data_store=None):
+                 tickers=None, data_store=None, access_control=AccessControl()):
 
-        self.temp_data_folder = temp_data_folder
-        self.temp_large_data_folder = temp_large_data_folder
-        self.tickers = None
-        self.util_func = UtilFunc()
-        self.time_series_ops = TimeSeriesOps()
-        self.data_store = data_store
+        self._temp_data_folder = temp_data_folder
+        self._temp_large_data_folder = temp_large_data_folder
+        self._tickers = None
+        self._util_func = UtilFunc()
+        self._time_series_ops = TimeSeriesOps()
+        self._data_store = data_store
+        self._access_control = access_control
 
         logger = LoggerManager().getLogger(__name__)
 
-        if not(os.path.isdir(self.temp_data_folder)):
-            logger.warning("Temp data folder " + self.temp_data_folder + " does not exist")
+        if not(os.path.isdir(self._temp_data_folder)):
+            logger.warning("Temp data folder " + self._temp_data_folder + " does not exist")
 
-        if not(os.path.isdir(self.temp_large_data_folder)):
-            logger.warning("Temp large data folder " + self.temp_data_folder + " does not exist")
+        if not(os.path.isdir(self._temp_large_data_folder)):
+            logger.warning("Temp large data folder " + self._temp_data_folder + " does not exist")
 
         if tickers is not None:
-            self.tickers = tickers
+            self._tickers = tickers
 
     @abc.abstractmethod
     def _fetch_market_data(self, start, finish, ticker, web_proxies=constants.web_proxies):
@@ -125,7 +127,7 @@ class DatabasePopulator(ABC):
 
     @abc.abstractmethod
     def _get_tickers(self):
-        """List of tickers that can accessedd from the external/input DatabaseSource
+        """List of _tickers that can accessedd from the external/input DatabaseSource
 
         Returns
         -------
@@ -149,11 +151,11 @@ class DatabasePopulator(ABC):
                         write_temp_to_disk=True, write_large_csv=True, write_large_hdf5_parquet=True,
                         csv_folder=constants.csv_folder, csv_compression=None, return_df=False, web_proxies=constants.web_proxies):
 
-        start_date = self.time_series_ops.date_parse(start_date)
-        finish_date = self.time_series_ops.date_parse(finish_date)
+        start_date = self._time_series_ops.date_parse(start_date)
+        finish_date = self._time_series_ops.date_parse(finish_date)
 
-        dates = self.util_func.split_date_single_list(start_date, finish_date, split_size=split_size,
-                                                      add_partial_period_start_finish_dates=include_partial_periods)
+        dates = self._util_func.split_date_single_list(start_date, finish_date, split_size=split_size,
+                                                       add_partial_period_start_finish_dates=include_partial_periods)
 
         df_dict = {}
         msg = []
@@ -177,7 +179,7 @@ class DatabasePopulator(ABC):
                     else:
                         df_dict[k] = df_dict_list[k]
 
-        return self.util_func.flatten_list_of_lists(msg), df_dict
+        return self._util_func.flatten_list_of_lists(msg), df_dict
 
 
     def download_from_external_source(self, append_data=True, remove_duplicates=True, if_exists_table='append',
@@ -228,7 +230,7 @@ class DatabasePopulator(ABC):
 
         if write_large_csv:
             if not (os.path.isdir(csv_folder)):
-                logger.warn("CSV folder " + self.temp_data_folder + " where we are about to write does not exist")
+                logger.warn("CSV folder " + self._temp_data_folder + " where we are about to write does not exist")
 
         # What chunk size in minutes do we want for this data provider?
         if chunk_int_min is None:
@@ -252,8 +254,8 @@ class DatabasePopulator(ABC):
 
             start_date = finish_date - timedelta(days=number_of_days)  # 30*7
         else:
-            start_date = self.time_series_ops.date_parse(start_date)
-            finish_date = self.time_series_ops.date_parse(finish_date)
+            start_date = self._time_series_ops.date_parse(start_date)
+            finish_date = self._time_series_ops.date_parse(finish_date)
 
         if finish_date < start_date:
             logger.error("Download finish date is before start data!")
@@ -276,7 +278,7 @@ class DatabasePopulator(ABC):
             if delete_cached_files and write_to_disk_db:
                 logger.info("Deleting all cached temp files for " + ticker)
 
-                for name in glob.glob(self.temp_data_folder + '/*' + ticker + "*"):
+                for name in glob.glob(self._temp_data_folder + '/*' + ticker + "*"):
                     try:
                         os.remove(name)
                     except:
@@ -292,7 +294,7 @@ class DatabasePopulator(ABC):
                 try:
                     df_old = data_source_local.fetch_market_data(start_date, finish_date, ticker, web_proxies=web_proxies)
 
-                    # This will vary between tickers (in particular if we happen to add a new ticker)
+                    # This will vary between _tickers (in particular if we happen to add a new ticker)
                     start_date = df_old.index[-1]
 
                     has_old = True
@@ -322,7 +324,7 @@ class DatabasePopulator(ABC):
                     start_date_list.append(finish_date)
 
             df = None
-            filename = os.path.join(self.temp_data_folder, ticker) + '.' + fileformat
+            filename = os.path.join(self._temp_data_folder, ticker) + '.' + fileformat
 
             try:
                 # df = UtilFunc().read_dataframe_from_hdf(filename)
@@ -402,7 +404,7 @@ class DatabasePopulator(ABC):
 
                     # Need to sort data (database assumes sorted data for chunking/searches)
                     df = df.sort_index()
-                    df = self.time_series_ops.localize_as_UTC(df)
+                    df = self._time_series_ops.localize_as_UTC(df)
 
                     if write_large_hdf5_parquet:
                         if df is not None:
@@ -418,7 +420,7 @@ class DatabasePopulator(ABC):
 
             if df is not None:
                 # Assume UTC time (don't want to mix UTC and non-UTC in database!)
-                df = self.time_series_ops.localize_as_UTC(df)
+                df = self._time_series_ops.localize_as_UTC(df)
 
             # write CSV
             if write_large_csv:
@@ -474,7 +476,7 @@ class DatabasePopulator(ABC):
     def _remove_duplicates_time_series(self, df, remove_duplicates, field='mid'):
 
         if remove_duplicates:
-            df = self.time_series_ops.drop_consecutive_duplicates(df, field)
+            df = self._time_series_ops.drop_consecutive_duplicates(df, field)
 
         return df
 
@@ -495,7 +497,7 @@ class DatabasePopulator(ABC):
 
         """
 
-        if tickers is None: tickers = self.tickers.keys()
+        if tickers is None: tickers = self._tickers.keys()
 
         if isinstance(tickers, dict): tickers = tickers.keys()
 
@@ -527,7 +529,7 @@ class DatabasePopulator(ABC):
         time_series_ops = TimeSeriesOps()
 
         logger.info('Getting ' + ticker + ' filenames...')
-        temp_data_folder = self.temp_data_folder
+        temp_data_folder = self._temp_data_folder
 
         filename_list = []
 
@@ -598,7 +600,7 @@ class DatabasePopulator(ABC):
         if remove_duplicates:
             postfix = '-' + self._get_postfix() + '-no-duplicates'
 
-        filename = os.path.join(self.temp_large_data_folder, ticker + postfix) + '.' + fileformat
+        filename = os.path.join(self._temp_large_data_folder, ticker + postfix) + '.' + fileformat
 
         df = time_series_ops.localize_as_UTC(df)
         util_func.write_dataframe_to_binary(df, filename, format=binary_format)
@@ -611,7 +613,7 @@ class DatabasePopulator(ABC):
         Parameters
         ----------
         tickers : str (list or dict)
-            List of tickers
+            List of _tickers
 
         remove_duplicates : bool
             True (default) - removes any follow on duplicates in the dataset
@@ -632,7 +634,7 @@ class DatabasePopulator(ABC):
 
         """
 
-        if tickers is None: tickers = self.tickers.keys()
+        if tickers is None: tickers = self._tickers.keys()
 
         if isinstance(tickers, dict): tickers = tickers.keys()
 
@@ -668,7 +670,7 @@ class DatabasePopulator(ABC):
         if remove_duplicates:
             postfix = '-' + self._get_postfix() + '-no-duplicates'
 
-        filename = os.path.join(self.temp_large_data_folder, ticker + postfix) + '.' + fileformat
+        filename = os.path.join(self._temp_large_data_folder, ticker + postfix) + '.' + fileformat
 
         logger.info("Reading " + filename)
 
@@ -694,28 +696,29 @@ class DatabasePopulatorNCFX(DatabasePopulator):
     """
 
     def __init__(self, temp_data_folder=constants.temp_data_folder, temp_large_data_folder=constants.temp_large_data_folder,
-        tickers=None, data_store=constants.ncfx_data_store):
+        tickers=None, data_store=constants.ncfx_data_store, access_control=AccessControl()):
 
         super(DatabasePopulatorNCFX, self).__init__(
-            temp_data_folder=temp_data_folder, temp_large_data_folder=temp_large_data_folder, tickers=tickers, data_store=data_store)
+            temp_data_folder=temp_data_folder, temp_large_data_folder=temp_large_data_folder, tickers=tickers, data_store=data_store,
+            access_control=access_control)
 
     def _get_output_data_source(self):
-        return Mediator.get_database_source_picker().get_database_source(MarketRequest(data_store=self.data_store))
+        return Mediator.get_database_source_picker().get_database_source(MarketRequest(data_store=self._data_store))
 
     def _get_postfix(self):
         return 'ncfx'
 
     def _get_tickers(self):
-        if self.tickers is None:
+        if self._tickers is None:
             return constants.ncfx_tickers.keys()
 
-        return self.tickers.keys()
+        return self._tickers.keys()
 
     def _get_tickers_vendor(self):
-        if self.tickers is None:
+        if self._tickers is None:
             return constants.ncfx_tickers
 
-        return self.tickers
+        return self._tickers
 
     def _get_threads(self):
         return constants.ncfx_threads
@@ -726,14 +729,15 @@ class DatabasePopulatorNCFX(DatabasePopulator):
     def _get_input_data_source(self):
         from tcapy.data.databasesource import DatabaseSourceNCFX
 
-        return DatabaseSourceNCFX()
+        return DatabaseSourceNCFX(username=self._access_control.ncfx_username, password=self._access_control.ncfx_password,
+                                  url=self._access_control.ncfx_url)
 
     def _fetch_market_data(self, start, finish, ticker, write_to_disk=True, read_cached_from_disk=True, web_proxies=constants.web_proxies):
         logger = LoggerManager.getLogger(__name__)
 
         key = (str(start) + str(finish) + ticker + '_' + self._get_postfix()).replace(":", '_')
 
-        filename = os.path.join(self.temp_data_folder, key) + '.' + fileformat
+        filename = os.path.join(self._temp_data_folder, key) + '.' + fileformat
         util_func = UtilFunc()
 
         start_time_stamp = pd.Timestamp(start)
@@ -782,28 +786,29 @@ class DatabasePopulatorDukascopy(DatabasePopulatorNCFX):
     """
 
     def __init__(self, temp_data_folder=constants.temp_data_folder, temp_large_data_folder=constants.temp_large_data_folder,
-        tickers=None, data_store=constants.dukascopy_data_store):
+        tickers=None, data_store=constants.dukascopy_data_store, access_control=AccessControl()):
 
         super(DatabasePopulatorDukascopy, self).__init__(
-            temp_data_folder=temp_data_folder, temp_large_data_folder=temp_large_data_folder, tickers=tickers, data_store=data_store)
+            temp_data_folder=temp_data_folder, temp_large_data_folder=temp_large_data_folder, tickers=tickers, data_store=data_store,
+            access_control=access_control)
 
     def _get_output_data_source(self):
-        return Mediator.get_database_source_picker().get_database_source(MarketRequest(data_store=self.data_store))
+        return Mediator.get_database_source_picker().get_database_source(MarketRequest(data_store=self._data_store))
 
     def _get_postfix(self):
         return 'dukascopy'
 
     def _get_tickers(self):
-        if self.tickers is None:
+        if self._tickers is None:
             return constants.dukascopy_tickers.keys()
 
-        return self.tickers.keys()
+        return self._tickers.keys()
 
     def _get_tickers_vendor(self):
-        if self.tickers is None:
+        if self._tickers is None:
             return constants.dukascopy_tickers
 
-        return self.tickers
+        return self._tickers
 
     def _get_threads(self):
         return constants.dukascopy_threads

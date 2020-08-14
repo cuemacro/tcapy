@@ -111,7 +111,7 @@ services:
 
   redis:
     image: "redis:alpine"
-    command: redis-server --port 6379 --save ""
+    command: redis-server --server_port 6379 --save ""
     ports:
       - 6379:6379
 

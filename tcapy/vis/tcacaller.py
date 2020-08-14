@@ -233,7 +233,7 @@ class TCACaller(ComputationCaller, ABC):
         Parameters
         ----------
         tca_request : TCARequest
-            Governs start date/finish date, tickers etc. of TCA analysis
+            Governs start date/finish date, _tickers etc. of TCA analysis
 
         Returns
         -------

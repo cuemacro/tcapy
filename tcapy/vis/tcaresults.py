@@ -142,7 +142,7 @@ class TCAResults(ComputationResults):
         title = title.capitalize()
         title = title.replace('#', ' & ')
 
-        # Make case of assets same as tickers
+        # Make case of assets same as _tickers
         tickers = constants.available_tickers_dictionary['All'].copy()
         lowercase_tickers = [t.lower() for t in tickers]
 
@@ -266,7 +266,7 @@ class TCAResults(ComputationResults):
 
         for d in keys:
 
-            ## for single/multiple tickers
+            ## for single/multiple _tickers
             # timeline
             if d.find('timeline_') == 0:
                 simpler_d = d.replace('timeline_', '')
@@ -303,7 +303,7 @@ class TCAResults(ComputationResults):
                 simpler_d = d.replace('table_', '')
                 table[simpler_d] = dict_of_df[d]
 
-            ## single tickers
+            ## single _tickers
             elif d.find('market_df') == 0:
 
                 simpler_d = d.replace('market_df', self.ticker[0])
@@ -319,7 +319,7 @@ class TCAResults(ComputationResults):
                 simpler_d = d.replace('candlestick_fig', self.ticker[0])
                 candlestick_chart[simpler_d] = dict_of_df[d]
 
-        #### for situations when we have multiple tickers
+        #### for situations when we have multiple _tickers
 
         # market, candlesticks
         for t in self.computation_request.ticker:

@@ -29,6 +29,7 @@ export TCAPY_CELERY_WORKERS=14
 
 export START_MYSQL=1
 export START_MONGODB=1
+export START_CLICKHOUSE=1
 
 ## Web server settings #################################################################################################
 

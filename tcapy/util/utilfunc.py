@@ -182,7 +182,7 @@ class UtilFunc(object):
         return result
 
     def populate_field(self, field_val, available_dictionary, exception_fields=[]):
-        """Expands a specified field (eg. 'All' becomes a list of all the tickers we have)
+        """Expands a specified field (eg. 'All' becomes a list of all the _tickers we have)
         according to a pre-defined dictionary.
 
         Parameters

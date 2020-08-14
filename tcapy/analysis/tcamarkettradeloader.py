@@ -29,8 +29,8 @@ ABC = abc.ABCMeta('ABC', (object,), {'__slots__': ()})
 class TCAMarketTradeLoader(ABC):
     """TCAMarketTradeLoader provides wrapper methods to load market and trade data and also allows adds additional calculated
     fields to the trade data such as metrics (slippage, market impact etc), benchmarks (mid, VWAP, TWAP etc.) etc. as well
-    as ways to process this output for display for multiple tickers. Underneath it uses TCATickerLoader, for fetching
-    data/calculating metrics for individual tickers.
+    as ways to process this output for display for multiple _tickers. Underneath it uses TCATickerLoader, for fetching
+    data/calculating metrics for individual _tickers.
 
     Typically, TCAMarketTradeLoader will be called by an instance of TCAEngine. However, it can also be called directly, if we
     simply want to download market or trade data by itself.
@@ -43,8 +43,8 @@ class TCAMarketTradeLoader(ABC):
         self._version = version
 
     def get_market_data(self, market_request):
-        """Gets market data for tickers. When we ask for non-standard FX crosses, only the mid-field is
-        returned (calculated as a cross rate). We do not give bid/ask quotes for calculated non-standard tickers, as these
+        """Gets market data for _tickers. When we ask for non-standard FX crosses, only the mid-field is
+        returned (calculated as a cross rate). We do not give bid/ask quotes for calculated non-standard _tickers, as these
         can difficult to estimate.
 
         Parameters
@@ -72,7 +72,7 @@ class TCAMarketTradeLoader(ABC):
         return tca_ticker_loader.get_market_data(market_request)
 
     def get_trade_order_data(self, tca_request, trade_order_type):
-        """Gets trade data for specified parameters (eg. start/finish dates tickers). Will also try to find trades
+        """Gets trade data for specified parameters (eg. start/finish dates _tickers). Will also try to find trades
         when they have booked in the inverted market convention, and change the fields appropriately. For example, if
         we ask for GBPUSD trade data, it will also search for USDGBP and convert those trades in the correct convention.
 
@@ -150,7 +150,7 @@ class TCAMarketTradeLoader(ABC):
             tca_request)
 
     def load_market_calculate_summarize_metrics(self, tca_request, dummy_market=False):
-        """Splits up the TCA request into individual tickers. Market/trade data is loaded for each ticker, before
+        """Splits up the TCA request into individual _tickers. Market/trade data is loaded for each ticker, before
         conducting TCA (ie. calculating metrics, benchmarks etc.). Returns a dictionary consisting of market data and
         another dictionary of trade/order data (and any additional results associated with the TCA)
 
@@ -183,12 +183,12 @@ class TCAMarketTradeLoader(ABC):
             raise DataMissingException(err_msg)
 
         # trade_df = trade_order_results_df_dict['trade_df']
-        # Now summarize those metrics across all the tickers, for easier display
+        # Now summarize those metrics across all the _tickers, for easier display
         return self.summarize_metrics(market_df_dict, trade_order_results_df_dict, tca_request_list,
                                       dummy_market=dummy_market)
 
     def summarize_metrics(self, market_df_dict, trade_order_results_df_dict, tca_request_list, dummy_market=False):
-        """Takes in precomputed metrics across one or more tickers, and summarizes them for later user display
+        """Takes in precomputed metrics across one or more _tickers, and summarizes them for later user display
         (should be customised for users)
 
         Parameters
@@ -240,12 +240,12 @@ class TCAMarketTradeLoader(ABC):
 
         logger.debug("Start loading trade/data/computation")
 
-        # split up TCARequest into a list of TCA with different tickers
+        # split up TCARequest into a list of TCA with different _tickers
         tca_request_list = self._split_tca_request_into_list(tca_request)
 
         market_df_dict, trade_order_results_df_dict = self._get_market_trade_metrics(tca_request_list, dummy_market)
 
-        logger.debug("Finished loading data and calculating metrics on individual tickers")
+        logger.debug("Finished loading data and calculating metrics on individual _tickers")
 
         return market_df_dict, trade_order_results_df_dict, tca_request_list
 
@@ -255,7 +255,7 @@ class TCAMarketTradeLoader(ABC):
         Parameters
         ----------
         tca_request_list : TCARequest (list)
-            Requests for multiple TCARequests (eg. for different tickers)
+            Requests for multiple TCARequests (eg. for different _tickers)
 
         dummy_market : bool
             Return dummy market data?
@@ -294,7 +294,7 @@ class TCAMarketTradeLoader(ABC):
         Parameters
         ----------
         tca_request : TCARequest
-            TCA request to broken up into tickers
+            TCA request to broken up into _tickers
 
         Returns
         -------

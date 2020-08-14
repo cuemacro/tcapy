@@ -191,7 +191,7 @@ class DisplayListeners(object):
                                         self._time_series_ops.downsample_time_series_usable(
                                             market_full_df, start_date=start_date, finish_date=finish_date))
 
-                            # market_df = time_series_ops.filter_between_dates(market_df, start_date, finish_date)
+                            # market_df = _time_series_ops.filter_between_dates(market_df, start_date, finish_date)
 
                     if market_df is not None:
                         if not(market_df.empty):
@@ -873,7 +873,7 @@ class PlotRender(object):
 
             # {u'yaxis.autorange': True, u'xaxis.autorange': True}
 
-        # lines_to_get = util_func.flatten_list_of_strings([lines_to_plot, 'notional'])
+        # lines_to_get = _util_func.flatten_list_of_strings([lines_to_plot, 'notional'])
 
         notional_series = sparse_market_trade_df['notional']
 

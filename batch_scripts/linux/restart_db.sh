@@ -24,12 +24,12 @@ sudo killall mongod
 # Stop MySQL
 sudo service mysql stop
 
-# kill Redis
+# Kill Redis
 sudo service redis-server stop
 sudo killall redis-server
 sudo redis-cli -p 6379 shutdown
 
-# kill Memcached
+# Kill Memcached
 sudo service memcached stop
 
 # Wait for mongod to shutdown first
@@ -43,6 +43,12 @@ sleep 10s
 
 # Now start up redis, mysql and mongod in the background
 # sudo service mongod start
+if [ $START_CLICKHOUSE == 1 ]; then
+  # Starting Clickhouse columnar database
+  sudo service clickhouse-server start
+  echo "Started Clickhouse"
+fi
+
 if [ $START_MONGODB == 1 ]; then
   # Starting MongoDB as root
   sudo mongod --config $TCAPY_CUEMACRO/tcapy/conf/mongo.conf

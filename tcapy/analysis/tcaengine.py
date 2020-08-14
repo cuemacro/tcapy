@@ -132,7 +132,7 @@ class TCAEngineImpl(TCAEngine):
                     if tca_request.ticker in market_df_dict.keys():
                         trade_order_results_df_dict['market_df'] = market_df_dict[tca_request.ticker]
 
-            # If we want aggregated TCA analysis, typically to later calculate many metrics across many trades and tickers,
+            # If we want aggregated TCA analysis, typically to later calculate many metrics across many trades and _tickers,
             # as opposed to one specific currency pair
             # Or for market-analysis (which involves purely calculations on market data WITHOUT any trade/order data)
             elif tca_request.tca_type == 'aggregated' or tca_request.tca_type == 'compliance' or tca_request.tca_type == 'market-analysis':

@@ -192,8 +192,8 @@ involve a lot of downloading of all the dependencies and collecting them.
 
 We can then get access to many of the services from our host machine:
 
-* `http://localhost:9000/tcapy` - main tcapy web gui
-* `http://localhost:9000/tcapyboard/` - tcapy web gui for uploading trade CSVs
+* `http://localhost:10500/tcapy` - main tcapy web gui
+* `http://localhost:10500/tcapyboard/` - tcapy web gui for uploading trade CSVs
 * `http://localhost:8888` - Jupyter notebook with tcapy
 * `localhost:6379` - Redis
 * `localhost:3306` - MySQL
@@ -482,9 +482,9 @@ This will do several things, which includes:
 
 * Change the Python environment to `py36tca` under `conda` (although `virtualenv` environments are also supported)
 * Start server web apps:
-    * `http://localhost:9000/tcapy/` - main webapp
-    * `http://localhost:9000/tcapyboard/` - simpler webapp where you can upload a trade CSV and get TCA output
-    * `http://localhost:9000/tcapyapi/` - RESTful API endpoint
+    * `http://localhost:10500/tcapy/` - main webapp
+    * `http://localhost:10500/tcapyboard/` - simpler webapp where you can upload a trade CSV and get TCA output
+    * `http://localhost:10500/tcapyapi/` - RESTful API endpoint
 * Start Celery for distributed computation, which can also be accessed programmatically
     * If we do TCA on multiple assets, each asset is sent to a different Celery worker for computation
     * Celery also distributes the loading of data from the databases/caches by using different Celery workers

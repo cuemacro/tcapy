@@ -50,7 +50,7 @@ class TCACallerImplBoardGen(TCACaller):
             Parameters
             ----------
             ticker_val : str(list)
-                tickers (eg. EURUSD, GBPUSD etc)
+                _tickers (eg. EURUSD, GBPUSD etc)
 
             venue_val : str(list)
                 Trading venues

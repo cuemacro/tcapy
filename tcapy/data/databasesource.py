@@ -93,7 +93,7 @@ class DatabaseSource(ABC):
 
     Most implementations assume that market data for any particular ticker is stored in its own table. For trade/order
     data, we assume that trade data and order data is stored in separate tables. Unlike for market data, trade data for
-    multiple tickers is assumed to be stored in the same table. Obviously, if internally you stored your trade data in a
+    multiple _tickers is assumed to be stored in the same table. Obviously, if internally you stored your trade data in a
     different way, you can, for example write an SQL VIEW to return the data in the appropriate form for tcapy.
 
     """
@@ -602,6 +602,9 @@ class DatabaseSourcePicker(object):
             elif data_store == 'kdb':
                 database_source = DatabaseSourceKDB(postfix=postfix, username=access_control.kdb_username,
                                                     password=access_control.kdb_password)
+            elif data_store == 'clickhouse':
+                database_source = DatabaseSourceClickHouse(postfix=postfix, username=access_control.clickhouse_username,
+                                                    password=access_control.clickhouse_password)
             elif data_store == 'pystore':
                 database_source = DatabaseSourcePyStore(postfix=postfix)
             elif 'csv' in data_store or '.h5' in data_store or '.gzip' in data_store or '.parquet' in data_store:
@@ -613,7 +616,8 @@ class DatabaseSourcePicker(object):
                 else:
                     database_source = DatabaseSourceCSVBinary()
             elif data_store == 'ncfx':
-                database_source = DatabaseSourceNCFX()
+                database_source = DatabaseSourceNCFX(username=access_control.ncfx_username, password=access_control.ncfx_password,
+                                                     url=access_control.ncfx_url)
             elif data_store == 'dukascopy':
                 database_source = DatabaseSourceDukascopy()
 
@@ -653,7 +657,7 @@ class DatabaseSourceCSV(DatabaseSource):
             except:
                 return None
 
-        # Sometimes flat files may have multiple tickers in them, so filter by that
+        # Sometimes flat files may have multiple _tickers in them, so filter by that
         if ticker != None:
             try:
                 # Check that the ticker has been defined for every row
@@ -1075,7 +1079,7 @@ class DatabaseSourceSQL(DatabaseSource):
 
         for i in range(0, len(csv_file)):
 
-            # Only appropriate to store different tickers in different table for market data!
+            # Only appropriate to store different _tickers in different table for market data!
             # for trade data store in one table
             if ticker is not None:
                 tick = ticker[i]
@@ -1265,10 +1269,10 @@ class DatabaseSourceSQL(DatabaseSource):
         self._check_data_integrity(df, market_trade_data=market_trade_data)
 
         #df = df[0:1000]
-        # This will fail if we try to insert the *SAME* trades/orders, which have the same dates/id/tickers
+        # This will fail if we try to insert the *SAME* trades/orders, which have the same dates/id/_tickers
         # df.to_sql(sqlalchemy_table_name_tick, engine, if_exists='append', index=True,
         #          schema=schema, method=self._default_multi, chunksize=constants.sql_dump_record_chunksize)
-        # This will fail if we try to insert the *SAME* trades/orders, which have the same dates/id/tickers
+        # This will fail if we try to insert the *SAME* trades/orders, which have the same dates/id/_tickers
         df.to_sql(sqlalchemy_table_name_tick, engine, if_exists='append', index=True,
                   schema=schema, chunksize=self._sql_dump_record_chunksize)
 
@@ -1276,7 +1280,7 @@ class DatabaseSourceSQL(DatabaseSource):
 
     # def _write_df_to_sql(self, df, sqlalchemy_table_name_tick, engine, schema):
     #
-    #     # This will fail if we try to insert the *SAME* trades/orders, which have the same dates/id/tickers
+    #     # This will fail if we try to insert the *SAME* trades/orders, which have the same dates/id/_tickers
     #     df.to_sql(sqlalchemy_table_name_tick, engine, if_exists='append', index=True,
     #               schema=schema, method=self._default_multi, chunksize=constants.sql_dump_record_chunksize)
 
@@ -1539,12 +1543,13 @@ class DatabaseSourceSQLite(DatabaseSourceSQL):
 
     """
 
-    def __init__(self, trade_data_database_name=constants.sqlite_trade_data_database_name):
+    def __init__(self, trade_data_database_name=constants.sqlite_trade_data_database_name, username=None, password=None):
         """Initialises SQL object.
 
         """
         super(DatabaseSourceSQLite, self).__init__(trade_data_database_name=trade_data_database_name)
 
+        # Note, username and password are ignored by sqlite, given it's flat file based.
         self._sql_dialect = 'sqlite'
 
     def _get_database_engine(self, database_name=None, table_name=None):
@@ -1669,7 +1674,7 @@ class DatabaseSourceTickData(DatabaseSource):
         if df is not None:
             if not (df.empty):
                 # Filter by a specific ticker (if the data has a ticker column) and this is market data
-                # we assume that for market data tickers are stored individually
+                # we assume that for market data _tickers are stored individually
                 if 'ticker' in df.columns and market_trade_data == 'market':
                     df = df[df['ticker'] == ticker]
 
@@ -1907,7 +1912,7 @@ class DatabaseSourceArctic(DatabaseSourceTickData):
     socketTimeoutMS = constants.arctic_timeout_ms
 
     def __init__(self, postfix=None, connection_string=constants.arctic_connection_string,
-                 host=constants.arctic_host, port=constants.arctic_port,
+                 server_host=constants.arctic_host, server_port=constants.arctic_port,
                  username=constants.arctic_username, password=constants.arctic_password,
                  arctic_lib_type=constants.arctic_lib_type):
         """Initialise the Arctic object with our selected market data type (Arctic library type)
@@ -1919,16 +1924,16 @@ class DatabaseSourceArctic(DatabaseSourceTickData):
             one market data source, this is not necessary
 
         connection_string : str
-            Connection string for MongoDB, you can use this instead of specifiying the host directly eg. if you are
+            Connection string for MongoDB, you can use this instead of specifiying the server_host directly eg. if you are
             accessing MongoDB Atlas, it will be of the form below. If a connection string is provided, tcapy will ignore
-            all the various other paramaters like host, username, password etc.
+            all the various other paramaters like server_host, username, password etc.
 
             mongodb+srv://<username>:<password>@cluster0.blah-blah.mongodb.net/?retryWrites=true&w=majority
 
-        host : str
+        server_host : str
             MongoDB server hostname/IP
 
-        port : str
+        server_port : str
             Port of MongoDB server
 
         arctic_lib_type : str
@@ -1942,7 +1947,7 @@ class DatabaseSourceArctic(DatabaseSourceTickData):
         # # only want to instantiate this once (or if any parameters have changed!)
         # with DatabaseSourceArctic._arctic_lock:
         #     if self._engine is None or self._store is None or arctic_lib_type != self._arctic_lib_type or \
-        #         self._host != host or self._port != port or self._username != username or self._password != password:
+        #         self._server_host != server_host or self._server_port != server_port or self._username != username or self._password != password:
 
         if connection_string is not None:
             # Assume short connection strings are invalid
@@ -1953,7 +1958,7 @@ class DatabaseSourceArctic(DatabaseSourceTickData):
             ssl = constants.arctic_ssl
             tlsAllowInvalidCertificates = constants.arctic_tlsAllowInvalidCertificates
 
-            self._engine = pymongo.MongoClient(host, port=port, connect=False,
+            self._engine = pymongo.MongoClient(server_host, port=server_port, connect=False,
                                                username=username,
                                                password=password,
                                                ssl=ssl, tlsAllowInvalidCertificates=tlsAllowInvalidCertificates)
@@ -1967,7 +1972,7 @@ class DatabaseSourceArctic(DatabaseSourceTickData):
 
         self._username = username
         self._password = password
-        self._host = host
+        self._server_host = server_host
         self._password = password
 
         self._arctic_lib_type = arctic_lib_type
@@ -2118,35 +2123,11 @@ class DatabaseSourceArctic(DatabaseSourceTickData):
 
         return
 
-        # start_date, finish_date = self._parse_start_finish_dates(start_date, finish_date)
-        #
-        # ticker = ticker + self.postfix
-        #
-        # # logger.warning("Only use Arctic/MongoDB database for extracting test trade data, does not contain actual trade data")
-        #
-        # engine, store = self._get_database_engine(table_name=table_name)
-        #
-        # library = store[table_name]
-        #
-        # # we store the trade data as one symbol
-        # item = library.read(table_name, date_range=DateRange(start_date, finish_date))
-        #
-        # if isinstance(item, pd.DataFrame):
-        #     df = item
-        # else:
-        #     df = item.data
-        #
-        # logger.debug("Extracted Arctic/MongoDB library: " + str(table_name) + " between " +
-        #              " between " + str(start_date) + " - " + str(finish_date) + " from " + self._arctic_lib_type)
-        #
-        # if ticker is not None:
-        #     return self._downsample_localize_utc(df[df['ticker'] == ticker], convert=True)
-
     def convert_csv_to_table(self, csv_file, ticker, table_name, database_name=None, if_exists_table='replace',
                              if_exists_ticker='replace', market_trade_data='market', date_format=None,
                              read_in_reverse=False,
                              csv_read_chunksize=constants.csv_read_chunksize, remove_duplicates=True):
-        """Reads CSV from disk (or potentionally a list of CSVs for a list of different tickers) into a pandas DataFrame
+        """Reads CSV from disk (or potentionally a list of CSVs for a list of different _tickers) into a pandas DataFrame
         which is then dumped in Arctic/MongoDB.
 
         Parameters
@@ -2476,7 +2457,7 @@ class DatabaseSourcePyStore(DatabaseSourceTickData):
             Postfix can be used to identify different market data sources (eg. 'ncfx' or 'dukascopy'), if we only use
             one market data source, this is not necessary
 
-        data_store : str
+        _data_store : str
             Underlying data store for PyStore
 
         path : str
@@ -2589,7 +2570,7 @@ class DatabaseSourcePyStore(DatabaseSourceTickData):
                              if_exists_ticker='replace', market_trade_data='market', date_format=None,
                              read_in_reverse=False,
                              csv_read_chunksize=constants.csv_read_chunksize, remove_duplicates=True):
-        """Reads CSV from disk (or potentionally a list of CSVs for a list of different tickers) into a pandas DataFrame
+        """Reads CSV from disk (or potentionally a list of CSVs for a list of different _tickers) into a pandas DataFrame
         which is then dumped in Arctic/MongoDB.
 
         Parameters
@@ -2868,18 +2849,18 @@ class DatabaseSourceInfluxDB(DatabaseSourceTickData):
     # engine = None
     # store = None
 
-    def __init__(self, host=constants.influxdb_host, port=constants.influxdb_port, username=constants.influxdb_username,
+    def __init__(self, server_host=constants.influxdb_host, server_port=constants.influxdb_port, username=constants.influxdb_username,
                  password=constants.influxdb_password, postfix=None):
         super(DatabaseSourceInfluxDB, self).__init__(postfix=postfix)
 
-        self._host = host
-        self._port = port
+        self._server_host = server_host
+        self._server_port = server_port
         self._username = username
         self._password = password
 
     def _get_database_engine(self, table_name=None):
 
-        engine = DataFrameClient(self._host, self._port, self._username, self._password, table_name)
+        engine = DataFrameClient(self._server_host, self._server_port, self._username, self._password, table_name)
 
         db_stored = engine.query("show databases")
 
@@ -2894,7 +2875,7 @@ class DatabaseSourceInfluxDB(DatabaseSourceTickData):
                              if_exists_ticker='replace', market_trade_data='market', date_format=None,
                              read_in_reverse=False,
                              csv_read_chunksize=constants.csv_read_chunksize, remove_duplicates=True):
-        """Reads CSV from disk (or potentionally a list of CSVs for a list of different tickers) into a pandas DataFrame
+        """Reads CSV from disk (or potentionally a list of CSVs for a list of different _tickers) into a pandas DataFrame
         which is then dumped in InfluxDB
 
         Parameters
@@ -2946,7 +2927,7 @@ class DatabaseSourceInfluxDB(DatabaseSourceTickData):
         """
         engine, store = self._get_database_engine(table_name=table_name)
 
-        # Delete InfluxDB measurement (if we specified to replace whole table ie. delete all tickers)
+        # Delete InfluxDB measurement (if we specified to replace whole table ie. delete all _tickers)
         # can't delete directly with 'hdel', need to empty the folder recursively
         if if_exists_table == 'replace':
             self._delete_table(engine, table_name)
@@ -3168,6 +3149,10 @@ class DatabaseSourceInfluxDB(DatabaseSourceTickData):
         except:
             logger.warning("Error deleting data between " + start_date_str + " " + finish_date_str)
 
+########################################################################################################################
+class DatabaseSourceClickHouse(DatabaseSourceTickData):
+    # TODO!
+    pass
 
 ########################################################################################################################
 
@@ -3198,19 +3183,19 @@ class DatabaseSourceKDB(DatabaseSourceTickData):
     # engine = None
     # store = None
 
-    def __init__(self, host=constants.kdb_host, port=constants.kdb_port, username=constants.kdb_username,
+    def __init__(self, server_host=constants.kdb_host, server_port=constants.kdb_port, username=constants.kdb_username,
                  password=constants.kdb_password, postfix=None):
         super(DatabaseSourceKDB, self).__init__(postfix=postfix)
 
-        self._host = host
-        self._port = port
+        self._server_host = server_host
+        self._server_port = server_port
         self._username = username
         self._password = password
 
     def _get_database_engine(self):
 
         # Note table_name is not needed to make a connection with KDB
-        engine = qconnection.QConnection(host=self._host, port=self._port,
+        engine = qconnection.QConnection(host=self._server_host, port=self._server_port,
                                          username=self._username, password=self._password, pandas=True)
 
         return engine, None
@@ -3219,7 +3204,7 @@ class DatabaseSourceKDB(DatabaseSourceTickData):
                              if_exists_ticker='replace', market_trade_data='market', date_format=None,
                              read_in_reverse=False,
                              csv_read_chunksize=constants.csv_read_chunksize, remove_duplicates=True):
-        """Reads CSV from disk (or potentionally a list of CSVs for a list of different tickers) into a pandas DataFrame
+        """Reads CSV from disk (or potentionally a list of CSVs for a list of different _tickers) into a pandas DataFrame
         which is then dumped in KDB
 
         Parameters
@@ -3271,7 +3256,7 @@ class DatabaseSourceKDB(DatabaseSourceTickData):
         """
         engine, store = self._get_database_engine()
 
-        # Delete KDB directory/collection (if we specified to replace whole table ie. delete all tickers)
+        # Delete KDB directory/collection (if we specified to replace whole table ie. delete all _tickers)
         # can't delete directly with 'hdel', need to empty the folder recursively
         if if_exists_table == 'replace':
             engine.open()
@@ -3315,7 +3300,7 @@ class DatabaseSourceKDB(DatabaseSourceTickData):
                     if existing_datacheck == 'ignore':
                         temp_df = None
                     else:
-                        # Is there any data already there on disk in this date range
+                        # Is there any data already there on disk in this date range?
                         try:
                             start_date_str = self._convert_kdb_date_string(start_date)
 
@@ -3330,7 +3315,7 @@ class DatabaseSourceKDB(DatabaseSourceTickData):
                         except:
                             temp_df = None
 
-                    # If there was data in KDB during this time period, don't attempt to write
+                    # If there was data in KDB during this time period, don't attempt to write!
                     if temp_df is not None:
                         temp_df = self._downsample_localize_utc(temp_df)
 
@@ -3549,7 +3534,6 @@ class DatabaseSourceKDB(DatabaseSourceTickData):
 
         return df
 
-
 ########################################################################################################################
 
 class DatabaseSourceDataFrame(DatabaseSource):
@@ -3629,10 +3613,14 @@ class DatabaseSourceNCFX(DatabaseSource):
 
     """
 
-    def __init__(self):
+    def __init__(self, username=constants.ncfx_username, password=constants.ncfx_password, url=constants.ncfx_url):
         super(DatabaseSourceNCFX, self).__init__()
 
         self._util_func = UtilFunc()
+
+        self._username = username
+        self._password = password
+        self._url = url
 
     def fetch_market_data(self, start_date=None, finish_date=None, ticker=None, web_proxies=constants.web_proxies, table_name=None):
         start_date, finish_date = self._parse_start_finish_dates(start_date, finish_date)
@@ -3738,7 +3726,7 @@ class DatabaseSourceNCFX(DatabaseSource):
 
             headers = {'Content-Type': 'application/json'}
 
-            response = requests.post(constants.ncfx_url, auth=HTTPBasicAuth(constants.ncfx_username, constants.ncfx_password),
+            response = requests.post(self._url, auth=HTTPBasicAuth(self._username, self._password),
                                          data=json.dumps(payload), headers=headers, proxies=https_proxy)
 
             status_code = response.status_code
@@ -3887,7 +3875,7 @@ class DatabaseSourceDukascopy(DatabaseSourceExternalDownloader):
         # Use findatapy to download (supports several providers including Dukascopy)
         # md_request = MarketDataRequest(start_date=start_date, finish_date=finish_date, data_source=self._data_provider(),
         #                                freq='tick',
-        #                                tickers=ticker, vendor_tickers=constants.dukascopy_tickers[ticker],
+        #                                _tickers=ticker, vendor_tickers=constants.dukascopy_tickers[ticker],
         #                                fields=['bid', 'ask'], vendor_fields=['bid', 'ask'], push_to_cache=False)
 
         self._md_request.start_date=start_date

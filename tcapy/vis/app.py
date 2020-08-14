@@ -84,7 +84,7 @@ logger.info("Root path = " + app.server.root_path)
 #app.css.config.serve_locally = True
 app.scripts.config.serve_locally = True # had issues fetching JS scripts remotely
 
-logger.info("Connected to volatile cache/Redis host")
+logger.info("Connected to volatile cache/Redis server_host")
 
 # Create the HTML layout for the pages (note: this is in a separate file layout.py)
 app.layout = layout.page_content

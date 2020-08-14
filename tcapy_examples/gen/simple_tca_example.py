@@ -259,12 +259,12 @@ def single_ticker_tca_example_1600LDN_benchmark():
     tca_report.create_report(output_filename='test_tca_twap_report.htm', output_format='html', offline_js=False)
 
 def multiple_ticker_tca_aggregated_example():
-    """Example of how to do TCa analysis on multiple tickers
+    """Example of how to do TCa analysis on multiple _tickers
     """
 
     tca_engine = TCAEngineImpl(version=tca_version)
 
-    # Run a TCA computation for multiple tickers, calculating slippage
+    # Run a TCA computation for multiple _tickers, calculating slippage
     tca_request = TCARequest(start_date=start_date, finish_date=finish_date, ticker=mult_ticker, tca_type='aggregated',
                              trade_data_store=trade_data_store, market_data_store=market_data_store,
                              metric_calcs=MetricSlippage(), reporting_currency='EUR')
@@ -361,12 +361,12 @@ def compare_multithreading_type():
                   + str(use_multithreading) + ' multithreading_params = ' + str(multithreading_params))
 
 def multiple_ticker_tca_aggregated_with_results_example():
-    """Example of how to do TCa analysis on multiple tickers with TCAResults
+    """Example of how to do TCa analysis on multiple _tickers with TCAResults
     """
 
     tca_engine = TCAEngineImpl(version=tca_version)
 
-    # Run a TCA computation for multiple tickers, calculating slippage
+    # Run a TCA computation for multiple _tickers, calculating slippage
     tca_request = TCARequest(start_date=start_date, finish_date=finish_date, ticker=mult_ticker, tca_type='aggregated',
                              trade_data_store=trade_data_store, market_data_store=market_data_store,
                              results_form=[TimelineResultsForm(metric_name='slippage', by_date='datehour', scalar=10000.0)],

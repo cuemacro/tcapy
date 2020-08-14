@@ -37,8 +37,8 @@ constants = Constants()
 ABC = abc.ABCMeta('ABC', (object,), {'__slots__': ()})
 
 class TCATickerLoader(ABC):
-    """This class is designed to load up market and trade data for single tickers and also makes appropriate metric calculations
-    for that specific ticker. It is generally called by the higher level TCAMarketTradeLoader class, which can handle multiple tickers.
+    """This class is designed to load up market and trade data for single _tickers and also makes appropriate metric calculations
+    for that specific ticker. It is generally called by the higher level TCAMarketTradeLoader class, which can handle multiple _tickers.
 
     """
 
@@ -59,7 +59,7 @@ class TCATickerLoader(ABC):
 
     def get_market_data(self, market_request):
         """Gets market data for a particular ticker. When we ask for non-standard FX crosses, only the mid-field is
-        returned (calculated as a cross rate). We do not give bid/ask quotes for calculated non-standard tickers, as these
+        returned (calculated as a cross rate). We do not give bid/ask quotes for calculated non-standard _tickers, as these
         can difficult to estimate.
 
         Parameters
@@ -144,7 +144,7 @@ class TCATickerLoader(ABC):
                         self._fx_conv.currency_pair_in_list(
                             self._fx_conv.correct_notation(market_request_terms.ticker), available_tickers)
 
-                # If both USD tickers don't exist try computing via EUR tickers? (eg. USDSEK from EURUSD & EURSEK)
+                # If both USD _tickers don't exist try computing via EUR _tickers? (eg. USDSEK from EURUSD & EURSEK)
                 if not(tickers_exist):
                     market_request_base.ticker = old_ticker[0:3] + 'EUR'
                     market_request_terms.ticker = 'EUR' + old_ticker[3:7]
@@ -154,7 +154,7 @@ class TCATickerLoader(ABC):
                                     self._fx_conv.currency_pair_in_list(
                                         self._fx_conv.correct_notation(market_request_terms.ticker), available_tickers)
 
-                # Check if that currency (in the CORRECT convention) is in the available tickers
+                # Check if that currency (in the CORRECT convention) is in the available _tickers
                 # we will typically not collect market data for currencies in their wrong convention
                 if tickers_exist:
 
@@ -216,7 +216,7 @@ class TCATickerLoader(ABC):
         return market_df
 
     def get_trade_order_data(self, tca_request, trade_order_type, start_date=None, finish_date=None):
-        """Gets trade data for specified parameters (eg. start/finish dates tickers). Will also try to find trades
+        """Gets trade data for specified parameters (eg. start/finish dates _tickers). Will also try to find trades
         when they have booked in the inverted market convention, and change the fields appropriately. For example, if
         we ask for GBPUSD trade data, it will also search for USDGBP and convert those trades in the correct convention.
 

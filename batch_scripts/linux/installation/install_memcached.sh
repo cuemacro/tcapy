@@ -16,5 +16,5 @@ elif [ $DISTRO == "redhat"  ]; then
 fi
 
 # By default it is started at 127.0.0.1:11211
-# If you want to change the port and other settings edit /etc/sysconfig/memcached
+# If you want to change the server_port and other settings edit /etc/sysconfig/memcached
 # Note: it should NOT be accessible from outside

@@ -26,7 +26,8 @@ if __name__ == '__main__':
     market_data_store = 'arctic'
 
     # If left as None, will pick up from constants
-    host = None
+    server_host = None
+    server_port = None
 
     logger.info("About to upload data to " + market_data_store)
 
@@ -53,13 +54,14 @@ if __name__ == '__main__':
     from tcapy.data.datadumper import DataDumper
 
     data_dumper = DataDumper()
-    data_dumper.upload_market_data_flat_file(data_vendor=data_vendor, market_data_store=market_data_store, host=host,
-                    ticker_mkt=ticker_mkt,
-                    csv_folder=csv_folder,
-                    if_exists_table=if_exists_table,
-                    if_append_replace_ticker=if_append_replace_ticker,
-                    file_extension=file_extension,
-                    plot_back_data=plot_back_data)
+    data_dumper.upload_market_data_flat_file(data_vendor=data_vendor, market_data_store=market_data_store,
+                                             server_host=server_host, server_port=server_port,
+                                             ticker_mkt=ticker_mkt,
+                                             csv_folder=csv_folder,
+                                             if_exists_table=if_exists_table,
+                                             if_append_replace_ticker=if_append_replace_ticker,
+                                             file_extension=file_extension,
+                                             plot_back_data=plot_back_data)
 
 
 

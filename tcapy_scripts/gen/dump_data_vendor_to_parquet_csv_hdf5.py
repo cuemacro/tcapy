@@ -31,7 +31,7 @@ if __name__ == '__main__':
     constants = Constants()
 
     # Where should we dump the temporary FX data mini files and large H5/Parquet files
-    # sometimes we might want to specify just a small section to download and specific tickers
+    # sometimes we might want to specify just a small section to download and specific _tickers
 
     # Usual default parameters
     start_date = None; finish_date = None
@@ -42,7 +42,7 @@ if __name__ == '__main__':
     temp_large_data_folder = '/data/csv_dump/temp/large/'
 
     start_date_csv = '01 Apr 2016'; finish_date_csv = '01 May 2020'; split_size = 'monthly' # 'daily' or 'monthly'
-    # start_date_csv = '01 Jan 2020'; finish_date_csv = '01 Jun 2020';
+    # start_date_csv = '01 Jan 2014'; finish_date_csv = '01 Apr 2016';
 
     if data_vendor == 'ncfx':
         from tcapy.data.databasepopulator import DatabasePopulatorNCFX as DatabasePopulator
@@ -53,8 +53,8 @@ if __name__ == '__main__':
 
         tickers = constants.dukascopy_tickers
 
-    # Example of manually specifying tickers
-    # tickers = {'EURUSD' : 'EURUSD', 'GBPUSD': 'GBPUSD', 'USDCAD': 'USDCAD', 'NZDUSD': 'NZDUSD', 'USDCHF' : 'USDCHF',
+    # Example of manually specifying _tickers
+    # _tickers = {'EURUSD' : 'EURUSD', 'GBPUSD': 'GBPUSD', 'USDCAD': 'USDCAD', 'NZDUSD': 'NZDUSD', 'USDCHF' : 'USDCHF',
     #            'USDJPY' : 'USDJPY'}
 
     db_populator = DatabasePopulator(temp_data_folder=temp_data_folder, temp_large_data_folder=temp_large_data_folder,

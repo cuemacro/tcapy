@@ -45,7 +45,7 @@ def docker_var(docker_var, normal_var, default_value=None):
     return normal_var
 
 class Constants(object):
-    """The constants of tcapy are stored here. They govern behavior such as: tickers, settings, markout
+    """The constants of tcapy are stored here. They govern behavior such as: _tickers, settings, markout
     and resampling settings, asset list, logging functionality and chart settings.
 
     These can be overrriden (in order) for you to specify settings which are unlikely to change very much (and excluding
@@ -77,7 +77,7 @@ class Constants(object):
 
     temp_data_folder = os.path.join(os.path.join(up(up(os.path.dirname(root_folder))), 'tcapy_tests_data'), 'temp2')
 
-    # temp_data_folder = os.path.join(test_data_folder, 'temp')
+    # _temp_data_folder = os.path.join(test_data_folder, 'temp')
     temp_large_data_folder = os.path.join(test_data_folder, 'large')
 
     # For backward compatibility with Python 2
@@ -142,7 +142,7 @@ class Constants(object):
     csv_folder = docker_var('/tmp/csv/', '/tmp/csv/')
     temp_data_folder = docker_var('/tmp/tcapy/', '/tmp/tcapy/')
 
-    ### Dukascopy tickers
+    ### Dukascopy _tickers
     dukascopy_tickers = {'EURUSD' : 'EURUSD',
                          'GBPUSD' : 'GBPUSD', 'AUDUSD': 'AUDUSD', 'NZDUSD': 'NZDUSD', 'USDCAD' : 'USDCAD', 'USDCHF' : 'USDCHF',
                          'USDJPY' : 'USDJPY',
@@ -275,7 +275,7 @@ class Constants(object):
 
     # Customise the types of assets traders, venues etc. (for testing purposes can just use the dummy variables above)
     available_market_data = ['arctic-dukascopy', 'arctic-ncfx', 'kdb-ncfx', 'dukascopy', 'ncfx']  # market data sources
-    available_tickers_dictionary = test_available_tickers_dictionary  # which tickers do we trade, and want to do TCA in
+    available_tickers_dictionary = test_available_tickers_dictionary  # which _tickers do we trade, and want to do TCA in
     available_venues_dictionary = test_venues_dictionary  # trading venues
     available_portfolios_dictionary = test_portfolios_dictionary  # portfolio IDs
     available_portfolio_managers_dictionary = test_portfolio_managers_dictionary  # portfolio manager IDs
@@ -293,7 +293,7 @@ class Constants(object):
     web_proxies = {"http" : None,
                    "https" : None}
 
-    # Below is a proxy example with username, password, server IP and port
+    # Below is a proxy example with username, password, server IP and server_port
     # web_proxies = {
     #     "http": "http://user:pass@1.1.1.10:1111/",
     #     "https" : "https://user:pass@1.1.1.10:1111"
@@ -456,7 +456,7 @@ class Constants(object):
 
     arctic_quota_market_data_GB = 80
 
-    ### KDB tickers
+    ### KDB _tickers
     kdb_tickers = {'EURUSD': 'EURUSD'}
 
     kdb_host = 'localhost'
@@ -465,7 +465,7 @@ class Constants(object):
     kdb_password = None
     kdb_market_data_database_table = 'market_data_table'
 
-    ### InfluxDB tickers
+    ### InfluxDB _tickers
     influxdb_host = docker_var('influxdb', 'localhost')
     influxdb_port = 8086
     influxdb_username = None
@@ -475,6 +475,19 @@ class Constants(object):
     influxdb_time_precision = 'n'   # 'n' for nanosecond
 
     influxdb_market_data_database_table = 'market_data_table'
+
+    ### ClickHouse
+    clickhouse_host = docker_var("$CLICKHOUSE_HOST", '127.0.0.1', default_value='clickhouse')
+    clickhouse_port = docker_var("$CLICKHOUSE_PORT", 9000, default_value=9000)
+
+    # OVERWRITE_IN_ConstantsCred or set env var
+    clickhouse_username = docker_var("$CLICKHOUSE_USERNAME", 'tcapyuser')
+    clickhouse_password = docker_var("$CLICKHOUSE_PASSWORD", 'tcapyuser')
+
+    clickhouse_market_data_database_name = 'fx'
+    clickhouse_market_data_database_table = 'market_data_table'  # Name of the table with market tick data
+
+    ########################################################################################################################
 
     GB = 1073741824  # bytes (do not change)
 
@@ -556,7 +569,7 @@ class Constants(object):
 
     # Note: msgpack is slightly faster, but is not supported in Pandas in later versions
     # at current stage arrow is not fully tested
-    volatile_cache_redis_format = 'msgpack' # 'msgpack' or 'arrow'
+    volatile_cache_redis_format = 'arrow' # 'msgpack' or 'arrow'
 
     volatile_cache_redis_compression = {'msgpack' : 'blosc',
                                         'arrow' : 'snappy'} # 'lz4' or 'snappy'

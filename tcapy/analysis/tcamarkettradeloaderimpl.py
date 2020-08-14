@@ -31,7 +31,7 @@ from tcapy.conf.celery_calls import calculate_metrics_single_ticker_via_celery, 
 from celery import chord, group
 
 class TCAMarketTradeLoaderImpl(TCAMarketTradeLoader):
-    """This allows the parallel fetching of market/trade data across different tickers
+    """This allows the parallel fetching of market/trade data across different _tickers
     """
 
     def __init__(self, version=constants.tcapy_version):

@@ -14,8 +14,8 @@ from tcapy.conf.constants import Constants
 constants = Constants()
 
 class AccessControl(object):
-    """The AccessControl object has username/password combinations for accessing protected resources (eg. databases)
-    which can be set by the user. It will default to those in the constants file (these can be set to None to force
+    """The AccessControl object has username/password combinations for accessing protected resources (eg. databases, or external
+    data sources) which can be set by the user. It will default to those in the constants file (these can be set to None to force
     users to create their own AccessControl objects when making database requests)
 
     """
@@ -30,7 +30,11 @@ class AccessControl(object):
                  # market data
                  arctic_username=constants.arctic_username, arctic_password=constants.arctic_password,
                  influxdb_username=constants.influxdb_username, influxdb_password=constants.influxdb_password,
-                 kdb_username=constants.kdb_username, kdb_password=constants.kdb_password
+                 kdb_username=constants.kdb_username, kdb_password=constants.kdb_password,
+                 clickhouse_username=constants.clickhouse_username, clickhouse_password=constants.clickhouse_password,
+
+                 # external sources
+                 ncfx_username=constants.ncfx_username, ncfx_password=constants.ncfx_password, ncfx_url=constants.ncfx_url
                  ):
 
         self.ms_sql_server_username = ms_sql_server_username
@@ -46,6 +50,12 @@ class AccessControl(object):
         self.influxdb_password = influxdb_password
         self.kdb_username = kdb_username
         self.kdb_password = kdb_password
+        self.clickhouse_username = clickhouse_username
+        self.clickhouse_password = clickhouse_password
+
+        self.ncfx_username = ncfx_username
+        self.ncfx_password = ncfx_password
+        self.ncfx_url = ncfx_url
     
     # trade/order data username/password
     @property
@@ -146,4 +156,46 @@ class AccessControl(object):
     @kdb_password.setter
     def kdb_password(self, kdb_password):
         self.__kdb_password = kdb_password
+
+    @property
+    def clickhouse_username(self):
+        return self.__clickhouse_username
+
+    @clickhouse_username.setter
+    def clickhouse_username(self, clickhouse_username):
+        self.__clickhouse_username = clickhouse_username
+
+    @property
+    def clickhouse_password(self):
+        return self.__clickhouse_password
+
+    @clickhouse_password.setter
+    def clickhouse_password(self, clickhouse_password):
+        self.__clickhouse_password = clickhouse_password
+        
+
+    @property
+    def ncfx_username(self):
+        return self.__ncfx_username
+
+    @ncfx_username.setter
+    def ncfx_username(self, ncfx_username):
+        self.__ncfx_username = ncfx_username
+
+    @property
+    def ncfx_password(self):
+        return self.__ncfx_password
+
+    @ncfx_password.setter
+    def ncfx_password(self, ncfx_password):
+        self.__ncfx_password = ncfx_password
+        
+    @property
+    def ncfx_url(self):
+        return self.__ncfx_url
+
+    @ncfx_url.setter
+    def ncfx_url(self, ncfx_url):
+        self.__ncfx_url = ncfx_url
+
     

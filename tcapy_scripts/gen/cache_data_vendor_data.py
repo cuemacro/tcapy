@@ -36,10 +36,10 @@ if __name__ == '__main__':
     WRITE_CSV = 0           # Purely for downloading from the external source to CSV/Parquet/HDF5 file
 
     # Where should we dump the temporary FX data mini files and large H5 files
-    # sometimes we might want to specify just a small section to download and specific tickers
-    # temp_data_folder = 'E:/tcapy_tests_data/temp_01Jun2018'; temp_large_data_folder = 'E:/tcapy_tests_data/temp_01Jun2018/large'
-    # temp_data_folder = 'E:/tcapy_tests_data/temp'; temp_large_data_folder = 'E:/tcapy_tests_data/large'
-    # tickers = {'EURUSD' : 'EURUSD'}
+    # sometimes we might want to specify just a small section to download and specific _tickers
+    # _temp_data_folder = 'E:/tcapy_tests_data/temp_01Jun2018'; _temp_large_data_folder = 'E:/tcapy_tests_data/temp_01Jun2018/large'
+    # _temp_data_folder = 'E:/tcapy_tests_data/temp'; _temp_large_data_folder = 'E:/tcapy_tests_data/large'
+    # _tickers = {'EURUSD' : 'EURUSD'}
     # start_date = '04 Nov 2017'; finish_date = '04 Nov 2017 09:00'
     # delete_cached_files = True
 

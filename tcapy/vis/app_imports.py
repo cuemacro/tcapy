@@ -90,9 +90,9 @@ logger.info("Env = " + constants.env)
 logger.info("Python = " + sys.executable)
 logger.info("Debug environment = " + str(constants.debug_start_flask_server_directly))
 
-logger.info("Database volatile cache/Redis host = " + str(constants.volatile_cache_host_redis))
-logger.info("Database arctic host = " + str(constants.arctic_host))
-logger.info("Database ms sql server host = " + str(constants.ms_sql_server_host))
+logger.info("Database volatile cache/Redis server_host = " + str(constants.volatile_cache_host_redis))
+logger.info("Database arctic server_host = " + str(constants.arctic_host))
+logger.info("Database ms sql server server_host = " + str(constants.ms_sql_server_host))
 
 logger.info("Database trade/order data source = " + str(constants.default_trade_data_store))
 logger.info("Database market data source = " + str(constants.default_market_data_store))
