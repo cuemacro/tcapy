@@ -5,7 +5,7 @@ services:
     image: nginx:latest
     container_name: nginx
     ports:
-      - 9000:9000
+      - 9500:9500
       - 80:80
     volumes:
       - ./tcapy:/tcapy
@@ -111,7 +111,7 @@ services:
 
   redis:
     image: "redis:alpine"
-    command: redis-server --server_port 6379 --save ""
+    command: redis-server --port 6379 --save ""
     ports:
       - 6379:6379
 

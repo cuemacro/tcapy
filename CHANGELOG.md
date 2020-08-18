@@ -6,6 +6,9 @@
 
 ## Coding log
 
+* 18 Aug 2020
+    * Fixed problem with Docker and nginx port 9500
+    * Fixed configuration issue with Redis and Docker
 * 14 Aug 2020
     * Starting to add ClickHouse support (not finished yet)
     * Refactored variables in DatabasePopulator
