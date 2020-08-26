@@ -12,11 +12,11 @@ REM Is the Python environment either "conda" or "virtualenv"?
 set TCAPY_PYTHON_ENV_TYPE=conda
 
 REM virtualenv folder or conda name
-REM set TCAPY_PYTHON_ENV=/home/$USER/py36tca/
+REM set TCAPY_PYTHON_ENV=/home/$USER/py37tca/
 
 REM virtualenv folder or conda name
 set CONDA_ACTIVATE=C:\Anaconda3\Scripts\activate.bat
-set TCAPY_PYTHON_ENV=py36tca
+set TCAPY_PYTHON_ENV=py37tca
 set TCAPY_PYTHON_ENV_BIN=%TCAPY_PYTHON_ENV%\bin\
 
 REM Installation parameters - create conda environment from YAML (1 or 0)

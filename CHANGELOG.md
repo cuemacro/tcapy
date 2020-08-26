@@ -6,6 +6,8 @@
 
 ## Coding log
 
+* 26 Aug 2020
+    * Updating conda/pip files to Python 3.7 (note: not yet compatible with Pandas 1.x)
 * 18 Aug 2020
     * Fixed problem with Docker and nginx port 9500
     * Fixed configuration issue with Redis and Docker

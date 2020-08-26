@@ -28,7 +28,7 @@ elif [ $TCAPY_PYTHON_ENV_TYPE == "conda" ]; then
     elif [ $CONDA_FROM_YAML == 0 ]; then
         # Sometimes might help to try an older version of conda - https://github.com/conda/conda/issues/9004
         # conda install conda=4.6.14
-        conda create -n $TCAPY_PYTHON_ENV python=3.6 --yes
+        conda create -n $TCAPY_PYTHON_ENV python=3.7 --yes
     fi
 
     source activate $TCAPY_PYTHON_ENV

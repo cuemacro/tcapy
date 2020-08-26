@@ -111,7 +111,8 @@ echo 'Flushing Redis cache...'
 
 redis-cli flushall
 
-echo 'Current working folder'
+echo 'Current working folder (set to notebook folder by default - so works with test trade files)'
+cd $TCAPY_CUEMACRO/tcapy_notebooks
 echo $PWD
 
 echo 'About to start celery...'

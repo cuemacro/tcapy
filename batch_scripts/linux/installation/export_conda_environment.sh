@@ -9,4 +9,4 @@ source $SCRIPT_FOLDER/set_tcapy_env_vars.sh
 source $SCRIPT_FOLDER/activate_python_environment.sh
 
 conda update -n base conda --yes
-conda env export > $TCAPY_CUEMACRO/batch_scripts/linux/installation/environment_linux_py36tca.yml
+conda env export > $TCAPY_CUEMACRO/batch_scripts/linux/installation/environment_linux_py37tca.yml

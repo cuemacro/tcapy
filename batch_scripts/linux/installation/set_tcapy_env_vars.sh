@@ -12,8 +12,8 @@ export TCAPY_CUEMACRO=/home/$USER/cuemacro/tcapy
 
 # Is the Python environment either "conda" or "virtualenv"?
 export TCAPY_PYTHON_ENV_TYPE="conda"
-# export TCAPY_PYTHON_ENV=/home/$USER/py36tca/ # virtualenv folder or conda name
-export TCAPY_PYTHON_ENV=py36tca # virtualenv folder or conda name
+# export TCAPY_PYTHON_ENV=/home/$USER/py37tca/ # virtualenv folder or conda name
+export TCAPY_PYTHON_ENV=py37tca # virtualenv folder or conda name
 export TCAPY_PYTHON_ENV_BIN=$TCAPY_PYTHON_ENV/bin/
 export TCAPY_PYTHON_VERSION=3 # Only Python 3 is now supported
 

@@ -26,7 +26,7 @@ if %TCAPY_PYTHON_ENV_TYPE%==conda (
         call %TCAPY_CUEMACRO%\batch_scripts\windows\installation\install_conda_from_env_yaml.bat
     ) else if %CONDA_FROM_YAML%==0 (
         REM try an older version of conda - https://github.com/conda/conda/issues/9004
-        call conda create -n %TCAPY_PYTHON_ENV% python=3.6 --yes
+        call conda create -n %TCAPY_PYTHON_ENV% python=3.7 --yes
     )
 
     call activate %TCAPY_PYTHON_ENV%

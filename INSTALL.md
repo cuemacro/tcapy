@@ -14,7 +14,7 @@ Note you may need slight editing of `set_tcapy_env_vars.sh` for CentOS/Amazon Li
 in general it is easier to use. Furthermore, Ubuntu is also available on WSL (Windows Subsystem for Linux), which we
 discuss later.
 
-tcapy is tested for use with Python 3.6/3.7 and does not support any version of Python 2, and do not use it with earlier
+tcapy is primarily tested for use with Python 3.7 and does not support any version of Python 2, and do not use it with earlier
 versions of Python 3.
 
 ## Use pip 

@@ -27,7 +27,7 @@ if %TCAPY_PYTHON_ENV_TYPE%==virtualenv (
         qpython==2.0.0 influxdb==5.2.3 ^
         Flask-Session==0.3.1 ^
         celery==4.4.0 msgpack-python pytest-tap kombu==4.6.7 python-memcached==1.59 ^
-        numba==0.48.0 vispy==0.6.4 pdfkit==0.6.1 jinja2==2.11.2 xlwings==0.19.4 ^
+        numba==0.48.0 vispy==0.6.4 pdfkit==0.6.1 jinja2==2.11.2 xlwings==0.20.2 ^
         jupyterlab jupyter_contrib_nbextensions jupyter_nbextensions_configurator RISE bqplot WeasyPrint==51 ^
         dask==2.14.0 distributed==2.14.0 cloudpickle==1.3.0 python-snappy==0.5.4 bokeh==2.0.1 msgpack==1.0.0 pystore==0.1.15 ^
         fsspec==0.3.3
@@ -42,16 +42,16 @@ if %TCAPY_PYTHON_ENV_TYPE%==conda (
 
         REM Install conda forge packages (removed gunicorn and python-pdfkit)
         call conda install -c conda-forge ^
-            setuptools-git=1.2 cython=0.29.13 arctic=1.79.2 sqlalchemy=1.3.17 redis-py=3.3.7 pymssql=2.1.4 ^
-            pandas=0.25.3 numpy=1.18.5 scipy=1.4.1 statsmodels=0.11.1 pytables=3.5.2 python-blosc=1.8.3 ^
-            pathos=0.2.1 multiprocess=0.70.9 fastparquet=0.3.3 ^
-            beautifulsoup4=4.8.0 psutil=5.6.3 ^
-            matplotlib=3.1.1 ^
-            pyodbc=4.0.23 ^
-            pytest=5.4.3 pytest-cov=2.5.1 ^
-            numba=0.48.0 pyarrow=0.16.0 vispy=0.6.4 jinja2=2.11.2 xlwings=0.19.4 ^
+            setuptools-git cython arctic sqlalchemy redis-py pymssql ^
+            pandas=0.25.3 numpy scipy statsmodels pytables python-blosc ^
+            pathos multiprocess fastparquet ^
+            beautifulsoup4 psutil ^
+            matplotlib ^
+            pyodbc ^
+            pytest pytest-cov ^
+            numba pyarrow vispy jinja2 xlwings=0.20.2 ^
             jupyterlab jupyter_contrib_nbextensions jupyter_nbextensions_configurator nodejs rise bqplot ^
-            dask=2.14.0 distributed=2.14.0 cloudpickle=1.3.0 python-snappy=0.5.4 bokeh=2.0.1 msgpack-python=1.0.0 --yes
+            dask distributed cloudpickle python-snappy bokeh msgpack-python --yes
 
         REM Install charting libraries for flash recording of session variables to allow celery to use Redis
         call pip install mysql-connector-python==8.0.19 chartpy==0.1.8 findatapy==0.1.12 dash-auth==1.3.2 cufflinks==0.17.3 ^
