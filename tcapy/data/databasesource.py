@@ -621,6 +621,10 @@ class DatabaseSourcePicker(object):
             elif data_store == 'dukascopy':
                 database_source = DatabaseSourceDukascopy()
 
+            elif data_store == 'eikon':
+                database_source = DatabaseSourceEikon(eikon_api_key=access_control.eikon_api_key)
+
+
         return database_source
 
 ########################################################################################################################
@@ -3871,6 +3875,9 @@ class DatabaseSourceDukascopy(DatabaseSourceExternalDownloader):
     def _data_provider(self):
         return 'dukascopy'
 
+    def _get_vendor_ticker(self, ticker):
+        return constants.dukascopy_tickers[ticker]
+
     def _download(self, start_date, finish_date, ticker):
         # Use findatapy to download (supports several providers including Dukascopy)
         # md_request = MarketDataRequest(start_date=start_date, finish_date=finish_date, data_source=self._data_provider(),
@@ -3882,7 +3889,7 @@ class DatabaseSourceDukascopy(DatabaseSourceExternalDownloader):
         self._md_request.finish_date=finish_date
         self._md_request.data_source = self._data_provider()
         self._md_request.tickers = ticker
-        self._md_request.vendor_tickers = constants.dukascopy_tickers[ticker]
+        self._md_request.vendor_tickers = self._get_vendor_ticker(ticker)
 
         df = self._market.fetch_market(self._md_request)
 
@@ -3894,3 +3901,24 @@ class DatabaseSourceDukascopy(DatabaseSourceExternalDownloader):
             df['mid'] = (df['bid'].values + df['ask'].values) / 2.0
 
         return df
+
+class DatabaseSourceEikon(DatabaseSourceDukascopy):
+    """Implements DatabaseSource for calling Eikon. It is recommend edto use this to download data from external source
+    and then cache data locally in an Arctic/MongoDB database (or similar) for reuse. Repeated calling
+    of this unnecessarily will cause latency issues.
+
+    """
+
+    def __init__(self, eikon_api_key=constants.eikon_api_key):
+        super(DatabaseSourceEikon, self).__init__()
+
+        self._market = Market(market_data_generator=MarketDataGenerator())
+        self._md_request = MarketDataRequest(freq='tick', data_source=self._data_provider(),
+                                             fields=['bid', 'ask'], vendor_fields=['bid', 'ask'], push_to_cache=False,
+                                             eikon_api_key=eikon_api_key)
+
+    def _data_provider(self):
+        return 'eikon'
+
+    def _get_vendor_ticker(self, ticker):
+        return constants.eikon_tickers[ticker]

@@ -823,3 +823,47 @@ class DatabasePopulatorDukascopy(DatabasePopulatorNCFX):
 
     def _remove_weekend_points(self):
         return True
+
+class DatabasePopulatorEikon(DatabasePopulatorNCFX):
+    """Implements DatabasePopulator for Eikon
+    """
+
+    def __init__(self, temp_data_folder=constants.temp_data_folder, temp_large_data_folder=constants.temp_large_data_folder,
+        tickers=None, data_store=constants.dukascopy_data_store, access_control=AccessControl()):
+
+        super(DatabasePopulatorEikon, self).__init__(
+            temp_data_folder=temp_data_folder, temp_large_data_folder=temp_large_data_folder, tickers=tickers, data_store=data_store,
+            access_control=access_control)
+
+    def _get_output_data_source(self):
+        return Mediator.get_database_source_picker().get_database_source(MarketRequest(data_store=self._data_store))
+
+    def _get_postfix(self):
+        return 'eikon'
+
+    def _get_tickers(self):
+        if self._tickers is None:
+            return constants.eikon_tickers.keys()
+
+        return self._tickers.keys()
+
+    def _get_tickers_vendor(self):
+        if self._tickers is None:
+            return constants.eikon_tickers
+
+        return self._tickers
+
+    def _get_threads(self):
+        return constants.eikon_threads
+
+    def _get_download_chunk_min_size(self):
+        return None
+
+    def _get_input_data_source(self):
+        from tcapy.data.databasesource import DatabaseSourceEikon
+
+        return DatabaseSourceEikon(eikon_api_key=self._access_control.eikon_api_key)
+
+    def _remove_weekend_points(self):
+        return True
+

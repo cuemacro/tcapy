@@ -6,6 +6,8 @@
 
 ## Coding log
 
+* 10 Sep 2020
+    * Adding support to use Eikon as a FX tick data source
 * 26 Aug 2020
     * Updating conda/pip files to Python 3.7 (note: not yet compatible with Pandas 1.x)
 * 18 Aug 2020

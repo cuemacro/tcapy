@@ -34,7 +34,9 @@ class AccessControl(object):
                  clickhouse_username=constants.clickhouse_username, clickhouse_password=constants.clickhouse_password,
 
                  # external sources
-                 ncfx_username=constants.ncfx_username, ncfx_password=constants.ncfx_password, ncfx_url=constants.ncfx_url
+                 ncfx_username=constants.ncfx_username, ncfx_password=constants.ncfx_password, ncfx_url=constants.ncfx_url,
+
+                 eikon_api_key=constants.eikon_api_key
                  ):
 
         self.ms_sql_server_username = ms_sql_server_username
@@ -56,6 +58,8 @@ class AccessControl(object):
         self.ncfx_username = ncfx_username
         self.ncfx_password = ncfx_password
         self.ncfx_url = ncfx_url
+
+        self.eikon_api_key = eikon_api_key
     
     # trade/order data username/password
     @property
@@ -197,5 +201,13 @@ class AccessControl(object):
     @ncfx_url.setter
     def ncfx_url(self, ncfx_url):
         self.__ncfx_url = ncfx_url
+
+    @property
+    def eikon_api_key(self):
+        return self.__eikon_api_key
+
+    @eikon_api_key.setter
+    def eikon_api_key(self, eikon_api_key):
+        self.__eikon_api_key = eikon_api_key
 
     

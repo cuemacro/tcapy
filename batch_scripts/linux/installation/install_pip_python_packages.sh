@@ -33,7 +33,7 @@ if [ $TCAPY_PYTHON_ENV_TYPE == "virtualenv" ]; then
         Flask-Session==0.3.1 \
         celery==4.4.0 pytest-tap kombu==4.6.7 python-memcached==1.59 numba==0.48.0 vispy==0.6.4 jinja2==2.11.2 \
         jupyterlab jupyter_contrib_nbextensions jupyter_nbextensions_configurator RISE bqplot WeasyPrint==51 \
-        dask==2.14.0 distributed==2.14.0 cloudpickle==1.3.0 python-snappy==0.5.4 bokeh==2.0.1 msgpack==1.0.0 pystore==0.1.15 fsspec==0.3.3
+        dask==2.14.0 distributed==2.14.0 cloudpickle==1.3.0 python-snappy==0.5.4 bokeh==2.0.1 msgpack==1.0.0 pystore==0.1.15 fsspec==0.3.3 eikon==1.1.2
 
     # Can't install orca with pip (has to be done manually or via conda)
     sudo apt-get install nodejs npm
@@ -63,5 +63,5 @@ elif [ $TCAPY_PYTHON_ENV_TYPE == "conda" ] && [ $CONDA_FROM_YAML == 0 ]; then
         dash==1.12.0 dash-html-components==1.0.3 dash-core-components==1.10.0 dash-table==4.7.0 jupyter-dash==0.2.1 dtale==1.8.1 \
         qpython==2.0.0 influxdb==5.2.3 \
         Flask-Session==0.3.1 \
-        celery==4.4.0 pytest-tap kombu==4.6.7 python-memcached==1.59 WeasyPrint==51 pystore==0.1.15 fsspec==0.3.3
+        celery==4.4.0 pytest-tap kombu==4.6.7 python-memcached==1.59 WeasyPrint==51 pystore==0.1.15 fsspec==0.3.3 eikon==1.1.2
 fi

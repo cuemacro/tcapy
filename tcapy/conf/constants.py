@@ -153,6 +153,18 @@ class Constants(object):
     dukascopy_data_store = 'arctic-dukascopy'
     dukascopy_threads = 1 # Dukascopy downloader not thread-safe so only use 1!
 
+    ### Eikon tickers
+    eikon_tickers = {'EURUSD' : 'EUR=',
+                         'GBPUSD' : 'GBP=', 'AUDUSD': 'AUD=', 'NZDUSD': 'NZD=', 'USDCAD' : 'CAD=', 'USDCHF' : 'CHF=',
+                         'USDJPY' : 'JPY=',
+                         'EURNOK' : 'EURNOK=', 'EURSEK': 'EURSEK=', 'USDNOK' : 'NOK=', 'USDSEK' : 'SEK=',
+                         'USDTRY' : 'TRY=', 'USDZAR': 'ZAR=',
+                         'EURPLN' : 'EURPLN=', 'USDMXN': 'MXN=', 'EURHUF' : 'EURHUF=', 'EURJPY' : 'EURJPY='}
+
+    eikon_data_store = 'arctic-eikon'
+    eikon_api_key = 'TYPE_HERE'
+    eikon_threads = 2
+
     ##### Metric parameters/hard constants for TCA calculation #########################################################
 
     ##### Hard constants
@@ -710,6 +722,7 @@ class Constants(object):
             ### these are the FX crosses which are available in each set of market data
             self.market_data_tickers = {'arctic-ncfx': self.ncfx_tickers,
                                         'arctic-dukascopy': self.dukascopy_tickers,
+                                        'arctic-eikon': self.eikon_tickers,
                                         'arctic-testharness': self.test_harness_tickers,
                                         'pystore-ncfx': self.ncfx_tickers,
                                         'pystore-dukascopy': self.dukascopy_tickers,
@@ -720,7 +733,8 @@ class Constants(object):
                                         'kdb-ncfx': self.ncfx_tickers,
                                         'kdb-testharness': self.test_harness_tickers,
                                         'ncfx': self.ncfx_tickers,
-                                        'dukascopy' : self.dukascopy_tickers
+                                        'dukascopy' : self.dukascopy_tickers,
+                                        'eikon' : self.eikon_tickers
                                         }
         except:
             pass

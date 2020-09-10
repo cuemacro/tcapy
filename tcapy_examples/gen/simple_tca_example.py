@@ -61,9 +61,6 @@ def single_ticker_tca_example():
     weights by reporting currency)
     """
 
-    # Note: running Orca might not work in WSL, also when generating Plotly charts, might get an error with WSL, if
-    # it doesn't have silent_display=True, as it will try to open a web page in a browser (which isn't supported in WSL1
-    # but is in WSL2)
     PLOT = True
 
     # clear entire cache
@@ -73,12 +70,6 @@ def single_ticker_tca_example():
 
     trade_order_type = 'trade_df'
     trade_order_list = ['trade_df', 'order_df']
-
-    # Ensure orca is started, if want to convert to PDF (sometimes you may need to specify the path)
-    # Can be slow to start
-    if PLOT:
-        from chartpy.engine import EnginePlotly
-        EnginePlotly().start_orca()# constants.orca_server_path)
 
     # specify the TCA request
     tca_request = TCARequest(start_date=start_date, finish_date=finish_date, ticker=ticker,
@@ -163,7 +154,7 @@ def single_ticker_tca_example():
 
         tca_report.create_report(output_filename='test_tca_report.htm', output_format='html', offline_js=False)
 
-        # Note needs plotly orca + wkhtmltopdf installed to render PDFs
+        # Note: now use kaleido instead of orca, which is much easier to setup
         try:
             tca_report.create_report(output_filename='test_tca_report.pdf', output_format='pdf')
         except Exception as e:

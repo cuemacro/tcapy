@@ -30,10 +30,7 @@ if %TCAPY_PYTHON_ENV_TYPE%==virtualenv (
         numba==0.48.0 vispy==0.6.4 pdfkit==0.6.1 jinja2==2.11.2 xlwings==0.20.2 ^
         jupyterlab jupyter_contrib_nbextensions jupyter_nbextensions_configurator RISE bqplot WeasyPrint==51 ^
         dask==2.14.0 distributed==2.14.0 cloudpickle==1.3.0 python-snappy==0.5.4 bokeh==2.0.1 msgpack==1.0.0 pystore==0.1.15 ^
-        fsspec==0.3.3
-
-    REM Cannot install orca with pip (has to be done manually or via conda)
-    REM https://github.com/plotly/orca has details on this
+        fsspec==0.3.3 eikon=1.1.2
 )
 
 if %TCAPY_PYTHON_ENV_TYPE%==conda (
@@ -60,6 +57,6 @@ if %TCAPY_PYTHON_ENV_TYPE%==conda (
           qpython==2.0.0 influxdb==5.2.3 ^
           Flask-Session==0.3.1 ^
           celery==4.4.0 pytest-tap kombu==4.6.7 python-memcached==1.59 boto3==1.5.11 pdfkit==0.6.1 WeasyPrint==51 pystore==0.1.15 ^
-          fsspec==0.3.3
+          fsspec==0.3.3 eikon==1.1.2
     )
 )
