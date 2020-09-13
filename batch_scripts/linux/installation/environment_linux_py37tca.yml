@@ -269,7 +269,7 @@ dependencies:
     - dtale==1.8.1
     - eikon==1.1.2
     - et-xmlfile==1.0.1
-    - findatapy==0.1.15
+    - findatapy==0.1.16
     - flask-compress==1.5.0
     - flask-ngrok==0.0.25
     - flask-seasurf==0.2.2
@@ -293,7 +293,6 @@ dependencies:
     - keyring==21.3.1
     - kombu==4.6.7
     - multidict==4.7.6
-    - multiprocessing-on-dill==3.5.0a4
     - multitasking==0.0.9
     - mysql-connector-python==8.0.19
     - nest-asyncio==1.0.0
