@@ -29,7 +29,7 @@ RUN buildDeps='gcc g++ libhdf5-dev hdf5-tools libsnappy-dev unixodbc-dev build-e
 USER $NB_UID
 
 RUN pip install --no-cache-dir /tmp/tcapy && \
-    rm -rf /tmp/tcapy
+    rm -rf /tmp/tcapy --hdf5=/opt/local
 
 RUN ln -s /home/${NB_USER}/tcapy /home/${NB_USER}/work/tcapy
 RUN ln -s /home/${NB_USER}/tcapyuser /home/${NB_USER}/work/tcapyuser
