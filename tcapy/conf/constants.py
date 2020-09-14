@@ -381,7 +381,7 @@ class Constants(object):
     ms_sql_server_username = docker_var('$MS_SQL_SERVER_USER', 'tcapyuser')
     ms_sql_server_password = docker_var('$MS_SQL_SERVER_PASSWORD', 'tcapyuser')
 
-    ms_sql_server_python_package = 'pyodbc'  # 'pyodbc' or 'pymssql'
+    ms_sql_server_python_package = 'pyodbc'  # 'pyodbc' ('pymssql' no longer supported)
 
     # For kerberos in Linux (for SQL server)
     ms_sql_server_kinit_path = '/usr/bin/kinit'

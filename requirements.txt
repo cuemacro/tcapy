@@ -3,7 +3,6 @@ cython==0.29.13
 arctic==1.79.2
 sqlalchemy==1.3.17
 redis==3.3.7
-pymssql==2.1.4
 pandas==0.25.3
 numpy==1.19.1
 scipy==1.4.1

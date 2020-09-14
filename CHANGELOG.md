@@ -8,8 +8,9 @@
 
 * 14 Sep 2020
     * Fixed findatapy version dependency
+    * Removed pymssql dependency (package deprecated)
 * 13 Sep 2020
-    * Removed multiprocessing_on_dill dep
+    * Removed multiprocessing_on_dill dependency
 * 10 Sep 2020
     * Adding support to use Eikon as a FX tick data source
 * 26 Aug 2020

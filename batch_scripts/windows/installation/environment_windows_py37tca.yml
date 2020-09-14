@@ -149,7 +149,6 @@ dependencies:
   - pycparser=2.20=pyh9f0ad1d_2
   - pygments=2.6.1=py_0
   - pymongo=3.11.0=py37h1834ac0_3
-  - pymssql=2.1.4=py37he774522_0
   - pyodbc=4.0.30=py37h6538335_0
   - pyopenssl=19.1.0=py_1
   - pyparsing=2.4.7=pyh9f0ad1d_0

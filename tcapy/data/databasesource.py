@@ -1445,11 +1445,12 @@ class DatabaseSourceMSSQLServer(DatabaseSourceSQL):
                 con_exp = "mssql+pyodbc://" + self._username + ":" + self._password \
                           + "@" + str(self._server_host) + ":" + str(self._server_port)
 
-        elif constants.ms_sql_server_python_package == 'pymssql':
-
-            # This driver is not recommended, as can't deal with enough decimal places
-            con_exp = "mssql+pymssql://" + self._username + ":" + self._password \
-                      + "@" + str(self._server_host)
+        # pymssql deprecated
+        # elif constants.ms_sql_server_python_package == 'pymssql':
+        #
+        #     # This driver is not recommended, as can't deal with enough decimal places
+        #     con_exp = "mssql+pymssql://" + self._username + ":" + self._password \
+        #               + "@" + str(self._server_host)
 
         if database_name is not None:
             con_exp = con_exp + "/" + database_name
