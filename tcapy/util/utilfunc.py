@@ -42,7 +42,7 @@ class UtilFunc(object):
     - manipulate lists of strings
     - parse dates
     - split dates into lists
-    - read/write DataFrames to disk in HDF5 format
+    - read/write DataFrames to disk in Parquet (or HDF5) format
 
     """
 
@@ -239,8 +239,8 @@ class UtilFunc(object):
         fname : str
             Path of binary file
 
-        format : str (default: 'hdf5')
-            What is the binary format? ('hdf5' and 'parquet' are supported)
+        format : str (default: 'parquet')
+            What is the binary format? ('parquet' or 'hdf5' are supported)
 
         Returns
         -------
@@ -265,6 +265,7 @@ class UtilFunc(object):
                 return data_frame
 
         elif format == 'hdf5':
+            # Needs pytables tables
             data_frame = None
             store = None
 
@@ -327,6 +328,7 @@ class UtilFunc(object):
                     data_frame.to_parquet(fname, compression=constants.parquet_compression, engine=constants.parquet_engine)
 
         elif format == 'hdf5':
+            # Needs pytables tables
             if data_frame is not None:
                 if not(data_frame.empty):
                     store = pd.HDFStore(fname)

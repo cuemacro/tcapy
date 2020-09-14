@@ -155,7 +155,6 @@ dependencies:
   - pyqt=5.12.3=py37h6538335_1
   - pyrsistent=0.16.0=py37h8055547_0
   - pysocks=1.7.1=py37hc8dfbb8_1
-  - pytables=3.6.1=py37h2d87964_2
   - pytest=6.0.1=py37hc8dfbb8_0
   - pytest-cov=2.10.1=pyh9f0ad1d_0
   - python=3.7.9=h60c2a47_0

@@ -17,7 +17,7 @@ if [ $TCAPY_PYTHON_ENV_TYPE == "virtualenv" ]; then
     # Install everything by pip
     pip install
         setuptools-git==1.2 cython==0.29.13 arctic==1.79.2 sqlalchemy==1.3.17 redis==3.3.7 \
-        pandas==0.25.3 numpy==1.18.5 scipy==1.4.1 statsmodels==0.11.1 tables==3.5.2 blosc==1.8.3 pyarrow==0.16.0 \
+        pandas==0.25.3 numpy==1.18.5 scipy==1.4.1 statsmodels==0.11.1 blosc==1.8.3 pyarrow==0.16.0 \
         pathos==0.2.1 multiprocess==0.70.9 fastparquet==0.3.3 \
         flask-restplus==0.13.0 gunicorn==19.9.0 \
         beautifulsoup4==4.8.0 pdfkit==0.6.1 psutil==5.6.6 \
@@ -43,7 +43,7 @@ elif [ $TCAPY_PYTHON_ENV_TYPE == "conda" ] && [ $CONDA_FROM_YAML == 0 ]; then
     # Install conda forge packages
     conda install -c conda-forge \
         setuptools-git cython arctic sqlalchemy redis-py \
-        pandas=0.25.3 numpy scipy statsmodels pytables python-blosc \
+        pandas=0.25.3 numpy scipy statsmodels python-blosc \
         pathos multiprocess fastparquet \
         flask-restplus gunicorn \
         beautifulsoup4 python-pdfkit psutil \
