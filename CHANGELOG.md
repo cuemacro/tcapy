@@ -6,6 +6,8 @@
 
 ## Coding log
 
+* 14 Sep 2020
+    * Fixed findatapy version dependency
 * 13 Sep 2020
     * Removed multiprocessing_on_dill dep
 * 10 Sep 2020

@@ -130,6 +130,9 @@ run all the Jupyter notebooks interactively in [Binder](https://mybinder.org/v2/
 Note, for those examples which use databases/multithreading, they
 will not function fully in Binder. However, all other examples, which don't rely on databases/multithreading do work.
 
+It can also take a long time for Binder to load, as in many instances it will need to build the Docker. Also there will
+be times when the compute on Binder is limited, in which case, you might need to try again later to use it.
+
 Also see [here](tcapy_notebooks/jupyter_notebooks_description.md), which lists all the notebooks
 
 * [A 10 minute view of tcapy](tcapy_notebooks/a_10_minute_view_of_tcapy.ipynb) - quick guide to
