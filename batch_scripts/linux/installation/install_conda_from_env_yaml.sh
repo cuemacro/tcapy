@@ -5,4 +5,4 @@
 export SCRIPT_FOLDER="$( dirname "$(readlink -f -- "$0")" )"
 source $SCRIPT_FOLDER/set_tcapy_env_vars.sh
 
-conda env create -f $TCAPY_CUEMACRO/batch_scripts/linux/installation/environment_linux_py36tca.yml
+conda env create -f $TCAPY_CUEMACRO/batch_scripts/linux/installation/environment_linux_py37tca.yml
