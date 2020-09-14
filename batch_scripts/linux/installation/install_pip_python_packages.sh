@@ -58,7 +58,7 @@ elif [ $TCAPY_PYTHON_ENV_TYPE == "conda" ] && [ $CONDA_FROM_YAML == 0 ]; then
     # Install charting libraries
     # for flash recording of session variables
     # to allow celery to use Redis
-    pip install mysql-connector-python==8.0.19 chartpy==0.1.8 findatapy==0.1.14 dash-auth==1.3.2 cufflinks==0.17.3 plotly==4.9.0 \
+    pip install mysql-connector-python==8.0.19 chartpy==0.1.8 findatapy==0.1.16 dash-auth==1.3.2 cufflinks==0.17.3 plotly==4.9.0 \
         chart-studio==1.1.0 kaleido dash-bootstrap-components==0.10.3 \
         dash==1.12.0 dash-html-components==1.0.3 dash-core-components==1.10.0 dash-table==4.7.0 jupyter-dash==0.2.1 dtale==1.8.1 \
         qpython==2.0.0 influxdb==5.2.3 \

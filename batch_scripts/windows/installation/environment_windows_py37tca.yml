@@ -6,7 +6,8 @@ dependencies:
   - abseil-cpp=20200225.2=ha925a31_2
   - arctic=1.79.3=py_0
   - argon2-cffi=20.1.0=py37h4ab8f01_1
-  - arrow-cpp=1.0.1=py37h1234567_1_cpu
+  - arrow-cpp=1.0.1=py37h1234567_2_cpu
+  - async_generator=1.10=py_0
   - atomicwrites=1.4.0=pyh9f0ad1d_0
   - attrs=20.2.0=pyh9f0ad1d_0
   - aws-sdk-cpp=1.7.164=vc14h84f8083_2
@@ -30,30 +31,28 @@ dependencies:
   - cloudpickle=1.6.0=py_0
   - colorama=0.4.3=py_0
   - comtypes=1.1.7=py37hc8dfbb8_1001
-  - coverage=5.2.1=py37h4ab8f01_0
+  - coverage=5.3=py37h4ab8f01_0
   - coveralls=2.1.2=py_0
   - cryptography=3.1=py37h26f1ce3_0
   - curl=7.71.1=h4b64cdc_5
   - cycler=0.10.0=py_2
   - cython=0.29.21=py37h1834ac0_0
   - cytoolz=0.10.1=py37hfa6e2cd_0
-  - dask=2.25.0=py_0
-  - dask-core=2.25.0=py_0
+  - dask=2.26.0=py_0
+  - dask-core=2.26.0=py_0
   - decorator=4.4.2=py_0
   - defusedxml=0.6.0=py_0
   - dill=0.3.2=pyh9f0ad1d_0
-  - distributed=2.25.0=py37hc8dfbb8_0
+  - distributed=2.26.0=py37hc8dfbb8_0
   - docopt=0.6.2=py_1
   - entrypoints=0.3=py37hc8dfbb8_1001
   - enum-compat=0.0.3=py37hc8dfbb8_1
   - fastparquet=0.4.1=py37h44b1f71_0
-  - freetds=1.00.97=h7a1dbc1_0
   - freetype=2.10.2=hd328e21_0
   - freetype-py=2.2.0=pyh9f0ad1d_0
   - gflags=2.2.2=ha925a31_1004
   - glog=0.4.0=h0174b99_3
   - grpc-cpp=1.30.1=h45b88af_1
-  - hdf5=1.10.6=nompi_he0bbb20_101
   - heapdict=1.0.1=py_0
   - icc_rt=2019.0.0=h0cc432a_1
   - icu=67.1=h33f27b4_0
@@ -78,7 +77,8 @@ dependencies:
   - jupyter_highlight_selected_word=0.2.0=py37_1000
   - jupyter_latex_envs=1.4.4=py37_1000
   - jupyter_nbextensions_configurator=0.4.1=py37hc8dfbb8_1
-  - jupyterlab=2.2.6=py_0
+  - jupyterlab=2.2.8=py_0
+  - jupyterlab_pygments=0.1.1=pyh9f0ad1d_0
   - jupyterlab_server=1.2.0=py_0
   - kiwisolver=1.2.0=py37heaa310e_0
   - krb5=1.17.1=hc04afaa_3
@@ -112,18 +112,17 @@ dependencies:
   - mistune=0.8.4=py37h8055547_1001
   - mkl=2019.4=245
   - mkl-service=2.3.0=py37hfa6e2cd_0
-  - mock=4.0.2=py37hc8dfbb8_0
   - mockextras=1.0.2=py37hc8dfbb8_1
   - more-itertools=8.5.0=py_0
   - msgpack-python=1.0.0=py37heaa310e_1
   - msys2-conda-epoch=20160418=1
   - multiprocess=0.70.10=py37h4ab8f01_0
-  - nbconvert=5.6.1=py37hc8dfbb8_1
+  - nbclient=0.5.0=py_0
+  - nbconvert=6.0.2=py37hc8dfbb8_0
   - nbformat=5.0.7=py_0
-  - nodejs=14.10.0=0
-  - notebook=6.1.3=py37hc8dfbb8_0
+  - nodejs=14.10.1=0
+  - notebook=6.1.4=py37hc8dfbb8_0
   - numba=0.51.2=py37h414f9d2_0
-  - numexpr=2.7.1=py37h1834ac0_1
   - numpy=1.19.1=py37h7cee19a_2
   - olefile=0.46=py_0
   - openssl=1.1.1g=he774522_1
@@ -145,20 +144,20 @@ dependencies:
   - prompt-toolkit=3.0.7=py_0
   - psutil=5.7.2=py37h4ab8f01_0
   - py=1.9.0=pyh9f0ad1d_0
-  - pyarrow=1.0.1=py37h1234567_1_cpu
+  - pyarrow=1.0.1=py37h1234567_2_cpu
   - pycparser=2.20=pyh9f0ad1d_2
-  - pygments=2.6.1=py_0
+  - pygments=2.7.0=py_0
   - pymongo=3.11.0=py37h1834ac0_3
   - pyodbc=4.0.30=py37h6538335_0
   - pyopenssl=19.1.0=py_1
   - pyparsing=2.4.7=pyh9f0ad1d_0
   - pyqt=5.12.3=py37h6538335_1
-  - pyrsistent=0.16.0=py37h8055547_0
+  - pyrsistent=0.17.3=py37h4ab8f01_0
   - pysocks=1.7.1=py37hc8dfbb8_1
-  - pytest=6.0.1=py37hc8dfbb8_0
+  - pytest=6.0.2=py37hc8dfbb8_0
   - pytest-cov=2.10.1=pyh9f0ad1d_0
   - python=3.7.9=h60c2a47_0
-  - python-blosc=1.9.1=py37hca44ab5_0
+  - python-blosc=1.9.2=py37h89887c2_0
   - python-dateutil=2.8.1=py_0
   - python-snappy=0.5.4=py37h9a6de72_1
   - python_abi=3.7=1_cp37m
@@ -168,7 +167,7 @@ dependencies:
   - pyyaml=5.3.1=py37h8055547_0
   - pyzmq=19.0.2=py37h453f00a_0
   - qt=5.12.6=hb2cf2c5_0
-  - re2=2020.08.01=ha925a31_0
+  - re2=2020.08.01=ha925a31_1
   - redis-py=3.5.3=pyh9f0ad1d_0
   - requests=2.24.0=pyh9f0ad1d_0
   - rise=5.6.1=py37hc8dfbb8_1
@@ -187,7 +186,7 @@ dependencies:
   - terminado=0.8.3=py37hc8dfbb8_1
   - testpath=0.4.4=py_0
   - thrift=0.11.0=py37h6538335_1001
-  - thrift-cpp=0.13.0=h209c91f_3
+  - thrift-cpp=0.13.0=hdfef310_4
   - tk=8.6.10=he774522_0
   - toml=0.10.1=pyh9f0ad1d_0
   - toolz=0.10.0=py_0
@@ -311,4 +310,4 @@ dependencies:
     - yarl==1.5.1
     - yfinance==0.1.54
     - zope-interface==5.1.0
-prefix: C:\Anaconda3\envs\py37tca
+
