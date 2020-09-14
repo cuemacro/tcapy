@@ -8,7 +8,8 @@
 
 * 14 Sep 2020
     * Fixed findatapy version dependency
-    * Removed pymssql dependency (package deprecated)
+    * Removed pymssql dependency (package deprecated) and pytables/tables (now optional)
+    * Fixed Jupyter Binder build (fixed version at 1.2.0)
 * 13 Sep 2020
     * Removed multiprocessing_on_dill dependency
 * 10 Sep 2020
