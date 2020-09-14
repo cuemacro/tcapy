@@ -85,7 +85,7 @@ class Constants(object):
     pickle.HIGHEST_PROTOCOL = 2
 
     # Default format for writing small binary files to disk (eg. by DatabasePopulator, UtilFunc..)
-    # 'parquet' (or 'hdf5', but that requires pytables tables)
+    # 'parquet' (or 'hdf5', but that requires pytables tables Python package installed, which is not done by default)
     binary_default_dump_format = 'parquet'
 
     # 'snappy' or 'gzip'

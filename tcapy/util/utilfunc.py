@@ -297,7 +297,7 @@ class UtilFunc(object):
 
 
     def write_dataframe_to_binary(self, data_frame, fname, format=constants.binary_default_dump_format):
-        """Writes a DataFrame to disk in Parquet, HDF5, CSV or CSV.GZ format
+        """Writes a DataFrame to disk in Parquet (default), HDF5, CSV or CSV.GZ format
 
         Parameters
         ----------
@@ -328,7 +328,7 @@ class UtilFunc(object):
                     data_frame.to_parquet(fname, compression=constants.parquet_compression, engine=constants.parquet_engine)
 
         elif format == 'hdf5':
-            # Needs pytables tables
+            # Needs pytables tables as an additional install
             if data_frame is not None:
                 if not(data_frame.empty):
                     store = pd.HDFStore(fname)

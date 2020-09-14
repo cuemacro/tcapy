@@ -32,7 +32,7 @@ constants = Constants()
 # Compatible with Python 2 *and* 3:
 ABC = abc.ABCMeta('ABC', (object,), {'__slots__': ()})
 
-binary_format=constants.binary_default_dump_format # 'hdf5' or 'parquet'
+binary_format=constants.binary_default_dump_format # 'parquet' is default ('hdf5' requires additional installation of pytables tables/HDF5)
 
 if binary_format == 'hdf5':
     fileformat = 'h5' # 'h5' or 'gzip'
