@@ -28,7 +28,7 @@ RUN buildDeps='gcc g++ libhdf5-dev hdf5-tools libsnappy-dev unixodbc-dev build-e
 # Switch back to jovyan to avoid accidental container runs as root
 USER $NB_UID
 
-ENV PATH="/opt/local:${PATH}"
+ENV HD5_DIR=/opt/local
 
 RUN pip install --no-cache-dir /tmp/tcapy && \
     rm -rf /tmp/tcapy
