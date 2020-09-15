@@ -56,7 +56,7 @@ if %TCAPY_PYTHON_ENV_TYPE%==conda (
           dash==1.12.0 dash-html-components==1.0.3 dash-core-components==1.10.0 dash-table==4.7.0 jupyter-dash==0.2.1 dtale==1.8.1 ^
           qpython==2.0.0 influxdb==5.2.3 ^
           Flask-Session==0.3.1 ^
-          celery==4.4.0 pytest-tap kombu==4.6.7 python-memcached==1.59 boto3==1.5.11 pdfkit==0.6.1 WeasyPrint==51 pystore==0.1.15 ^
+          celery==4.4.7 pytest-tap kombu==4.6.7 python-memcached==1.59 boto3==1.5.11 pdfkit==0.6.1 WeasyPrint==51 pystore==0.1.15 ^
           fsspec==0.3.3 eikon==1.1.2
     )
 )

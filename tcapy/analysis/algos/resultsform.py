@@ -248,6 +248,8 @@ class DistResultsForm(ResultsForm):
         market_trade_order_df = self._trade_order_filter_tag.filter_trade_order(market_trade_order_df,
                                                                                 tag_value_combinations=tag_value_combinations)
 
+        if market_trade_order_df is None: return [None]
+
         if weighting_field is not None and weighting_field not in market_trade_order_df.columns: return [None]
 
         if not (isinstance(aggregate_by_field, list)): aggregate_by_field = [aggregate_by_field]
@@ -313,6 +315,8 @@ class BarResultsForm(ResultsForm):
 
         market_trade_order_df = self._trade_order_filter_tag.filter_trade_order(market_trade_order_df,
                                                                                 tag_value_combinations=tag_value_combinations)
+
+        if market_trade_order_df is None: return [None]
 
         if weighting_field is not None and weighting_field not in market_trade_order_df.columns: return [None]
 

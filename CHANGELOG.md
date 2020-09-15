@@ -6,6 +6,8 @@
 
 ## Coding log
 
+* 15 Sep 2020
+    * Synching various Python library versions across Docker, Windows and Linux for tcapy
 * 14 Sep 2020
     * Fixed findatapy version dependency
     * Removed pymssql dependency (package deprecated) and pytables/tables (now optional)

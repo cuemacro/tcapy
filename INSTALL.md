@@ -461,6 +461,16 @@ Whilst option 3 (install tcapy directly on Windows) is feasible, note, that doin
 make it difficult to run certain features such as Celery which is not fully supported. We have not tested other functionality 
 such as the use of [nginx for Windows](http://nginx.org/en/docs/windows.html) to host the web GUI of tcapy directly on Windows.
 
+# Mismatches in Python libraries when running on multiple OS
+
+If you end up running for example tcapy on Windows (say to use in xlwings) but with a backend in Docker or Linux directly, 
+you need to make sure that Python versions of libraries are relatively similar, if you want to run things in parallel. 
+If you use the conda YML files and
+use requirements.txt with Docker it should be fine in general.
+
+Some the major issues with mismatching can be using different versions of Celery (and its dependencies like kombu) 
+as well as pyarrow on Windows/Linux/Docker, which can cause issues when caching data/sending back and forth from Celery.
+
 # Running tcapy on Linux
 
 After tcapy installation it is recommended you restart you computer.

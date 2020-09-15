@@ -8,7 +8,7 @@ numpy==1.19.1
 scipy==1.4.1
 statsmodels==0.11.1
 blosc==1.8.3
-pyarrow==0.16.0
+pyarrow==1.0.1
 pathos==0.2.1
 multiprocess==0.70.9
 fastparquet==0.3.3
