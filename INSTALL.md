@@ -293,15 +293,15 @@ can choose to skip). We paste the code below, with comments.
     # Install Python setup tools, gcc (compiler) and Apache web server etc.
     source install_python_tools_apache.sh
     
-    # Setup the virtual Python environmnent (py36tca) - by default conda environment from environment_linux_py36.yml
+    # Setup the virtual Python environmnent (py37tca) - by default conda environment from environment_linux_py36.yml
     source install_virtual_env.sh
     
     # Install the Microsoft SQL Server driver on Linux (only necessary if we want to use SQL Server for trade data)
     # assumes that Microsoft SQL Server has already been installed (or you are accessing it over a network)
     sudo ./install_sql_driver.sh
     
-    # Install all the Python packages in the py36tca environment
-    # If the conda environment has not already been created from the environment_linux_py36tca.yml file (default)
+    # Install all the Python packages in the py37tca environment
+    # If the conda environment has not already been created from the environment_linux_py37tca.yml file (default)
     # It is generally quicker to create from YML file rather than running conda/pip for each library
     source install_pip_python_packages.sh
     
@@ -413,9 +413,9 @@ and then install tcapy on VirtualBox/Linux
         * `TCAPY_CUEMACRO` - with the folder you installed tcapy (default: `e:\cuemacro\tcapy`)
         * `CONDA_ACTIVATE` - the path to Anaconda conda (default: `C:\Anaconda3\Scripts\activate.bat`)
     * run `e:\cuemacro\tcapy\batch_scripts\windows\installation\install_virtual_env.bat` which will setup a new 
-    conda environment called `py36tca`
+    conda environment called `py37tca`
     * run `e:\cuemacro\tcapy\batch_scripts\windows\installation\install_pip_python_packages.bat` which will install
-    all the packages you need in the `py36tca` environment for the tcapy library
+    all the packages you need in the `py37tca` environment for the tcapy library
     * you can optionally also run `e:\cuemacro\tcapy\batch_scripts\windows\installation\install_jupyter_extensions.bat` if 
     you're planning to use tcapy from Jupyter, and it will add some useful extensions like RISE for slides, ExecuteTime
     to make it easy to time the execution of cells etc.
@@ -428,9 +428,9 @@ and then install tcapy on VirtualBox/Linux
             tcapy_path = 'e:/cuemacro/tcapy'
             sys.path.insert(0, tcapy_path)
           
-    * make sure to activate the `py36tca` conda environment if you want to use tcapy, you can do this by running
+    * make sure to activate the `py37tca` conda environment if you want to use tcapy, you can do this by running
             
-            conda activate py36tca 
+            conda activate py37tca 
     
         in your Anaconda prompt or you can run `e:\cuemacro\tcapy\batch_scripts\windows\installation\activate_python_environment.bat`
         which will activate it and also add the tcapy folder to your `PYTHONPATH`
@@ -490,11 +490,11 @@ In order to start tcapy, we need to first run `cd /home/tcapyuser/cuemacro/tcapy
 Once all the databases/caches have been started, we can run `./restart_tcapy.sh` from the same folder.
 This will do several things, which includes:
 
-* Change the Python environment to `py36tca` under `conda` (although `virtualenv` environments are also supported)
+* Change the Python environment to `py37tca` under `conda` (although `virtualenv` environments are also supported)
 * Start server web apps:
-    * `http://localhost:10500/tcapy/` - main webapp
-    * `http://localhost:10500/tcapyboard/` - simpler webapp where you can upload a trade CSV and get TCA output
-    * `http://localhost:10500/tcapyapi/` - RESTful API endpoint
+    * `http://localhost:9500/tcapy/` - main webapp
+    * `http://localhost:9500/tcapyboard/` - simpler webapp where you can upload a trade CSV and get TCA output
+    * `http://localhost:9500/tcapyapi/` - RESTful API endpoint
 * Start Celery for distributed computation, which can also be accessed programmatically
     * If we do TCA on multiple assets, each asset is sent to a different Celery worker for computation
     * Celery also distributes the loading of data from the databases/caches by using different Celery workers

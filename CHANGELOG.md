@@ -6,6 +6,8 @@
 
 ## Coding log
 
+* 23 Sep 2020
+    * Minor changes to install instructions
 * 15 Sep 2020
     * Synching various Python library versions across Docker, Windows and Linux for tcapy
 * 14 Sep 2020

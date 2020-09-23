@@ -110,7 +110,7 @@ def combine_resampled_spot_data_into_single_dataframe_usd_base(resample_freq='1m
 
 if __name__ == '__main__':
     data_vendor_list = ['dukascopy']
-    resample_freq_list = ['1s', '1min']
+    resample_freq_list = ['1min', '1s']
 
     for data_vendor in data_vendor_list:
         for resample_freq in resample_freq_list:

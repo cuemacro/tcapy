@@ -19,12 +19,12 @@ if __name__ == '__main__':
 
     REVERSE_SORT_CSV = False
 
+    input_path = '/home/tcapyuser/cuemacro/tcapy/tests_harness_data'
+    output_path = '/home/tcapyuser/cuemacro/tcapy/tests_harness_data'
 
-    path = '/home/tcapyuser/cuemacro/tcapy/tests_harness_data'
-
-    # Convert from H5 to CSV file (change path as appropriate) - change path as appropriate
-    h5_file_list = [path + '/small_test_market_df.h5',
-                    path + '/small_test_market_df_reverse.h5']
+    # Convert from H5 to CSV file (change input_path as appropriate) - change input_path as appropriate
+    h5_file_list = [input_path + '/small_test_market_df.h5',
+                    input_path + '/small_test_market_df_reverse.h5']
 
     for h5_file in h5_file_list:
 
@@ -39,4 +39,5 @@ if __name__ == '__main__':
             if REVERSE_SORT_CSV:
                 df = df.sort_index(ascending=False)
 
-            UtilFunc().write_dataframe_to_binary(df, next_h5_file.replace('.h5', '.parquet'), format='parquet')
+            UtilFunc().write_dataframe_to_binary(df, next_h5_file.replace(input_path, output_path)
+                                                 .replace('.h5', '.parquet'), format='parquet')

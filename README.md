@@ -203,7 +203,7 @@ to the libraries please let us know too.
 
 Project contributors
 * Saeed Amen (@saeedamen) - lead developer
-* Thomas Schmelzer(@tschm) - thanks to Thomas for reviewing some of the code and in particular his help to begin the process
+* Thomas Schmelzer (@tschm) - thanks to Thomas for reviewing some of the code and in particular his help to begin the process
 of creating a Docker image 
 
 # Screenshots

@@ -248,7 +248,7 @@ class UtilFunc(object):
         """
         logger = LoggerManager.getLogger(__name__)
 
-        # parquet is not fully implemented at this stage in tcapy
+        # parquet is default choice in tcapy
         if format == 'parquet':
             data_frame = None
 
