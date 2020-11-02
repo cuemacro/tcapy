@@ -6,6 +6,8 @@
 
 ## Coding log
 
+* 02 Nov 2020
+    * Adding init module for testing
 * 23 Sep 2020
     * Minor changes to install instructions
 * 15 Sep 2020
