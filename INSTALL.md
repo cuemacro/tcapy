@@ -192,8 +192,8 @@ involve a lot of downloading of all the dependencies and collecting them.
 
 We can then get access to many of the services from our host machine:
 
-* `http://localhost:10500/tcapy` - main tcapy web gui
-* `http://localhost:10500/tcapyboard/` - tcapy web gui for uploading trade CSVs
+* `http://localhost:9500/tcapy` - main tcapy web gui
+* `http://localhost:9500/tcapyboard/` - tcapy web gui for uploading trade CSVs
 * `http://localhost:8888` - Jupyter notebook with tcapy
 * `localhost:6379` - Redis
 * `localhost:3306` - MySQL

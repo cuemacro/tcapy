@@ -6,6 +6,8 @@
 
 ## Coding log
 
+* 16 Dec 2020
+    * Fixed typo in notes, web server is on port 9500
 * 02 Nov 2020
     * Adding init module for testing
 * 23 Sep 2020
