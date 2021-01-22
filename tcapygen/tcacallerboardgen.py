@@ -56,10 +56,10 @@ class TCACallerImplBoardGen(TCACaller):
                 Trading venues
 
             start_date_val : str(list)
-                Start date of TCA calculations
+                Start date of TCA _calculations
 
             finish_date_val : str(list)
-                Finish date of TCA calculations
+                Finish date of TCA _calculations
 
             reload_val : str
                 Whether underlying market and trade data should be reloaded from dataframe or fetched from cache

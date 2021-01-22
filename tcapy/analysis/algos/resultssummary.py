@@ -259,7 +259,7 @@ class ResultsSummary(object):
             How should the data be aggregated
 
         aggregate_by_field : str, default 'venue'
-            How should we aggregate our calculations (eg. by 'venue')
+            How should we aggregate our _calculations (eg. by 'venue')
 
         by_date : str
             Should we aggregate our results by date, to create a timeline

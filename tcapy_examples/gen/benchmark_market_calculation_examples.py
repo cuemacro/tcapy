@@ -28,8 +28,10 @@ data_source = 'dukascopy'
 # Change the market and trade data store as necessary
 market_data_store = 'arctic-' + data_source
 
-trade_data_source = 'ms_sql_server'
+trade_data_source = 'mysql'
 ticker = ['EURUSD', 'USDJPY']
+
+use_multithreading = False
 
 # We are purely doing market analysis using market data (and client trade/order data)
 tca_type = 'market-analysis'
@@ -50,12 +52,12 @@ def get_tca_request():
         return TCARequest(start_date=start_date, finish_date=finish_date, ticker=ticker,
                                  reporting_currency='USD',
                                  market_data_store=os.path.join(folder, 'small_test_market_df.csv.gz'),
-                                 tca_type=tca_type)
+                                 tca_type=tca_type, use_multithreading=use_multithreading)
     else:
         return TCARequest(start_date=start_date, finish_date=finish_date, ticker=ticker,
                                  reporting_currency='USD',
                                  market_data_store=market_data_store,
-                                 tca_type=tca_type)
+                                 tca_type=tca_type, use_multithreading=use_multithreading)
 
 def get_sample_data():
     """Load sample market/trade/order data
@@ -92,7 +94,7 @@ def example_request_mid_benchmark():
 
     # Allow analysis to be done in a parallel approach day by day
     # (note: can't do analysis which requires data outside of the daily chunks to do this!)
-    tca_request.multithreading_params['splice_request_by_dates'] = True
+    tca_request.multithreading_params['splice_request_by_dates'] = use_multithreading
 
     # Filter market data by time of day between 15:00-17:00 LDN
     # Then calculate the market mid, then calculate the spread to the mid,
@@ -113,6 +115,7 @@ def example_request_mid_benchmark():
                              weighting_field=None, by_date=['month', 'timeldn'], scalar=10000.0)
         ]
 
+    # return
     tca_request.use_multithreading = True
 
     tca_engine = TCAEngineImpl()

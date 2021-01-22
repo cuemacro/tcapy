@@ -79,7 +79,7 @@ class TCAMarketTradeLoaderImpl(TCAMarketTradeLoader):
         join_tables = tca_request_list[0].join_tables
 
         # If dummy market (ie. don't return market data to the user) has been specified then market data cannot
-        # be included in ResultsForm calculations
+        # be included in ResultsForm _calculations
         if results_form is not None:
 
             # Go through all the trade/orders doing statistical aggregations
@@ -264,15 +264,15 @@ class TCAMarketTradeLoaderImpl(TCAMarketTradeLoader):
             # Exception likely related to Celery and possibly lack of communication with Redis message broker
             # or Memcached results backend
             # except Exception as e:
-            except Exception as e:
-                if i == no_of_tries - 1:
-                    err_msg = "Failed with " + parallel_library + " after multiple attempts: " + str(e) + ", " + str(traceback.format_exc())
-
-                    raise Exception(err_msg)
-
-                i = i + 1
-
-                logger.warning("Failed with " + parallel_library + ", trying again for " + str(i) + " time: " + str(e) + ", " + str(traceback.format_exc()))
+            # except Exception as e:
+            #     if i == no_of_tries - 1:
+            #         err_msg = "Failed with " + parallel_library + " after multiple attempts: " + str(e) + ", " + str(traceback.format_exc())
+            #
+            #         raise Exception(err_msg)
+            #
+            #     i = i + 1
+            #
+            #     logger.warning("Failed with " + parallel_library + ", trying again for " + str(i) + " time: " + str(e) + ", " + str(traceback.format_exc()))
 
         logger.debug("Finished parallel computation")
 

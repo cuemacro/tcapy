@@ -535,7 +535,7 @@ class Constants(object):
     # This will split the TCA request by date, and work on those dates independently
     # may end up (very rarely) having slightly different output if trades are right at the start/end of a monthly boundary
     # such as orders which straddle the end of the month
-    # currently experimental given that it doesn't pass tests for these edge cases (it is disabled for any calculations
+    # currently experimental given that it doesn't pass tests for these edge cases (it is disabled for any _calculations
     # involving anything other than point in time executions (ie. trade_df)
     multithreading_params = {# True or False
                              # Note: if orders go over 'day/week'/'month' boundaries will have inaccurate answers with "True"

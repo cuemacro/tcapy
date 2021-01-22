@@ -40,13 +40,13 @@ class TCACallerImplGen(TCACaller):
 
         # callback triggered by Dash application
         def callback(*args):
-            """Kicks off fetching of data of market data and TCA calculations for a specific currency pair. Caches the data
+            """Kicks off fetching of data of market data and TCA _calculations for a specific currency pair. Caches the data
             in a VolatileCache instance, ready to be read in by the other charts.
 
             Parameters
             ----------
             ticker_val : str
-                ticker to be used in TCA calculations
+                ticker to be used in TCA _calculations
 
             start_date_val : str
                 Start date of TCA analysis

@@ -114,6 +114,9 @@ def single_ticker_tca_example():
                              benchmark_calcs=[# At the arrival price for every trade/order
                                               BenchmarkArrival(),
 
+                                              # At TWAP of every order
+                                              BenchmarkTWAP(trade_order_list=['order_df']),
+
                                               # At the spread at the time of every trade/order
                                               BenchmarkMarketSpreadToMid()],
                              trade_order_mapping=trade_order_list, use_multithreading=False)

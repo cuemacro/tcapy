@@ -15,6 +15,8 @@ __author__ = 'saeedamen'  # Saeed Amen / saeed@cuemacro.com
 
 import pytest
 
+import os
+
 from tcapy.conf.constants import Constants
 from tcapy.util.loggermanager import LoggerManager
 from tcapy.util.mediator import Mediator
@@ -28,7 +30,21 @@ logger = LoggerManager().getLogger(__name__)
 constants = Constants()
 
 logger.info('Make sure you have created folder ' + constants.csv_folder + ' & ' + constants.temp_data_folder +
-            ' otherwise tests will fail')
+            ' otherwise tests will fail.')
+
+if not(os.path.exists(constants.csv_folder)):
+    try:
+        os.mkdir(constants.csv_folder)
+    except:
+        logger.warn('Could not create ' + constants.csv_folder)
+
+if not(os.path.exists(constants.temp_data_folder)):
+    try:
+        os.mkdir(constants.temp_data_folder)
+    except:
+        logger.warn('Could not create ' + constants.temp_data_folder)
+
+
 
 ########################################################################################################################
 

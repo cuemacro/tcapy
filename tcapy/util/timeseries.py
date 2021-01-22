@@ -449,7 +449,7 @@ class TimeSeriesOps(object):
 
         just_before_point : bool (default: True)
             Should we fetch the point just before (in the case of not matching), which would be necessary for slippage
-            calculations, by contrast for market impact we would likely want to set this to False (ie. for points just after)
+            _calculations, by contrast for market impact we would likely want to set this to False (ie. for points just after)
 
         Returns
         -------
@@ -821,7 +821,8 @@ class TimeSeriesOps(object):
         if field is not None:
             df = df[field]
 
-        resample_func = df.resample(str(resample_amount) + unit_r)
+        # Grouper more flexible in later versions of Pandas
+        resample_func = df.groupby(pd.Grouper(freq=str(resample_amount) + unit_r)) # df.resample(str(resample_amount) + unit_r)
 
         if not(isinstance(how, str)):
             return resample_func.apply(how)
@@ -894,7 +895,7 @@ class TimeSeriesOps(object):
         elif how == 'twap':
             df['twap_temp'] = df.index.tz_convert(None).to_series().diff().values / np.timedelta64(1, 's')
 
-            resample_func = df.resample(str(resample_amount) + unit_r)
+            resample_func = df.groupby(pd.Grouper(freq=str(resample_amount) + unit_r)) # df.resample(str(resample_amount) + unit_r)
 
             def twap(bucket):
                 try:
@@ -1092,7 +1093,7 @@ class TimeSeriesOps(object):
             if not(isinstance(date, pd.Timestamp)):
                 date = pd.Timestamp(date)
 
-        # for consistency we generally assume all times are in UTC
+        # For consistency we generally assume all times are in UTC
         if assume_utc:
             date = date.replace(tzinfo=pytz.utc)
 

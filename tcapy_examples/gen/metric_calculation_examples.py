@@ -16,7 +16,7 @@ from tcapy.util.loggermanager import LoggerManager
 logger = LoggerManager.getLogger(__name__)
 
 # 'dukascopy' or 'ncfx'
-data_source = 'ncfx'
+data_source = 'dukascopy'
 
 # Change the market and trade data store as necessary
 market_data_store = 'arctic-' + data_source
@@ -26,15 +26,17 @@ tca_type = 'aggregated'
 bid_mid_bp = 0.1;
 ask_mid_bp = 0.1
 
+use_multithreading = False
+
 
 def get_sample_data():
     from tcapy.analysis.algos.benchmark import BenchmarkMarketSpreadToMid
     logger.info("About to load data for " + ticker)
 
-    tca_request = TCARequest(start_date='01 May 2017', finish_date='15 May 2017', ticker=ticker, trade_data_store='ms_sql_server',
+    tca_request = TCARequest(start_date='01 May 2017', finish_date='15 May 2017', ticker=ticker, trade_data_store='mysql',
                              market_data_store=market_data_store,
                              benchmark_calcs=[BenchmarkMarketSpreadToMid(bid_mid_bp=bid_mid_bp, ask_mid_bp=ask_mid_bp)],
-                             trade_order_mapping=['trade_df'], tca_type=tca_type)
+                             trade_order_mapping=['trade_df'], tca_type=tca_type, use_multithreading=use_multithreading)
 
     tca_engine = TCAEngineImpl()
 

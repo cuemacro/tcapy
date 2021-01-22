@@ -14,24 +14,24 @@ from tcapy.conf.constants import Constants
 
 constants = Constants()
 
-BROKER_URL = constants.celery_broker_url
-CELERY_RESULT_BACKEND = constants.celery_result_backend
+broker_url = constants.celery_broker_url
+result_backend = constants.celery_result_backend
 
 # from kombu import serialization
 # serialization.registry._decoders.("application/x-python-serialize")
 
 # the below should not need to be changed by nearly all users
-# CELERY_RESULT_BACKEND = "amqp"
-# CELERY_RESULT_BACKEND = "redis://localhost:6379/2"
-CELERY_EVENT_SERIALIZER = 'pickle'
-CELERY_ACCEPT_CONTENT = ['pickle'] #
-CELERY_TASK_SERIALIZER = 'pickle'
-CELERY_RESULT_SERIALIZER = 'pickle'
-CELERY_HIJACK_ROOT_LOGGER = False
-CELERY_STORE_ERRORS_EVEN_IF_IGNORED = True
-CELERYD_MAX_TASKS_PER_CHILD = 50 # Stop memory leaks, so restart workers after a 100 tasks
-CELERY_ACKS_LATE = True
-CELERY_TASK_RESULT_EXPIRES = 900 # Clear memory after a while of results, if not picked up
-# CELERY_ALWAYS_EAGER = True # For debugging
-BROKER_TRANSPORT_OPTIONS = {'socket_timeout': 900}
-# BROKER_POOL_LIMIT = 0
+# result_backend = "amqp"
+# result_backend  = "redis://localhost:6379/2"
+event_serializer = 'pickle'
+accept_content = ['pickle'] #
+task_serializer = 'pickle'
+result_serializer = 'pickle'
+worker_hijack_root_logger = False
+task_store_errors_even_if_ignored = True
+worker_max_tasks_per_child = 50 # Stop memory leaks, so restart workers after a 100 tasks
+tasks_acks_late = True
+result_expires = 900 # Clear memory after a while of results, if not picked up
+# task_always_eager = True # For debugging, to run Celery in the same process
+broker_transport_options = {'socket_timeout': 900}
+# broker_pool_limit = 0

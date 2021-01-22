@@ -237,7 +237,7 @@ class MetricSlippage(MetricCalc):
 
         Returns
         -------
-        DataFrame with slippage calculations
+        DataFrame with slippage _calculations
         """
 
         # from tcapy.util.loggermanager import LoggerManager
@@ -265,7 +265,7 @@ class MetricSlippage(MetricCalc):
 
         metric_df[self._metric_name] = np.nan
         metric_df[self._metric_name + '_benchmark'] = np.nan
-        metric_df[self._metric_name + '_benchmark_time'] = trade_order_df.index
+        metric_df[self._metric_name + '_benchmark_time'] = pd.NaT # trade_order_df.index
 
         bid_benchmark_list = [bid_benchmark];
         ask_benchmark_list = [ask_benchmark]
@@ -372,11 +372,11 @@ class MetricMarketImpact(MetricCalc):
 
         # transient market impact
         metric_df[self._metric_name + '_benchmark'] = np.nan
-        metric_df[self._metric_name + '_benchmark_time'] = metric_df.index
+        metric_df[self._metric_name + '_benchmark_time'] = pd.NaT # metric_df.index for Pandas 1.0.5
 
         metric_df[executed_price] = trade_order_df[executed_price]
 
-        # Market impact
+        # Market impact (sell then buy trades)
         time_delta = self._time_series_ops.get_time_delta(self._market_impact_gap)
         metric_df = self._get_benchmark_time_points(trade_order_df, market_df, metric_df, is_sell, bid_benchmark,
                                                     self._metric_name + '_benchmark', timedelta_amount=time_delta,

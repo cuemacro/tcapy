@@ -383,7 +383,7 @@ class DatabaseSource(ABC):
         return True
 
     def _remove_duplicates_market_data(self, df, remove_duplicates):
-        """Removes consecutive points which are repeated. For many TCA style calculations this is safe to do. However,
+        """Removes consecutive points which are repeated. For many TCA style _calculations this is safe to do. However,
         if we have other columns such as volume, removing these points could cause issues. This method will first check
         that the dataset does not contain any of these columns (like volume), before allowing the removal of duplicates.
 
@@ -1770,7 +1770,7 @@ class DatabaseSourceTickData(DatabaseSource):
 
         remove_duplicates : bool (default: True)
             Should we remove consecutive duplicated market values (eg. if EURUSD is at 1.1652 and 20ms later it is also
-            recorded at 1.1652, should we ignore the second point), which will make our calculations a lot faster
+            recorded at 1.1652, should we ignore the second point), which will make our _calculations a lot faster
             - whilst in many TCA cases, we can ignore duplicated
             points, we cannot do this for situations where we might wish to use for example volume, to calculate VWAP
 
@@ -2174,7 +2174,7 @@ class DatabaseSourceArctic(DatabaseSourceTickData):
 
         remove_duplicates : bool (default: True)
             Should we remove consecutive duplicated market values (eg. if EURUSD is at 1.1652 and 20ms later it is also
-            recorded at 1.1652, should we ignore the second point), which will make our calculations a lot faster
+            recorded at 1.1652, should we ignore the second point), which will make our _calculations a lot faster
             - whilst in many TCA cases, we can ignore duplicated
             points, we cannot do this for situations where we might wish to use for example volume, to calculate VWAP
 
@@ -2617,7 +2617,7 @@ class DatabaseSourcePyStore(DatabaseSourceTickData):
 
         remove_duplicates : bool (default: True)
             Should we remove consecutive duplicated market values (eg. if EURUSD is at 1.1652 and 20ms later it is also
-            recorded at 1.1652, should we ignore the second point), which will make our calculations a lot faster
+            recorded at 1.1652, should we ignore the second point), which will make our _calculations a lot faster
             - whilst in many TCA cases, we can ignore duplicated
             points, we cannot do this for situations where we might wish to use for example volume, to calculate VWAP
 
@@ -2922,7 +2922,7 @@ class DatabaseSourceInfluxDB(DatabaseSourceTickData):
 
         remove_duplicates : bool (default: True)
             Should we remove consecutive duplicated market values (eg. if EURUSD is at 1.1652 and 20ms later it is also
-            recorded at 1.1652, should we ignore the second point), which will make our calculations a lot faster
+            recorded at 1.1652, should we ignore the second point), which will make our _calculations a lot faster
             - whilst in many TCA cases, we can ignore duplicated
             points, we cannot do this for situations where we might wish to use for example volume, to calculate VWAP
 
@@ -3052,7 +3052,7 @@ class DatabaseSourceInfluxDB(DatabaseSourceTickData):
 
         remove_duplicates : bool (default: True)
             Should we remove consecutive duplicated market values (eg. if EURUSD is at 1.1652 and 20ms later it is also
-            recorded at 1.1652, should we ignore the second point), which will make our calculations a lot faster
+            recorded at 1.1652, should we ignore the second point), which will make our _calculations a lot faster
             - whilst in many TCA cases, we can ignore duplicated
             points, we cannot do this for situations where we might wish to use for example volume, to calculate VWAP
 
@@ -3251,7 +3251,7 @@ class DatabaseSourceKDB(DatabaseSourceTickData):
 
         remove_duplicates : bool (default: True)
             Should we remove consecutive duplicated market values (eg. if EURUSD is at 1.1652 and 20ms later it is also
-            recorded at 1.1652, should we ignore the second point), which will make our calculations a lot faster
+            recorded at 1.1652, should we ignore the second point), which will make our _calculations a lot faster
             - whilst in many TCA cases, we can ignore duplicated
             points, we cannot do this for situations where we might wish to use for example volume, to calculate VWAP
 
@@ -3401,7 +3401,7 @@ class DatabaseSourceKDB(DatabaseSourceTickData):
 
         remove_duplicates : bool (default: True)
             Should we remove consecutive duplicated market values (eg. if EURUSD is at 1.1652 and 20ms later it is also
-            recorded at 1.1652, should we ignore the second point), which will make our calculations a lot faster
+            recorded at 1.1652, should we ignore the second point), which will make our _calculations a lot faster
             - whilst in many TCA cases, we can ignore duplicated
             points, we cannot do this for situations where we might wish to use for example volume, to calculate VWAP
 
@@ -3840,7 +3840,11 @@ class DatabaseSourceExternalDownloader(DatabaseSource):
         df.index.name = "Date"
         df['ticker'] = ticker
 
-        df.index = df.index.tz_localize(pytz.utc)
+        # Localize index as UTC (if not already done so)
+        try:
+            df.index = df.index.tz_localize(pytz.utc)
+        except:
+            pass
 
         return df
 

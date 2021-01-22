@@ -6,6 +6,9 @@
 
 ## Coding log
 
+* 22 Jan 2021
+  * Upgraded Pandas to 1.0.5, no longer recommended to use earlier Pandas versions
+  * Updated various other libraries in conda environments
 * 16 Dec 2020
     * Fixed typo in notes, web server is on port 9500
 * 02 Nov 2020

@@ -15,7 +15,7 @@ in general it is easier to use. Furthermore, Ubuntu is also available on WSL (Wi
 discuss later.
 
 tcapy is primarily tested for use with Python 3.7 and does not support any version of Python 2, and do not use it with earlier
-versions of Python 3.
+versions of Python 3. We also recommend Pandas 1.0.5. Versions of Pandas before 1 are not supported.
 
 ## Use pip 
 

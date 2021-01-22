@@ -62,7 +62,7 @@ class ConstantsGen(object):
                                              'line_shape': 'hv'}}
 
     # Max number of days lookback window for any TCA calculation versus today
-    gui_lookback_window = 3*365
+    gui_lookback_window = 4*365
 
     # Max number of days to allow plotting on detailed calculation
     max_plot_days = 180

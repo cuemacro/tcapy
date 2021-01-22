@@ -21,7 +21,7 @@ constants = Constants()
 from datetime import datetime
 
 class ComputationCaller(ABC):
-    """Abstract class which adds listeners to the GUI buttons in the tcapy application for doing TCA or other calculations. At
+    """Abstract class which adds listeners to the GUI buttons in the tcapy application for doing TCA or other _calculations. At
     initialisation it adds listeners for these buttons and links them to the various text box inputs (where the user
     can specify the various computation parameters such as start date, finish date, ticker, TCA metrics etc.)
 

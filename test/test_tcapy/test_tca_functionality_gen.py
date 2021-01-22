@@ -1,5 +1,5 @@
-"""Tests out the bulk of the TCA calculations including metric calculations (like slippage), calculating orders
-executed prices from executions, filtering of trades, calculations of benchmarks (like TWAP, arrival price etc.) and so on
+"""Tests out the bulk of the TCA _calculations including metric _calculations (like slippage), calculating orders
+executed prices from executions, filtering of trades, _calculations of benchmarks (like TWAP, arrival price etc.) and so on
 """
 
 from __future__ import division, print_function

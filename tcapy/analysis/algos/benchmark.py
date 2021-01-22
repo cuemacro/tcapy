@@ -438,13 +438,14 @@ class BenchmarkWeighted(BenchmarkTrade):
         if bid_benchmark in market_df.columns and ask_benchmark in market_df.columns and weighting_field_condition:
             trade_order_df[self._benchmark_name] = np.nan
 
+            # CAREFUL: want to preserve timezone of trade/orders
             if benchmark_date_start_field is not None and benchmark_date_end_field is not None and \
                     benchmark_date_start_field in trade_order_df.columns and benchmark_date_end_field in trade_order_df.columns:
-                date_start = trade_order_df[benchmark_date_start_field].values
-                date_end = trade_order_df[benchmark_date_end_field].values
+                date_start = trade_order_df[benchmark_date_start_field].array #.values
+                date_end = trade_order_df[benchmark_date_end_field].array #.values
             else:
-                date_start = trade_order_df.index.values
-                date_end = trade_order_df.index.values
+                date_start = trade_order_df.index #.values
+                date_end = trade_order_df.index #.values
 
             # Overwrite every trade/order start/end time by a specific time of day if this has been specified
             if overwrite_time_of_day is not None and overwrite_timezone is not None:
@@ -465,8 +466,10 @@ class BenchmarkWeighted(BenchmarkTrade):
             if finish_time_after_offset is not None:
                 date_end = date_end + self._time_series_ops.get_time_delta(finish_time_after_offset)
 
-            date_start = np.searchsorted(market_df.index, date_start)
-            date_end = np.searchsorted(market_df.index, date_end)
+            # date_start = np.searchsorted(market_df.index, date_start)
+            # date_end = np.searchsorted(market_df.index, date_end)
+            date_start = market_df.index.searchsorted(date_start)
+            date_end = market_df.index.searchsorted(date_end)
             bid_price = market_df[bid_benchmark].values
             ask_price = market_df[ask_benchmark].values
 

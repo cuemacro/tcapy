@@ -79,7 +79,7 @@ class TCAEngine(ABC):
 
 
 class TCAEngineImpl(TCAEngine):
-    """This does the computation for TCA style calculations for a specific currency pair
+    """This does the computation for TCA style _calculations for a specific currency pair
     for the analysis of trades and orders over a number of days.
 
     It creates a number of different additional DataFrames, which can be used by a GUI or dumped to disk.
@@ -134,7 +134,7 @@ class TCAEngineImpl(TCAEngine):
 
             # If we want aggregated TCA analysis, typically to later calculate many metrics across many trades and _tickers,
             # as opposed to one specific currency pair
-            # Or for market-analysis (which involves purely calculations on market data WITHOUT any trade/order data)
+            # Or for market-analysis (which involves purely _calculations on market data WITHOUT any trade/order data)
             elif tca_request.tca_type == 'aggregated' or tca_request.tca_type == 'compliance' or tca_request.tca_type == 'market-analysis':
                 tca_request.ticker = self._util_func.populate_field(tca_request.ticker, constants.available_tickers_dictionary)
                 tca_request.venue = self._util_func.populate_field(tca_request.venue, constants.available_venues_dictionary,

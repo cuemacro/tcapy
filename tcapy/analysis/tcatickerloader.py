@@ -37,7 +37,7 @@ constants = Constants()
 ABC = abc.ABCMeta('ABC', (object,), {'__slots__': ()})
 
 class TCATickerLoader(ABC):
-    """This class is designed to load up market and trade data for single _tickers and also makes appropriate metric calculations
+    """This class is designed to load up market and trade data for single _tickers and also makes appropriate metric _calculations
     for that specific ticker. It is generally called by the higher level TCAMarketTradeLoader class, which can handle multiple _tickers.
 
     """
@@ -565,7 +565,7 @@ class TCATickerLoader(ABC):
                                         trade_order_df=trade_order_df_dict[trade_order_list[i]], market_df=market_df,
                                         trade_order_name=trade_order_list[i])
 
-                logger.debug("Completed derived field calculations for " + ticker)
+                logger.debug("Completed derived field _calculations for " + ticker)
 
             trade_order_df_dict = self._calculate_additional_metrics(market_df, trade_order_df_dict, tca_request)
 

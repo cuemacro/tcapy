@@ -61,7 +61,7 @@ class DisplayListeners(object):
         self._layout = layout  # HTML/Dash layout for each page of the application
         self._session_manager = session_manager  # handling user session data
         self._callback_manager = callback_manager  # for creating Dash callbacks for Dash components
-        self._tca_caller = tca_caller  # for triggering TCA calculations and converting GUI input
+        self._tca_caller = tca_caller  # for triggering TCA _calculations and converting GUI input
 
         self._plot_render = PlotRender(css)  # for converting DataFrames to plotly.Fig
         self._util_func = UtilFunc()  # for utility function such as flattening lists
