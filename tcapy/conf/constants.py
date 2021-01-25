@@ -321,6 +321,7 @@ class Constants(object):
                          'arctic-dukascopy', 'arctic-ncfx', 'arctic-testharness',
                          'pystore-dukascopy', 'pystore-ncfx', 'pystore-testharness',
                          'kdb-testharness',
+                         'questdb-dukasacopy', 'questdb-ncfx', 'questdb-testharness'
                          'influxdb-dukasacopy', 'influxdb-ncfx', 'influxdb-testharness']
 
     ##### database configuration #######################################################################################
@@ -468,7 +469,7 @@ class Constants(object):
 
     arctic_quota_market_data_GB = 80
 
-    ### KDB _tickers
+    ### KDB
     kdb_tickers = {'EURUSD': 'EURUSD'}
 
     kdb_host = 'localhost'
@@ -477,7 +478,7 @@ class Constants(object):
     kdb_password = None
     kdb_market_data_database_table = 'market_data_table'
 
-    ### InfluxDB _tickers
+    ### InfluxDB
     influxdb_host = docker_var('influxdb', 'localhost')
     influxdb_port = 8086
     influxdb_username = None
@@ -487,6 +488,17 @@ class Constants(object):
     influxdb_time_precision = 'n'   # 'n' for nanosecond
 
     influxdb_market_data_database_table = 'market_data_table'
+
+    ### QuestDB
+    questdb_host = docker_var('questdb', 'localhost')
+    questdb_port = 9009
+    questdb_username = None
+    questdb_password = None
+    # questdb_protocol = 'line'      # 'json' or 'line'
+    # questdb_chunksize = 500000     # Number of records to write at once
+    # questdb_time_precision = 'n'   # 'n' for nanosecond
+
+    questdb_market_data_database_table = 'market_data_table'
 
     ### ClickHouse
     clickhouse_host = docker_var("$CLICKHOUSE_HOST", '127.0.0.1', default_value='clickhouse')
@@ -730,6 +742,9 @@ class Constants(object):
                                         'influxdb-ncfx' : self.ncfx_tickers,
                                         'influxdb-dukascopy': self.dukascopy_tickers,
                                         'influxdb-testharness' : self.test_harness_tickers,
+                                        'questdb-ncfx': self.ncfx_tickers,
+                                        'questdb-dukascopy': self.dukascopy_tickers,
+                                        'questdb-testharness': self.test_harness_tickers,
                                         'kdb-ncfx': self.ncfx_tickers,
                                         'kdb-testharness': self.test_harness_tickers,
                                         'ncfx': self.ncfx_tickers,

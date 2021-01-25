@@ -1,11 +1,10 @@
 # tcapy change log
 
-## Release Notes
-
-* No official releases yet
-
 ## Coding log
 
+* 25 Jan 2021
+  * Updated manifest
+  * Started adding QuestDB support (not complete)
 * 22 Jan 2021
   * Upgraded Pandas to 1.0.5, no longer recommended to use earlier Pandas versions
   * Updated various other libraries in conda environments

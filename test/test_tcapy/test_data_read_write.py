@@ -31,7 +31,7 @@ from tcapy.data.datafactory import MarketRequest, TradeRequest
 from tcapy.data.databasesource import DatabaseSourceCSVBinary as DatabaseSourceCSV
 from tcapy.data.databasesource import \
     DatabaseSourceMSSQLServer, DatabaseSourceMySQL, DatabaseSourceSQLite, \
-    DatabaseSourceArctic, DatabaseSourceKDB, DatabaseSourceInfluxDB, DatabaseSourcePyStore
+    DatabaseSourceArctic, DatabaseSourceKDB, DatabaseSourceInfluxDB, DatabaseSourceQuestDB, DatabaseSourcePyStore
 
 from tcapy.util.mediator import Mediator
 from tcapy.util.customexceptions import *
@@ -54,12 +54,13 @@ Mediator.get_volatile_cache().clear_cache()
 run_arctic_tests = True
 run_pystore_tests = False
 run_influx_db_tests = False
+run_quest_db_tests = False
 run_kdb_tests = False
 
 # For trade data
 run_ms_sql_server_tests = False
-run_mysql_server_tests = True
-run_sqlite_server_tests = True
+run_mysql_server_tests = False
+run_sqlite_server_tests = False
 
 start_date = '26 Apr 2017'
 finish_date = '05 Jun 2017'
@@ -414,6 +415,11 @@ def _get_db_market_database_source():
         database_source_list.append(DatabaseSourceInfluxDB(postfix='testharness'))
         test_harness_market_data_table_list.append(test_harness_influxdb_market_data_table)
         test_harness_data_store_list.append(test_harness_influxdb_market_data_store)
+
+    if run_quest_db_tests:
+        database_source_list.append(DatabaseSourceQuestDB(postfix='testharness'))
+        test_harness_market_data_table_list.append(test_harness_questdb_market_data_table)
+        test_harness_data_store_list.append(test_harness_questdb_market_data_store)
 
     if run_pystore_tests:
         database_source_list.append(DatabaseSourcePyStore(postfix='testharness'))
@@ -823,3 +829,5 @@ def test_fetch_market_data_db():
             pass
 
         assert market_empty_df.empty
+
+

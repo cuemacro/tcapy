@@ -30,6 +30,7 @@ class AccessControl(object):
                  # market data
                  arctic_username=constants.arctic_username, arctic_password=constants.arctic_password,
                  influxdb_username=constants.influxdb_username, influxdb_password=constants.influxdb_password,
+                 questdb_username=constants.questdb_username, questdb_password=constants.questdb_password,
                  kdb_username=constants.kdb_username, kdb_password=constants.kdb_password,
                  clickhouse_username=constants.clickhouse_username, clickhouse_password=constants.clickhouse_password,
 
@@ -50,6 +51,8 @@ class AccessControl(object):
         self.arctic_password = arctic_password
         self.influxdb_username = influxdb_username
         self.influxdb_password = influxdb_password
+        self.questdb_username = questdb_username
+        self.questdb_password = questdb_password
         self.kdb_username = kdb_username
         self.kdb_password = kdb_password
         self.clickhouse_username = clickhouse_username
@@ -144,6 +147,22 @@ class AccessControl(object):
     @influxdb_password.setter
     def influxdb_password(self, influxdb_password):
         self.__influxdb_password = influxdb_password
+
+    @property
+    def questdb_username(self):
+        return self.__questdb_username
+
+    @questdb_username.setter
+    def questdb_username(self, questdb_username):
+        self.__questdb_username = questdb_username
+
+    @property
+    def questdb_password(self):
+        return self.__questdb_password
+
+    @questdb_password.setter
+    def questdb_password(self, questdb_password):
+        self.__questdb_password = questdb_password
         
     @property
     def kdb_username(self):
@@ -209,5 +228,3 @@ class AccessControl(object):
     @eikon_api_key.setter
     def eikon_api_key(self, eikon_api_key):
         self.__eikon_api_key = eikon_api_key
-
-    

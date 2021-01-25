@@ -1,4 +1,4 @@
-#https://stackoverflow.com/questions/28097064/dockerignore-ignore-everything-except-a-file-and-the-dockerfile
+# https://stackoverflow.com/questions/28097064/dockerignore-ignore-everything-except-a-file-and-the-dockerfile
 
 # Ignore Everything
 **
@@ -19,6 +19,9 @@
 **/__pycache__
 **/*.pyc
 **/*cred*
+**/*.key*
+**/*.crt*
+**/*.sr*
 **/.cache
 **/.pytest_cache
 **/*.log

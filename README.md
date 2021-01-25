@@ -183,7 +183,10 @@ Detailed installation instructions can be found [here](INSTALL.md)
 
 There is now Dockerized version of tcapy, which makes it much easier to install tcapy and all its dependencies.
 
-You can also install it with pip if you want to use different parts of tcapy as dependencies in your own Python project.
+You can also install it with pip if you want to use different parts of tcapy as dependencies in your own Python project
+and we have recently added tcapy to PyPI, so it's just a matter of running the below to get the latest release
+
+    pip install tcapy
 
 # What technologies does tcapy use?
 
@@ -255,4 +258,6 @@ If you're a financial firm, and are keen to make TCA transparent, and would like
 
 # Release notes and coding log
 
-A change log is available [here](CHANGELOG.md)
+A change log is available [here](CHANGELOG.md) and release notes below
+
+* 0.11.2 - tcapy (25 Jan 2021)

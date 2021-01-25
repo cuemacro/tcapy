@@ -69,7 +69,6 @@ except ImportError:
 # Dukascopy
 from findatapy.market import Market, MarketDataGenerator, MarketDataRequest
 
-
 from tcapy.analysis.tcarequest import MarketRequest, TradeRequest
 from tcapy.conf.constants import Constants
 
@@ -599,6 +598,13 @@ class DatabaseSourcePicker(object):
                 # eg. EURUSD-ncfx, EURUSD-dukascopy
                 database_source = DatabaseSourceInfluxDB(postfix=postfix, username=access_control.influxdb_username,
                                                          password=access_control.influxdb_password)
+
+            elif data_store == 'influxdb':
+                # Allow multiple datasources to be stored in questdb (by using a postfix)
+                # eg. EURUSD-ncfx, EURUSD-dukascopy
+                database_source = DatabaseSourceQuestDB(postfix=postfix, username=access_control.questdb_username,
+                                                         password=access_control.questdb_password)
+
             elif data_store == 'kdb':
                 database_source = DatabaseSourceKDB(postfix=postfix, username=access_control.kdb_username,
                                                     password=access_control.kdb_password)
@@ -2863,6 +2869,10 @@ class DatabaseSourceInfluxDB(DatabaseSourceTickData):
         self._username = username
         self._password = password
 
+        self._default_market_data_database_table = constants.influxdb_market_data_database_table
+
+        self._database_type = 'InfluxDB'
+
     def _get_database_engine(self, table_name=None):
 
         engine = DataFrameClient(self._server_host, self._server_port, self._username, self._password, table_name)
@@ -2988,7 +2998,7 @@ class DatabaseSourceInfluxDB(DatabaseSourceTickData):
 
                         if temp_df is not None:
                             if not (temp_df.empty):
-                                err_msg = "tcapy doesn't allow influxdb to append overlapping data for " + ticker + " in " \
+                                err_msg = "tcapy doesn't allow " + self._database_type + " to append overlapping data for " + ticker + " in " \
                                           + table_name + ". " "Has data between " + str(df.index[0]) + ' - ' + str(df.index[-1])
 
                                 logger.error(err_msg)
@@ -3020,7 +3030,7 @@ class DatabaseSourceInfluxDB(DatabaseSourceTickData):
 
                     chunk_no = chunk_no + 1
 
-    def append_market_data(self, market_df, ticker, table_name=constants.kdb_market_data_database_table,
+    def append_market_data(self, market_df, ticker, table_name=None,
                            if_exists_table='append', if_exists_ticker='append', remove_duplicates=True,
                            existing_datacheck='yes'):
         """Append market data to InfluxDB It is expected that market data has an index of DateTimeIndex, and fields
@@ -3065,6 +3075,9 @@ class DatabaseSourceInfluxDB(DatabaseSourceTickData):
         """
         logger = LoggerManager.getLogger(__name__)
 
+        if table_name is None:
+            table_name = self._default_market_data_database_table
+
         old_ticker = ticker
         ticker = ticker + self.postfix
 
@@ -3079,7 +3092,7 @@ class DatabaseSourceInfluxDB(DatabaseSourceTickData):
         except:
             pass
 
-        logger.info("Now doing InfluxDB dump for ticker " + ticker + " in table " + table_name)
+        logger.info("Now doing " + self._database_type + " dump for ticker " + ticker + " in table " + table_name)
 
         # Tidy up time series/remove duplicates etc.
         market_df = self._tidy_market_data(market_df, old_ticker, 'dataframe', 'market',
@@ -3103,7 +3116,7 @@ class DatabaseSourceInfluxDB(DatabaseSourceTickData):
         ticker = ticker + self.postfix
 
         if table_name is None:
-            table_name = constants.influxdb_market_data_database_table
+            table_name = self._default_market_data_database_table
 
         engine, store = self._get_database_engine(table_name=table_name)
 
@@ -3120,14 +3133,14 @@ class DatabaseSourceInfluxDB(DatabaseSourceTickData):
         except:
             df = None
 
-        logger.debug("Extracted InfluxDB library: " + str(table_name) + " for ticker " + str(ticker) +
+        logger.debug("Extracted " + self._database_type + " library: " + str(table_name) + " for ticker " + str(ticker) +
                      " between " + str(start_date) + " - " + str(finish_date))
 
         # Downsample floats to reduce memory footprint
         return self._downsample_localize_utc(df)
 
     def fetch_trade_order_data(self, start_date=None, finish_date=None, ticker=None):
-        raise Exception("InfluxDB wrapper not implemented")
+        raise Exception(self._database_type + " wrapper not implemented")
 
     def delete_market_data(self, ticker, start_date=None, finish_date=None, table_name=None):
         logger = LoggerManager.getLogger(__name__)
@@ -3137,7 +3150,7 @@ class DatabaseSourceInfluxDB(DatabaseSourceTickData):
         ticker = ticker + self.postfix
 
         if table_name is None:
-            table_name = constants.influxdb_market_data_database_table
+            table_name = self._default_market_data_database_table
 
         engine, store = self._get_database_engine(table_name=table_name)
 
@@ -3153,6 +3166,32 @@ class DatabaseSourceInfluxDB(DatabaseSourceTickData):
                 "delete from \"%s\"..\"%s\" where Time >= '%s' and Time <= '%s'" % (table_name, ticker, start_date_str, finish_date_str))
         except:
             logger.warning("Error deleting data between " + start_date_str + " " + finish_date_str)
+
+########################################################################################################################
+
+class DatabaseSourceQuestDB(DatabaseSourceInfluxDB):
+    """Wrapper for QuestDB to access market data for tcapy.
+
+    TODO work in progress, currently uses InfluxDB line protocol, but needs to be rewritten
+
+    """
+
+    # static variable
+    # engine = None
+    # store = None
+
+    def __init__(self, server_host=constants.questdb_host, server_port=constants.questdb_port, username=constants.questdb_username,
+                 password=constants.questdb_password, postfix=None):
+        super(DatabaseSourceQuestDB, self).__init__(postfix=postfix)
+
+        self._server_host = server_host
+        self._server_port = server_port
+        self._username = username
+        self._password = password
+        self._default_market_data_database_table = constants.questdb_market_data_database_table
+
+        self._database_type = 'QuestDB'
+
 
 ########################################################################################################################
 class DatabaseSourceClickHouse(DatabaseSourceTickData):

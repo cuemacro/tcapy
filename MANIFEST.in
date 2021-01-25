@@ -1,0 +1,7 @@
+recursive-include tcapy/ *.*
+include tcapy/conf/*
+recursive-include tcapy_examples/ *.*
+recursive-include tcapygen/ *.*
+recursive-include tcapyuser/ *.*
+
+global-exclude *.py[cod] __pycache__ *.so *.pdf *.env

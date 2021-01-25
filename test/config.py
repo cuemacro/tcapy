@@ -46,6 +46,9 @@ test_harness_kdb_market_data_store = 'kdb-testharness'
 test_harness_influxdb_market_data_table = 'market_data_table_test_harness' # InfluxDB database
 test_harness_influxdb_market_data_store = 'influxdb-testharness' # InfluxDB measurement
 
+test_harness_questdb_market_data_table = 'market_data_table_test_harness' # InfluxDB database
+test_harness_questdb_market_data_store = 'questdb-testharness' # InfluxDB measurement
+
 test_harness_pystore_market_data_table = 'market_data_table_test_harness' # PyStore
 test_harness_pystore_market_data_store = 'pystore-testharness' # PyStore folder
 
