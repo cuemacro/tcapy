@@ -450,7 +450,7 @@ class UtilFunc(object):
         datetime
         """
 
-        dates = ['%Y-%m-%d', '%d %b %Y', '%d %b %y', '%d %B %Y', '%d %B %y']
+        dates = ['%Y-%m-%d', '%d %b %Y', '%d %b %y', '%d %B %Y', '%d %B %y', '%b %d %y', '%B %d %y', '%b %d %Y', '%B %d %Y']
         times = ['%H:%M:%S.%f', '%H:%M:%S', '%H:%M', None]
 
         if not(isinstance(datetime_str, str)):
