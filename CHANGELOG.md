@@ -2,6 +2,9 @@
 
 ## Coding log
 
+* 26 Jan 2021
+  * Added Dukascopy download example
+  * Fixed issue with parsing dates in DatabaseSource and also when splitting uneven date ranges
 * 25 Jan 2021
   * Updated manifest
   * Started adding QuestDB support (not complete)

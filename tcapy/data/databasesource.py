@@ -278,7 +278,7 @@ class DatabaseSource(ABC):
         if finish_date < start_date:
             raise Exception("Finish date before start date? " + str(start_date) + ' - ' + str(finish_date))
 
-        return start_date, finish_date
+        return pd.Timestamp(start_date), pd.Timestamp(finish_date)
 
     def mirror_data_timezone(self, df, start_date, finish_date):
 
@@ -3692,6 +3692,12 @@ class DatabaseSourceNCFX(DatabaseSource):
         # Create multiple download dates which don't exceed the chunk size minutes
         start_date_hist, finish_date_hist = self._util_func.split_into_freq(start_date, finish_date,
             freq=chunk_size_str, chunk_int_min=self._max_chunk_size())
+
+        # If we have asked for a date which doesn't fit on boundaries of downloading for NCFX
+        # if len(start_date_hist) > 0 and len(finish_date_hist) > 0:
+        #     if finish_date_hist[-1] < finish_date:
+        #         start_date_hist.append(finish_date_hist[-1])
+        #         finish_date_hist.append(finish_date)
 
         # Remove weekend points, given FX market doesn't trade Friday night/Sunday open
         start_date_hist, finish_date_hist = self._util_func.remove_weekend_points(start_date_hist, finish_date_hist)

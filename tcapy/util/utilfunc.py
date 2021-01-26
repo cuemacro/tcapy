@@ -689,9 +689,10 @@ class UtilFunc(object):
         return dates
 
     def split_into_freq(self, start_date, finish_date, freq='5min', microseconds_offset=0, chunk_int_min=None):
-        """Between a defined start/finish date/time, split it up into chunks of arbitary size (by default, 5 minutes) and
+        """Between a defined start/finish date/time, split it up into chunks of arbitrary size (by default, 5 minutes) and
         return two lists which define the starting and ending points respectively. If the size is less than the miniumum chunksize
-        then return start/finish dates
+        then return start/finish dates. If the finish_date is not divisible by the frequency, then we add an extra
+        uneven sized chunk at the end to go right up to the
 
         Parameters
         ----------
@@ -730,6 +731,13 @@ class UtilFunc(object):
         date_range_end[-1] = date_range[-1]
 
         date_range = date_range[:-1]
+
+        date_range = date_range.tolist()
+
+        if len(date_range) > 0 and len(date_range_end) > 0:
+            if finish_date > date_range_end[-1]:
+                date_range.append(date_range_end[-1])
+                date_range_end.append(finish_date)
 
         return date_range, date_range_end
 

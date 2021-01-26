@@ -15,8 +15,7 @@ from tcapy.conf.constants import Constants
 from tcapy.analysis.tcarequest import TCARequest
 from tcapy.util.mediator import Mediator
 
-from tcapy.data.databasesource import DatabaseSourceNCFX
-from tcapy.data.databasesource import DatabaseSourceArctic
+from tcapy.data.databasesource import DatabaseSourceNCFX, DatabaseSourceDukascopy, DatabaseSourceArctic
 
 from tcapy.util.loggermanager import LoggerManager
 
@@ -40,7 +39,7 @@ start_date = '01 May 2017'
 finish_date = '06 May 2017'
 
 short_start_date = "04 May 2017 00:00"
-short_finish_date = "04 May 2017 00:10"
+short_finish_date = "04 May 2017 01:55"
 
 # TCAMarketTradeLoader examples
 def example_market_data_convention():
@@ -99,8 +98,8 @@ def example_ncfx_download():
 
     In order to run this, you need to have a subscription with New Change FX, otherwise this will not work.
     """
-    start_date = "04 May 2017 00:00"
-    finish_date = "04 May 2017 00:05"
+    start_date = "04 May 2017 00:05"
+    finish_date = "04 May 2017 02:10"
     ticker = "EURUSD"
 
     if ncfx_available:
@@ -109,6 +108,23 @@ def example_ncfx_download():
         df = data_loader.fetch_market_data(start_date, finish_date, ticker=ticker)
 
         print(df)
+
+def example_dukascopy_download():
+    """Example of how to download directly from New Change FX using their RestAPI with the lower level DatabaseSourceDukasCopy
+    class. It is recommended to cache this data locally, typically in an Arctic (dependent on license terms), to reduce
+    latency when running TCA computations.
+
+    In order to run this, you need to have a subscription with New Change FX, otherwise this will not work.
+    """
+    start_date = "04 May 2017 00:00"
+    finish_date = "04 May 2017 00:05"
+    ticker = "EURUSD"
+
+    data_loader = DatabaseSourceDukascopy()
+
+    df = data_loader.fetch_market_data(start_date, finish_date, ticker=ticker)
+
+    print(df)
 
 def example_arctic_ncfx_download():
     """Example of downloading from the lower level Arctic wrapper directly (DatabaseSourceArctic, rather than using any
@@ -137,12 +153,16 @@ if __name__ == '__main__':
 
     start = time.time()
 
+    # DatabaseSource examples from external data vendors
+    example_dukascopy_download()
+    example_ncfx_download()
+
+    # Now using internal databases
+
     # TCAMarketTradeLoadder
     example_market_data_convention()
     example_market_data_non_usd_cross()
 
-    # DatabaseSource examples
-    example_ncfx_download()
     example_arctic_ncfx_download()
     example_arctic_dukacopy_download()
 
