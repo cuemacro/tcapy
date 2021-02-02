@@ -1,4 +1,5 @@
-"""Downloads new market data from data vendor for writing to CSV
+"""Downloads new market data from data vendor for writing to CSV (using a larger chunk size for DatabasePopulator,
+which should be quicker for NCFX, so we can reuse the same TCP connection)
 """
 
 from __future__ import print_function, division
@@ -18,7 +19,7 @@ if __name__ == '__main__':
 
     from tcapy.conf.constants import Constants
 
-    data_vendor = 'dukascopy' # 'ncfx' or 'dukascopy'
+    data_vendor = 'ncfx' # 'ncfx' or 'dukascopy'
     write_large_csv = False
     write_large_hdf5_parquet = True
     return_df = False # returns the dataframe (DO NOT DO this for large datasets, as it will cause you to run out of memory)
@@ -36,13 +37,15 @@ if __name__ == '__main__':
     # Usual default parameters
     start_date = None; finish_date = None
 
+    large_chunk_int_min = 1440 # Uses a full day chunk size (DatabaseSource underneath can still manage this)
+
     # You may need to change these folders
     temp_data_folder = constants.temp_data_folder; temp_large_data_folder = constants.temp_large_data_folder
     temp_data_folder = '/data/csv_dump/temp/'
     temp_large_data_folder = '/data/csv_dump/temp/large/'
 
-    start_date_csv = '01 Apr 2016'; finish_date_csv = '01 May 2020'; split_size = 'monthly' # 'daily' or 'monthly'
-    start_date_csv = '01 Jan 2005'; finish_date_csv = '01 Jan 2021';
+    start_date_csv = '01 Apr 2016'; finish_date_csv = '01 Feb 2021'; split_size = 'monthly' # 'daily' or 'monthly'
+    # start_date_csv = '01 Jan 2005'; finish_date_csv = '01 Jan 2021';
 
     if data_vendor == 'ncfx':
         from tcapy.data.databasepopulator import DatabasePopulatorNCFX as DatabasePopulator
@@ -64,7 +67,7 @@ if __name__ == '__main__':
     # Will also dump temporary HDF5 files to disk (to avoid reloading them)
     msg, df_dict = db_populator.download_to_csv(start_date_csv, finish_date_csv, tickers, split_size=split_size,
         csv_folder=csv_folder, return_df=False, remove_duplicates=False, write_large_csv=write_large_csv,
-        write_large_hdf5_parquet=write_large_hdf5_parquet)
+        write_large_hdf5_parquet=write_large_hdf5_parquet, chunk_int_min=large_chunk_int_min)
 
     print(msg)
     print(df_dict)

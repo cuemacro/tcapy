@@ -3650,6 +3650,13 @@ class DatabaseSourceDataFrame(DatabaseSource):
 # External data sources
 ########################################################################################################################
 
+
+# return pd.read_csv(url, index_col='DateTimeStamp', date_parser=dateparse)
+
+# if https_proxy is None:
+from requests.auth import HTTPBasicAuth
+import json
+
 class DatabaseSourceNCFX(DatabaseSource):
     """Implements DatabaseSource for calling New Change FX's external server, via their Rest/API. It is recommended to use
     this to download data from NCFX and then cache data locally in an Arctic/MongoDB database for reuse. Repeated calling
@@ -3700,7 +3707,11 @@ class DatabaseSourceNCFX(DatabaseSource):
         #         finish_date_hist.append(finish_date)
 
         # Remove weekend points, given FX market doesn't trade Friday night/Sunday open
-        start_date_hist, finish_date_hist = self._util_func.remove_weekend_points(start_date_hist, finish_date_hist)
+        start_date_hist, finish_date_hist = self._util_func.remove_weekend_points(
+            start_date_hist, finish_date_hist,
+            friday_close_nyc_hour=constants.ncfx_friday_close_nyc_hour,
+            sunday_open_ldn_hour=constants.ncfx_sunday_open_ldn_hour
+        )
 
         if start_date_hist == [] and finish_date_hist == []:
             logger.warning("Didn't attempt to download " + ticker + " from " + str(start_date) + " - " +
@@ -3708,13 +3719,16 @@ class DatabaseSourceNCFX(DatabaseSource):
 
             return None
 
+        r = requests.Session()
+
         # Download via http from NCFX
         for s, f in zip(start_date_hist, finish_date_hist):
 
             s = self._convert_date_to_string(s)
             f = self._convert_date_to_string(f)
 
-            df = self._download(ticker, s, f, dateparse, web_proxies)
+            time.sleep(constants.ncfx_chunk_sleep_seconds)
+            df = self._download(ticker, s, f, dateparse, web_proxies, r)
 
             if df is not None:
                 if not(df.empty):
@@ -3753,7 +3767,7 @@ class DatabaseSourceNCFX(DatabaseSource):
     def _max_chunk_size(self):
         return constants.ncfx_chunk_min_size
 
-    def _download(self, ticker, start_date, finish_date, dateparse, web_proxies):
+    def _download(self, ticker, start_date, finish_date, dateparse, web_proxies, r):
         logger = LoggerManager.getLogger(__name__)
 
         def download(args):
@@ -3762,42 +3776,53 @@ class DatabaseSourceNCFX(DatabaseSource):
 
             https_proxy = web_proxies['https']
 
-            # return pd.read_csv(url, index_col='DateTimeStamp', date_parser=dateparse)
-
-            #if https_proxy is None:
-            from requests.auth import HTTPBasicAuth
-            import json
-
-            payload = [{
-                 "currencyPairs" : ticker,
-                 "startDate" : start_date,
-                 "endDate" : finish_date
-            }]
-
             headers = {'Content-Type': 'application/json'}
 
-            response = requests.post(self._url, auth=HTTPBasicAuth(self._username, self._password),
-                                         data=json.dumps(payload), headers=headers, proxies=https_proxy)
+            payload = [{
+                "currencyPairs": ticker,
+                "startDate": start_date,
+                "endDate": finish_date
+            }]
 
-            status_code = response.status_code
-            s = response.text
+            download_part = ticker + " " + start_date + " - " + finish_date
 
-            if status_code == 200:
-                raw_string = StringIO(s)
+            for i in range(0, constants.ncfx_retry_times):
+                logger.debug("About to download " + download_part + "...")
 
-                if ticker in s:
-                    df = pd.read_csv(raw_string, index_col=1, date_parser=dateparse, header=None,
-                                     names=['ticker', 'Date', 'Empty', 'mid'])
+                response = r.post(self._url, auth=HTTPBasicAuth(self._username, self._password),
+                                data=json.dumps(payload), headers=headers, proxies=https_proxy)
 
-                    df.index.name = "Date"
-                    df.drop(['Empty', 'ticker'], axis=1, inplace=True)
+                status_code = response.status_code
+                s = response.text
 
-                    # For pandas 0.25.0
-                    df = df.tz_localize(None)
+                if status_code == 200 or status_code == 429:
 
-                    return df
-                else:
-                    logger.warning("Problem downloading data from NCFX: " + str(s))
+                    raw_string = StringIO(s)
+
+                    if ticker in s:
+                        logger.debug("Downloaded for " + download_part)
+                        df = pd.read_csv(raw_string, index_col=1, date_parser=dateparse, header=None,
+                                         names=['ticker', 'Date', 'Empty', 'mid'])
+
+                        df.index.name = "Date"
+                        df.drop(['Empty', 'ticker'], axis=1, inplace=True)
+
+                        # For pandas 0.25.0
+                        df = df.tz_localize(None)
+
+                        if status_code == 429:
+                            logger.warning("Possible rate limit issues for " + download_part)
+
+                            time.sleep(constants.ncfx_download_warning_retry_seconds)
+
+                        return df
+                    else:
+                        logger.warning("Problem downloading data from NCFX, possibly no data: " + str(s) + " for " + download_part)
+
+                        return None
+                elif status_code == 423:
+                    logger.warning("Will try again NCFX, likely server busy: " + str(s) + " for " + download_part)
+                    time.sleep(constants.ncfx_download_request_retry_seconds)
 
             return None
 
@@ -3810,17 +3835,18 @@ class DatabaseSourceNCFX(DatabaseSource):
             pool = swim.create_pool(thread_no=1)
 
             data = [[ticker, start_date, finish_date]]
+
             # Open the market data downloads in their own threads and return the results
             result = pool.map_async(download, data)
 
             try:
-                df = result.get(timeout=constants.ncfx_sleep_seconds)
+                df = result.get(timeout=constants.ncfx_outer_retry_seconds)
 
                 break
             except Exception as e:
                 logger.warning("Retrying... for " + str(i) + " time " + str(e) + " from URL " + constants.ncfx_url)
 
-                time.sleep(constants.ncfx_sleep_seconds)
+                time.sleep(constants.ncfx_outer_retry_seconds)
 
         if df is None:
             pass
@@ -3842,6 +3868,9 @@ class DatabaseSourceExternalDownloader(DatabaseSource):
 
     def __init__(self):
         super(DatabaseSourceExternalDownloader, self).__init__()
+
+        self._friday_close_nyc_hour = constants.friday_close_nyc_hour
+        self._sunday_open_ldn_hour = constants.sunday_open_ldn_hour
 
     def fetch_market_data(self, start_date=None, finish_date=None, ticker=None, web_proxies=None, table_name=None):
         start_date, finish_date = self._parse_start_finish_dates(start_date, finish_date)
@@ -3867,7 +3896,8 @@ class DatabaseSourceExternalDownloader(DatabaseSource):
             start_date = pd.Timestamp(start_date)
             finish_date = pd.Timestamp(finish_date)
 
-            if self._util_func.is_weekday_point(start_date, finish_date): #start_date.dayofweek != 5 and finish_date.dayofweek != 6:
+            if self._util_func.is_weekday_point(start_date, finish_date, friday_close_nyc_hour=self._friday_close_nyc_hour,
+                sunday_open_ldn_hour=self._sunday_open_ldn_hour): #start_date.dayofweek != 5 and finish_date.dayofweek != 6:
                 logger.warning("Failed to download from " + self._data_provider() + " for " + ticker + " from " + str(start_date) + " - " +
                             str(finish_date) + ". Check if network problem?")
             else:

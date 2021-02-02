@@ -63,9 +63,9 @@ def create_resampled_spot_data(resample_freq='1min', data_vendor='dukascopy'):
         df_dd = df_dd.dropna()
         df_dd.to_parquet(csv_output + ticker + '_' + resample_freq + '_' + data_vendor + '.' + file_extension)
 
-        df_dd = None
+        del df_dd
 
-def combine_resampled_spot_data_into_single_dataframe_usd_base(resample_freq='1min', data_vendor='dukascopy'):
+def combine_resampled_spot_data_into_single_dataframe(resample_freq='1min', data_vendor='dukascopy', usd_base=False):
     df_list = []
 
     logger = LoggerManager.getLogger(__name__)
@@ -78,20 +78,21 @@ def combine_resampled_spot_data_into_single_dataframe_usd_base(resample_freq='1m
         base = ticker[0:3]
         terms = ticker[3:6]
 
-        if terms == 'USD':
-            df_invert = pd.DataFrame(index=df.index)
-            df_invert[terms + base + '.close'] = 1.0 / df[ticker + '.close']
-            df_invert[terms + base + '.open'] = 1.0 / df[ticker + '.open']
+        if usd_base:
+            if terms == 'USD':
+                df_invert = pd.DataFrame(index=df.index)
+                df_invert[terms + base + '.close'] = 1.0 / df[ticker + '.close']
+                df_invert[terms + base + '.open'] = 1.0 / df[ticker + '.open']
 
-            # Invert high and low!
-            df_invert[terms + base + '.high'] = 1.0 / df[ticker + '.low']
-            df_invert[terms + base + '.low'] = 1.0 / df[ticker + '.high']
+                # Invert high and low!
+                df_invert[terms + base + '.high'] = 1.0 / df[ticker + '.low']
+                df_invert[terms + base + '.low'] = 1.0 / df[ticker + '.high']
 
-            df_invert[terms + base + '.close'] = 1.0 / df[ticker + '.close']
+                df_invert[terms + base + '.close'] = 1.0 / df[ticker + '.close']
 
-            df_invert[terms + base + '.tickcount'] = df[ticker + '.tickcount']
+                df_invert[terms + base + '.tickcount'] = df[ticker + '.tickcount']
 
-            df = df_invert
+                df = df_invert
 
         df_list.append(df)
 
@@ -101,20 +102,26 @@ def combine_resampled_spot_data_into_single_dataframe_usd_base(resample_freq='1m
     df['USDUSD.close'] = 1.0
 
     df_list.append(df)
-    df = calculations.pandas_outer_join(df_list)
+    df = calculations.join(df_list, how='outer')
     df = df.dropna()
 
-    combined_file = 'fx_' + resample_freq + '_' + data_vendor + '.' + file_extension
+    if usd_base:
+        combined_file = 'fx_' + resample_freq + '_' + data_vendor + '_usd_base.' + file_extension
+    else:
+        combined_file = 'fx_' + resample_freq + '_' + data_vendor + '.' + file_extension
 
     df.to_parquet(csv_output + combined_file)
 
 if __name__ == '__main__':
     data_vendor_list = ['dukascopy']
-    resample_freq_list = ['1min', '1s']
+    resample_freq_list = ['1s']
 
     for data_vendor in data_vendor_list:
         for resample_freq in resample_freq_list:
             create_resampled_spot_data(resample_freq=resample_freq, data_vendor=data_vendor)
-            combine_resampled_spot_data_into_single_dataframe_usd_base(resample_freq=resample_freq, data_vendor=data_vendor)
+            combine_resampled_spot_data_into_single_dataframe(resample_freq=resample_freq,
+                                                              data_vendor=data_vendor, usd_base=True)
+            combine_resampled_spot_data_into_single_dataframe(resample_freq=resample_freq,
+                                                              data_vendor=data_vendor, usd_base=False)
 
 

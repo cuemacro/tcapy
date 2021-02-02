@@ -2,6 +2,11 @@
 
 ## Coding log
 
+* 02 Feb 2021 
+  * Added more resampling examples for dumping to disk
+  * Fixed Windows conda environment (so installs Pandas 1.0.5)
+  * Added more timeout/error handling for NCFX download
+  * Adjusted FX hours computation (can specify via NYC Friday close/LDN Sunday open)
 * 26 Jan 2021
   * Added Dukascopy download example
   * Fixed issue with parsing dates in DatabaseSource and also when splitting uneven date ranges

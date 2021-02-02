@@ -57,6 +57,6 @@ if %TCAPY_PYTHON_ENV_TYPE%==conda (
           qpython==2.0.0 influxdb==5.2.3 ^
           Flask-Session==0.3.1 ^
           celery==5.0.5 pytest-tap kombu python-memcached==1.59 boto3==1.5.11 pdfkit==0.6.1 WeasyPrint==51 pystore==0.1.22 ^
-          fsspec==0.3.3 eikon==1.1.2
+          fsspec==0.3.3 eikon==1.1.2 pandas==1.0.5
     )
 )

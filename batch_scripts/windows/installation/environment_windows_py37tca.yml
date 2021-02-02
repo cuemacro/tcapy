@@ -6,7 +6,7 @@ dependencies:
   - abseil-cpp=20200923.3=h0e60522_0
   - anyio=2.0.2=py37h03978a9_4
   - argon2-cffi=20.1.0=py37hcc03f2d_2
-  - arrow-cpp=2.0.0=py37h68b104a_18_cpu
+  - arrow-cpp=3.0.0=py37h7c675fb_1_cpu
   - async_generator=1.10=py_0
   - atomicwrites=1.4.0=pyh9f0ad1d_0
   - attrs=20.3.0=pyhd3deb0d_0
@@ -15,13 +15,13 @@ dependencies:
   - aws-c-event-stream=0.2.6=hc969853_1
   - aws-c-io=0.8.0=h9f364c9_0
   - aws-checksums=0.1.10=h9f364c9_2
-  - aws-sdk-cpp=1.8.127=h0223788_0
+  - aws-sdk-cpp=1.8.130=h54f1628_1
   - babel=2.9.0=pyhd3deb0d_0
   - backcall=0.2.0=pyh9f0ad1d_0
   - backports=1.0=py_2
   - backports.functools_lru_cache=1.6.1=py_0
   - beautifulsoup4=4.9.3=pyhb0f4dca_0
-  - bleach=3.2.2=pyh44b312d_0
+  - bleach=3.2.3=pyh44b312d_0
   - blosc=1.21.0=h0e60522_0
   - bokeh=2.2.3=py37h03978a9_0
   - bqplot=0.12.21=pyhd8ed1ab_0
@@ -35,19 +35,18 @@ dependencies:
   - cloudpickle=1.6.0=py_0
   - colorama=0.4.4=pyh9f0ad1d_0
   - comtypes=1.1.8=py37h03978a9_0
-  - coverage=5.3.1=py37hcc03f2d_1
+  - coverage=5.4=py37hcc03f2d_0
   - cryptography=3.3.1=py37hd8e9650_1
   - cycler=0.10.0=py_2
   - cython=0.29.21=py37hf2a7229_2
-  - cytoolz=0.11.0=py37hcc03f2d_1
-  - dask=2021.1.0=pyhd8ed1ab_0
-  - dask-core=2021.1.0=pyhd8ed1ab_0
+  - cytoolz=0.11.0=py37hcc03f2d_3
+  - dask=2021.1.1=pyhd8ed1ab_0
+  - dask-core=2021.1.1=pyhd8ed1ab_0
   - decorator=4.4.2=py_0
   - defusedxml=0.6.0=py_0
   - dill=0.3.3=pyhd8ed1ab_0
-  - distributed=2021.1.0=py37h03978a9_1
+  - distributed=2021.1.1=py37h03978a9_0
   - entrypoints=0.3=pyhd8ed1ab_1003
-  - fastparquet=0.5.0=py37hda49f71_0
   - freetype=2.10.4=h546665d_1
   - freetype-py=2.2.0=pyh9f0ad1d_0
   - gflags=2.2.2=ha925a31_1004
@@ -60,25 +59,25 @@ dependencies:
   - iniconfig=1.1.1=pyh9f0ad1d_0
   - intel-openmp=2020.3=h57928b3_311
   - ipykernel=5.4.2=py37h7b7c402_0
-  - ipython=7.18.1=py37hc6149b9_1
+  - ipython=7.19.0=py37heaed05f_2
   - ipython_genutils=0.2.0=py_1
   - ipywidgets=7.6.3=pyhd3deb0d_0
-  - jedi=0.18.0=py37h03978a9_2
-  - jinja2=2.11.2=pyh9f0ad1d_0
+  - jedi=0.17.2=py37h03978a9_1
+  - jinja2=2.11.3=pyh44b312d_0
   - jpeg=9d=h8ffe710_0
   - json5=0.9.5=pyh9f0ad1d_0
   - jsonschema=3.2.0=py_2
   - jupyter_client=6.1.11=pyhd8ed1ab_1
   - jupyter_contrib_core=0.3.3=py_2
   - jupyter_contrib_nbextensions=0.5.1=py37hc8dfbb8_1
-  - jupyter_core=4.7.0=py37h03978a9_1
-  - jupyter_highlight_selected_word=0.2.0=py37hc8dfbb8_1002
+  - jupyter_core=4.7.1=py37h03978a9_0
+  - jupyter_highlight_selected_word=0.2.0=py37h03978a9_1002
   - jupyter_latex_envs=1.4.6=py37hc8dfbb8_1001
-  - jupyter_nbextensions_configurator=0.4.1=py37hc8dfbb8_2
-  - jupyter_server=1.2.2=py37h03978a9_1
-  - jupyterlab=3.0.5=pyhd8ed1ab_0
+  - jupyter_nbextensions_configurator=0.4.1=py37h03978a9_2
+  - jupyter_server=1.2.3=py37h03978a9_1
+  - jupyterlab=3.0.6=pyhd8ed1ab_0
   - jupyterlab_pygments=0.1.2=pyh9f0ad1d_0
-  - jupyterlab_server=2.1.2=pyhd8ed1ab_0
+  - jupyterlab_server=2.1.3=pyhd8ed1ab_0
   - jupyterlab_widgets=1.0.0=pyhd8ed1ab_1
   - kiwisolver=1.3.1=py37h8c56517_1
   - krb5=1.17.2=hbae68bd_0
@@ -107,8 +106,8 @@ dependencies:
   - m2w64-gmp=6.1.0=2
   - m2w64-libwinpthread-git=5.0.0.4634.697f757=2
   - markupsafe=1.1.1=py37hcc03f2d_3
-  - matplotlib=3.3.3=py37h03978a9_0
-  - matplotlib-base=3.3.3=py37h3379fd5_0
+  - matplotlib=3.3.4=py37h03978a9_0
+  - matplotlib-base=3.3.4=py37h3379fd5_0
   - mistune=0.8.4=py37hcc03f2d_1003
   - mkl=2020.4=hb70f87d_311
   - more-itertools=8.6.0=pyhd8ed1ab_0
@@ -119,17 +118,18 @@ dependencies:
   - nbclient=0.5.1=py_0
   - nbconvert=6.0.7=py37h03978a9_3
   - nbformat=5.1.2=pyhd8ed1ab_1
-  - nodejs=15.3.0=h57928b3_0
+  - nodejs=15.3.0=h57928b3_1
   - notebook=6.2.0=py37h03978a9_0
   - numba=0.52.0=py37h08fd248_0
-  - numpy=1.19.5=py37hd20adf4_1
+  - numpy=1.20.0=py37hd20adf4_0
   - olefile=0.46=pyh9f0ad1d_1
   - openssl=1.1.1i=h8ffe710_0
   - packaging=20.8=pyhd3deb0d_0
-  - pandoc=2.11.3.2=h8ffe710_0
+  - pandas=1.0.5=py37h3bbf574_0
+  - pandoc=2.11.4=h8ffe710_0
   - pandocfilters=1.4.2=py_1
   - parquet-cpp=1.5.1=2
-  - parso=0.8.1=pyhd8ed1ab_0
+  - parso=0.7.1=pyh9f0ad1d_0
   - partd=1.1.0=py_0
   - pathos=0.2.7=pyhd3deb0d_0
   - patsy=0.5.1=py_0
@@ -140,10 +140,10 @@ dependencies:
   - pox=0.2.9=pyhd3deb0d_0
   - ppft=1.6.6.3=pyhd3deb0d_0
   - prometheus_client=0.9.0=pyhd3deb0d_0
-  - prompt-toolkit=3.0.11=pyha770c72_0
+  - prompt-toolkit=3.0.14=pyha770c72_0
   - psutil=5.8.0=py37hcc03f2d_1
   - py=1.10.0=pyhd3deb0d_0
-  - pyarrow=2.0.0=py37h633fffd_18_cpu
+  - pyarrow=3.0.0=py37h633fffd_1_cpu
   - pycparser=2.20=pyh9f0ad1d_2
   - pygments=2.7.4=pyhd8ed1ab_0
   - pyodbc=4.0.30=py37hf2a7229_1
@@ -156,25 +156,25 @@ dependencies:
   - pyqtwebengine=5.12.1=py37hf2a7229_7
   - pyrsistent=0.17.3=py37hcc03f2d_2
   - pysocks=1.7.1=py37h03978a9_3
-  - pytest=6.2.1=py37h03978a9_1
+  - pytest=6.2.2=py37h03978a9_0
   - pytest-cov=2.11.1=pyh44b312d_0
   - python=3.7.9=h60c2a47_0
   - python-blosc=1.10.2=py37h80912f5_0
   - python-dateutil=2.8.1=py_0
   - python-snappy=0.5.4=py37hff7499e_3
   - python_abi=3.7=1_cp37m
-  - pytz=2020.5=pyhd8ed1ab_0
+  - pytz=2021.1=pyhd8ed1ab_0
   - pywin32=300=py37hcc03f2d_0
   - pywinpty=0.5.7=py37hc8dfbb8_1
   - pyyaml=5.4.1=py37hcc03f2d_0
-  - pyzmq=21.0.1=py37h0d95fc2_0
+  - pyzmq=22.0.1=py37h0d95fc2_0
   - qt=5.12.9=hb2cf2c5_0
   - re2=2020.11.01=h0e60522_0
   - redis-py=3.5.3=pyh9f0ad1d_0
   - rise=5.7.1=py37h03978a9_0
   - scipy=1.6.0=py37h6db1a17_0
   - send2trash=1.5.0=py_0
-  - setuptools=51.3.3=py37haa95532_4
+  - setuptools=52.0.0=py37haa95532_0
   - setuptools-git=1.2=py_1
   - six=1.15.0=pyh9f0ad1d_0
   - snappy=1.1.8=ha925a31_3
@@ -216,7 +216,7 @@ dependencies:
   - pip:
     - aiohttp==3.7.3
     - alpha-vantage==2.3.1
-    - amqp==5.0.3
+    - amqp==5.0.5
     - ansi2html==1.6.0
     - appdirs==1.4.3
     - arctic==1.79.4
@@ -254,6 +254,7 @@ dependencies:
     - eikon==1.1.2
     - enum-compat==0.0.3
     - et-xmlfile==1.0.1
+    - fastparquet==0.4.1
     - financepy==0.191
     - findatapy==0.1.19
     - flask==1.1.2
@@ -278,7 +279,7 @@ dependencies:
     - jmespath==0.10.0
     - jupyter-dash==0.2.1
     - kaleido==0.0.2
-    - keyring==21.8.0
+    - keyring==22.0.1
     - kombu==5.0.2
     - lz4==3.1.3
     - mockextras==1.0.2
@@ -288,7 +289,6 @@ dependencies:
     - nest-asyncio==1.0.0
     - oauthlib==3.1.0
     - openpyxl==3.0.6
-    - pandas==1.2.1
     - pandas-datareader==0.9.0
     - pdfkit==0.6.1
     - plotly==4.9.0

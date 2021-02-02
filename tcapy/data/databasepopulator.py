@@ -747,8 +747,8 @@ class DatabasePopulatorNCFX(DatabasePopulator):
             weekend_data = "Weekend? " + key
 
             weekday_point = UtilFunc().is_weekday_point(start_time_stamp, finish_time_stamp,
-                                                        friday_close_nyc_hour=constants.friday_close_utc_hour,
-                                                        sunday_open_utc_hour=constants.sunday_open_utc_hour)
+                                                        friday_close_nyc_hour=constants.ncfx_friday_close_nyc_hour,
+                                                        sunday_open_ldn_hour=constants.ncfx_sunday_open_ldn_hour)
 
             if not(weekday_point):
                 return None, weekend_data

@@ -110,7 +110,7 @@ class Constants(object):
     default_instrument = 'spot'
     default_asset_class = 'fx'
 
-    friday_close_utc_hour = 22; sunday_open_utc_hour = 20
+    friday_close_utc_hour = 22; sunday_open_ldn_hour = 20
     friday_close_nyc_hour = 17;
 
     weekend_period_seconds = 48 * 3600
@@ -133,11 +133,20 @@ class Constants(object):
                     'EURSEK': 'EURSEK',
                     'USDJPY': 'USDJPY'}
 
-    ncfx_threads = 2
-    ncfx_sleep_seconds = 30
-    ncfx_retry_times = 20
-    ncfx_chunk_min_size = 60     # Minute size for downloading NCFX
     ncfx_data_store = 'arctic-ncfx'
+    ncfx_threads = 1
+
+    ncfx_chunk_sleep_seconds = 1 # Gap between chunk calls
+
+    ncfx_outer_retry_seconds = 120 # Waiting for a timeout to retry
+    ncfx_retry_times = 20
+    ncfx_chunk_min_size = 60 # Minute size for downloading NCFX
+
+    ncfx_download_warning_retry_seconds = 15  # Sometimes you might hit a request warning, so sleep for a while then
+    ncfx_download_request_retry_seconds = 30 # Sometimes you might hit a request limit, so sleep for a while then
+
+    ncfx_friday_close_utc_hour = 22; ncfx_sunday_open_ldn_hour = 0
+    ncfx_friday_close_nyc_hour = 17;
 
     csv_folder = docker_var('/tmp/csv/', '/tmp/csv/')
     temp_data_folder = docker_var('/tmp/tcapy/', '/tmp/tcapy/')
@@ -537,6 +546,7 @@ class Constants(object):
     # Celery keeps workers open anyway
 
     # On Windows recommend using 'thread', whilst on Linux preferred to use 'multiprocess'
+
     database_populator_threading_library = 'multiprocess'
 
     # Allow use of use_multithreading in general (if set to False, will avoid eg. using Celery)

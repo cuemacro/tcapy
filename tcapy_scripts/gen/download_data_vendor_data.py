@@ -28,8 +28,11 @@ if __name__ == '__main__':
 
     ticker = 'EURUSD'
 
+    # df1 = database_source.fetch_market_data(start_date='02 Apr 2016 20:00', finish_date='04 Apr 2016 02:00',
+    #                                         ticker=ticker)
+
     # Note: some data sources might only let you download a small chunk of tick data (try daily and hourly)
-    df1 = database_source.fetch_market_data(start_date='05 Aug 2019 00:00', finish_date='05 Aug 2019 02:00', ticker=ticker)
+    df1 = database_source.fetch_market_data(start_date='05 Aug 2016 00:00', finish_date='05 Aug 2016 02:00', ticker=ticker)
     df2 = database_source.fetch_market_data(start_date='06 Aug 2019', finish_date='07 Aug 2019', ticker=ticker)
     df3 = database_source.fetch_market_data(start_date='07 Aug 2019', finish_date='08 Aug 2019', ticker=ticker)
 
@@ -41,11 +44,10 @@ if __name__ == '__main__':
     df5 = database_source.fetch_market_data(start_date='24 Apr 2020 18:00', finish_date='25 Apr 2020 02:00',
                                             ticker=ticker)
 
-
     print(df1)
     print(df2)
     print(df3)
-    print(df4)
+    print(df4) # Should be empty
     print(df5)
 
     finish = time.clock()
