@@ -134,7 +134,7 @@ class Constants(object):
                     'USDJPY': 'USDJPY'}
 
     ncfx_data_store = 'arctic-ncfx'
-    ncfx_threads = 1
+    ncfx_threads = 1 # If you do lots of NCFX downloads at once, you will get a Request limit error, which needs to be paused
 
     ncfx_chunk_sleep_seconds = 1 # Gap between chunk calls
 

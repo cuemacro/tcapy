@@ -20,11 +20,11 @@ dependencies:
   - backports=1.0=py_2
   - backports.functools_lru_cache=1.6.1=py_0
   - beautifulsoup4=4.9.3=pyhb0f4dca_0
-  - bleach=3.2.2=pyh44b312d_0
+  - bleach=3.3.0=pyh44b312d_0
   - blosc=1.20.1=he1b5a44_0
   - bokeh=2.2.3=py37h89c1867_0
-  - boto3=1.16.58=pyhd8ed1ab_0
-  - botocore=1.19.58=pyhd8ed1ab_0
+  - boto3=1.17.2=pyhd8ed1ab_0
+  - botocore=1.20.2=pyhd8ed1ab_0
   - bqplot=0.12.21=pyhd8ed1ab_0
   - brotlipy=0.7.0=py37hb5d75c8_1001
   - bzip2=1.0.8=h516909a_3
@@ -39,12 +39,12 @@ dependencies:
   - cycler=0.10.0=py_2
   - cython=0.29.21=py37hb892b2f_1
   - cytoolz=0.11.0=py37h4abf009_1
-  - dask=2021.1.0=pyhd8ed1ab_0
-  - dask-core=2021.1.0=pyhd8ed1ab_0
+  - dask=2021.1.1=pyhd8ed1ab_0
+  - dask-core=2021.1.1=pyhd8ed1ab_0
   - decorator=4.4.2=py_0
   - defusedxml=0.6.0=py_0
   - dill=0.3.3=pyhd8ed1ab_0
-  - distributed=2021.1.0=py37h89c1867_1
+  - distributed=2021.1.1=py37h89c1867_0
   - entrypoints=0.3=pyhd8ed1ab_1003
   - fastparquet=0.4.1=py37h03ebfcd_0
   - flask=1.1.2=pyh9f0ad1d_0
@@ -62,12 +62,12 @@ dependencies:
   - importlib_metadata=3.4.0=hd8ed1ab_0
   - iniconfig=1.1.1=pyh9f0ad1d_0
   - ipykernel=5.4.3=py37h888b3d9_0
-  - ipython=7.18.1=py37hc6149b9_1
+  - ipython=7.20.0=py37h888b3d9_2
   - ipython_genutils=0.2.0=py_1
   - ipywidgets=7.6.3=pyhd3deb0d_0
   - itsdangerous=1.1.0=py_0
   - jedi=0.18.0=py37h89c1867_2
-  - jinja2=2.11.2=pyh9f0ad1d_0
+  - jinja2=2.11.3=pyh44b312d_0
   - jmespath=0.10.0=pyh9f0ad1d_0
   - jpeg=9d=h36c2ea0_0
   - json5=0.9.5=pyh9f0ad1d_0
@@ -75,33 +75,31 @@ dependencies:
   - jupyter_client=6.1.11=pyhd8ed1ab_1
   - jupyter_contrib_core=0.3.3=py_2
   - jupyter_contrib_nbextensions=0.5.1=py37hc8dfbb8_1
-  - jupyter_core=4.7.0=py37h89c1867_1
-  - jupyter_highlight_selected_word=0.2.0=py37hc8dfbb8_1002
+  - jupyter_core=4.7.1=py37h89c1867_0
+  - jupyter_highlight_selected_word=0.2.0=py37h89c1867_1002
   - jupyter_latex_envs=1.4.6=py37hc8dfbb8_1001
-  - jupyter_nbextensions_configurator=0.4.1=py37hc8dfbb8_2
-  - jupyter_server=1.2.2=py37h89c1867_1
-  - jupyterlab=3.0.5=pyhd8ed1ab_0
+  - jupyter_nbextensions_configurator=0.4.1=py37h89c1867_2
+  - jupyter_server=1.3.0=py37h89c1867_0
+  - jupyterlab=3.0.7=pyhd8ed1ab_0
   - jupyterlab_pygments=0.1.2=pyh9f0ad1d_0
-  - jupyterlab_server=2.1.2=pyhd8ed1ab_0
+  - jupyterlab_server=2.2.0=pyhd8ed1ab_0
   - jupyterlab_widgets=1.0.0=pyhd8ed1ab_1
   - kiwisolver=1.3.1=py37hc928c03_0
   - krb5=1.17.2=h926e7f8_0
   - lcms2=2.11=hcbb858e_1
   - ld_impl_linux-64=2.33.1=h53a641e_7
-  - libblas=3.9.0=7_openblas
-  - libcblas=3.9.0=7_openblas
-  - libcurl=7.71.1=hcdd3856_8
+  - libblas=3.9.0=8_openblas
+  - libcblas=3.9.0=8_openblas
+  - libcurl=7.71.1=hcdd3856_3
   - libedit=3.1.20191231=h14c3975_1
-  - libev=4.33=h516909a_1
   - libevent=2.1.10=hcdb4288_3
   - libffi=3.3=he6710b0_2
   - libgcc-ng=9.1.0=hdf63c60_0
   - libgfortran-ng=7.5.0=h14aa051_18
   - libgfortran4=7.5.0=h14aa051_18
   - libiconv=1.16=h516909a_0
-  - liblapack=3.9.0=7_openblas
+  - liblapack=3.9.0=8_openblas
   - libllvm10=10.0.1=he513fc3_3
-  - libnghttp2=1.41.0=h8cfc5f6_2
   - libopenblas=0.3.12=pthreads_hb3c22a3_1
   - libpng=1.6.37=h21135ba_2
   - libprotobuf=3.13.0.1=h8b12597_0
@@ -109,11 +107,10 @@ dependencies:
   - libssh2=1.9.0=hab1572f_5
   - libstdcxx-ng=9.1.0=hdf63c60_0
   - libthrift=0.13.0=h5aa387f_6
-  - libtiff=4.1.0=h4f3a223_6
+  - libtiff=4.1.0=hc3755c2_3
   - libutf8proc=2.6.0=h36c2ea0_0
   - libuuid=2.32.1=h14c3975_1000
   - libuv=1.40.0=hd18ef5c_0
-  - libwebp-base=1.1.0=h36c2ea0_3
   - libxcb=1.13=h14c3975_1002
   - libxml2=2.9.10=h68273f3_2
   - libxslt=1.1.33=h572872d_1
@@ -140,9 +137,9 @@ dependencies:
   - olefile=0.46=pyh9f0ad1d_1
   - openssl=1.1.1h=h516909a_0
   - orc=1.6.5=hd3605a7_0
-  - packaging=20.8=pyhd3deb0d_0
+  - packaging=20.9=pyh44b312d_0
   - pandas=1.0.5=py37h0da4684_0
-  - pandoc=2.11.3.2=h7f98852_0
+  - pandoc=2.11.4=h7f98852_0
   - pandocfilters=1.4.2=py_1
   - parquet-cpp=1.5.1=2
   - parso=0.8.1=pyhd8ed1ab_0
@@ -157,7 +154,7 @@ dependencies:
   - pox=0.2.9=pyhd3deb0d_0
   - ppft=1.6.6.3=pyhd3deb0d_0
   - prometheus_client=0.9.0=pyhd3deb0d_0
-  - prompt-toolkit=3.0.11=pyha770c72_0
+  - prompt-toolkit=3.0.14=pyha770c72_0
   - psutil=5.7.3=py37hb5d75c8_0
   - pthread-stubs=0.4=h36c2ea0_1001
   - ptyprocess=0.7.0=pyhd3deb0d_0
@@ -170,7 +167,7 @@ dependencies:
   - pyparsing=2.4.7=pyh9f0ad1d_0
   - pyrsistent=0.17.3=py37h4abf009_1
   - pysocks=1.7.1=py37h89c1867_3
-  - pytest=6.2.1=py37h89c1867_1
+  - pytest=6.2.2=py37h89c1867_0
   - pytest-cov=2.11.1=pyh44b312d_0
   - python=3.7.9=h7579374_0
   - python-blosc=1.9.2=py37h10a2094_3
@@ -178,17 +175,17 @@ dependencies:
   - python-pdfkit=0.6.1=py_0
   - python-snappy=0.5.4=py37h484ad9e_3
   - python_abi=3.7=1_cp37m
-  - pytz=2020.5=pyhd8ed1ab_0
+  - pytz=2021.1=pyhd8ed1ab_0
   - pyyaml=5.3.1=py37hb5d75c8_1
   - pyzmq=20.0.0=py37h5a562af_1
   - re2=2020.11.01=h58526e2_0
-  - readline=8.0=h7b6447c_0
+  - readline=8.1=h27cfd23_0
   - redis-py=3.5.3=pyh9f0ad1d_0
   - rise=5.7.1=py37h89c1867_0
   - s3transfer=0.3.4=pyhd8ed1ab_0
   - scipy=1.5.3=py37h8911b10_0
   - send2trash=1.5.0=py_0
-  - setuptools=51.3.3=py37h06a4308_4
+  - setuptools=52.0.0=py37h06a4308_0
   - setuptools-git=1.2=py_1
   - six=1.15.0=pyh9f0ad1d_0
   - snappy=1.1.8=he1b5a44_3
@@ -236,7 +233,7 @@ dependencies:
   - pip:
     - aiohttp==3.7.3
     - alpha-vantage==2.3.1
-    - amqp==5.0.3
+    - amqp==5.0.5
     - ansi2html==1.6.0
     - appdirs==1.4.3
     - arctic==1.79.4
@@ -271,8 +268,8 @@ dependencies:
     - eikon==1.1.2
     - enum-compat==0.0.3
     - et-xmlfile==1.0.1
-    - financepy==0.191
-    - findatapy==0.1.18
+    - financepy==0.192
+    - findatapy==0.1.19
     - flask-compress==1.8.0
     - flask-ngrok==0.0.25
     - flask-seasurf==0.3.0
@@ -293,7 +290,7 @@ dependencies:
     - jeepney==0.6.0
     - jupyter-dash==0.2.1
     - kaleido==0.1.0
-    - keyring==21.8.0
+    - keyring==22.0.1
     - kombu==5.0.2
     - lz4==3.1.3
     - mockextras==1.0.2
@@ -306,7 +303,7 @@ dependencies:
     - pandas-datareader==0.9.0
     - plotly==4.9.0
     - protobuf==3.6.1
-    - pymongo==3.11.2
+    - pymongo==3.11.3
     - pyphen==0.10.0
     - pystore==0.1.22
     - pytest-tap==3.2

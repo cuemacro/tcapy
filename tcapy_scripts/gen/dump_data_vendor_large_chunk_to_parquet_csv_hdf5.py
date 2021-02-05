@@ -45,7 +45,7 @@ if __name__ == '__main__':
     temp_large_data_folder = '/data/csv_dump/temp/large/'
 
     start_date_csv = '01 Apr 2016'; finish_date_csv = '01 Feb 2021'; split_size = 'monthly' # 'daily' or 'monthly'
-    # start_date_csv = '01 Jan 2005'; finish_date_csv = '01 Jan 2021';
+    start_date_csv = '01 Jan 2005'; finish_date_csv = '01 Jan 2021';
 
     if data_vendor == 'ncfx':
         from tcapy.data.databasepopulator import DatabasePopulatorNCFX as DatabasePopulator

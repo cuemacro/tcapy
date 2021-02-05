@@ -2,6 +2,9 @@
 
 ## Coding log
 
+* 05 Feb 2021
+  * Updated Linux and Windows conda environments
+  * Reduced number of versioned libraries in requirements.txt
 * 02 Feb 2021 
   * Added more resampling examples for dumping to disk
   * Fixed Windows conda environment (so installs Pandas 1.0.5)

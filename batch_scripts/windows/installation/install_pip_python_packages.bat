@@ -12,7 +12,7 @@ if %TCAPY_PYTHON_ENV_TYPE%==virtualenv (
     REM Install everything by pip
     call pip install ^
         setuptools-git==1.2 cython arctic==1.79.4 sqlalchemy==1.3.17 redis==3.3.7 ^
-        pandas==1.0.5 numpy scipy statsmodels==0.11.1 blosc==1.8.3 pyarrow==2.0.0 ^
+        pandas==1.0.5 numpy scipy statsmodels==0.11.1 blosc==1.8.3 pyarrow ^
         pathos==0.2.1 multiprocess==0.70.9 fastparquet==0.5.0 ^
         flask-restplus==0.13.0 ^
         beautifulsoup4==4.8.0 psutil==5.6.6 ^
@@ -27,7 +27,7 @@ if %TCAPY_PYTHON_ENV_TYPE%==virtualenv (
         qpython==2.0.0 influxdb==5.2.3 ^
         Flask-Session==0.3.1 ^
         celery==celery==5.0.5 msgpack-python pytest-tap kombu==4.6.7 python-memcached==1.59 ^
-        numba==0.48.0 vispy==0.6.4 pdfkit==0.6.1 jinja2==2.11.2 xlwings==0.20.2 ^
+        numba==0.48.0 vispy==0.6.4 pdfkit==0.6.1 jinja2==2.11.2 xlwings==0.22.0 ^
         jupyterlab jupyter_contrib_nbextensions jupyter_nbextensions_configurator RISE bqplot WeasyPrint==51 ^
         dask==2.14.0 distributed==2.14.0 cloudpickle==1.3.0 python-snappy==0.5.4 bokeh==2.0.1 msgpack==1.0.0 pystore==0.1.22 ^
         fsspec==0.3.3 eikon=1.1.2
@@ -46,7 +46,7 @@ if %TCAPY_PYTHON_ENV_TYPE%==conda (
             matplotlib ^
             pyodbc ^
             pytest pytest-cov ^
-            numba pyarrow vispy jinja2 xlwings=0.20.2 ^
+            numba pyarrow vispy jinja2 xlwings=0.22.0 ^
             jupyterlab jupyter_contrib_nbextensions jupyter_nbextensions_configurator nodejs rise bqplot ^
             dask distributed cloudpickle python-snappy bokeh msgpack-python --yes
 
