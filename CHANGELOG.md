@@ -2,6 +2,8 @@
 
 ## Coding log
 
+* 14 Feb 2021
+  * Added script to convert Parquet to Arrow
 * 05 Feb 2021
   * Updated Linux and Windows conda environments
   * Reduced number of versioned libraries in requirements.txt
