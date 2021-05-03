@@ -42,7 +42,7 @@ class ComputationCaller(ABC):
 
         self._glob_volatile_cache = glob_volatile_cache
 
-        self.create_callbacks(app, callback_manager, callback_dict=callback_dict)
+        self.attach_callbacks(app, callback_manager, callback_dict=callback_dict)
 
     def create_plot_flags(self, session_manager, layout):
         """Creates flags for each display component (eg. plot or table) on each web page in the project. These are
@@ -53,7 +53,7 @@ class ComputationCaller(ABC):
         session_manager : SessionManager
             Stores and modifies session data which is unique for each user
 
-        layout : Layout
+        layout : LayoutDash
             Specifies the layout of an HTML page using Dash components
 
         Returns
@@ -100,7 +100,7 @@ class ComputationCaller(ABC):
 
         return plot_flags
 
-    def create_callbacks(self, app, callback_manager, callback_dict=None):
+    def attach_callbacks(self, app, callback_manager, callback_dict=None):
         """Creates callbacks for each calculation button in the application, so that it is linked to execution code, when that
         button is pressed. Typically these button presses kick off a large computation (eg. TCA analysis).
 

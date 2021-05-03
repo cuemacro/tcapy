@@ -17,7 +17,10 @@ from plotly.figure_factory import utils
 from plotly.figure_factory._ohlc import (_DEFAULT_INCREASING_COLOR,
                                          _DEFAULT_DECREASING_COLOR,
                                          validate_ohlc)
-from plotly.graph_objs import graph_objs
+#from plotly.graph_objs import graph_objs
+
+from plotly.graph_objects import Figure
+import plotly.graph_objects as go
 
 import numpy as np
 import pandas as pd
@@ -245,8 +248,8 @@ def create_candlestick(open, high, low, close, dates=None, direction='both',
                                                   dates, **kwargs)
         data = candle_incr_data + candle_decr_data
 
-    layout = graph_objs.Layout()
-    return graph_objs.Figure(data=data, layout=layout)
+    layout = go.Layout()
+    return Figure(data=data, layout=layout)
 
 
 class _Candlestick(object):

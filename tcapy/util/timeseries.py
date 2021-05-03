@@ -1462,32 +1462,6 @@ class TimeSeriesOps(object):
 
         return df
 
-    def outer_join(self, df_list):
-        """Outer joins a list of DataFrames into a single large DataFrame.
-
-        Parameters
-        ----------
-        df_list : DataFrame (list)
-            DataFrame to be joined
-
-        Returns
-        -------
-        DataFrame
-        """
-        if df_list is None: return None
-
-        # Remove any None elements (which can't be joined!)
-        df_list = [i for i in df_list if i is not None]
-
-        if len(df_list) == 0:
-            return None
-        elif len(df_list) == 1:
-            return df_list[0]
-
-        # df_list = [dd.from_pd(df) for df in df_list]
-
-        return df_list[0].join(df_list[1:], how="outer")
-
     def split_array_chunks(self, array, chunks=None, chunk_size=None):
         """Splits an array or DataFrame into a list of equally sized chunks
 

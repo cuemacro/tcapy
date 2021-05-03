@@ -23,18 +23,12 @@ from datetime import timedelta
 
 from pandas.tseries.offsets import *
 
-## For program constants
-from tcapy.conf.constants import Constants
-
-# Just instantiate once!
-constants = Constants()
-
-from tcapy.vis.layout import Layout
+from tcapy.vis.layoutdash import LayoutDash
 
 ########################################################################################################################
 
-class LayoutImplBoardGen(Layout):
-    """This implements the Layout abstract class, to create the web based GUI for the tcapy application. It creates two
+class LayoutDashImplBoardGen(LayoutDash):
+    """This implements the LayoutDash abstract class, to create the web based GUI for the tcapy application. It creates two
     web pages
 
     - detailed_page - for doing detailed tcapy analysis for a specific currency pair
@@ -42,11 +36,11 @@ class LayoutImplBoardGen(Layout):
 
     """
 
-    def __init__(self, url_prefix):
-        super(LayoutImplBoardGen, self).__init__(url_prefix=url_prefix)
+    def __init__(self, app=None, onstants=None, url_prefix=''):
+        super(LayoutDashImplBoardGen, self).__init__(app=app, constants=constants, url_prefix=url_prefix)
 
         available_dates = pd.date_range(
-            datetime.datetime.today().date() - timedelta(days=constants.gui_lookback_window),
+            datetime.datetime.today().date() - timedelta(days=self._constants.gui_lookback_window),
             datetime.datetime.today().date(), freq=BDay())
 
         times = pd.date_range("0:00", "23:59", freq="15min")
@@ -59,38 +53,29 @@ class LayoutImplBoardGen(Layout):
         # For detailed page only
         self.available_times = [t.strftime("%H:%M") for t in times]
 
-        self.available_tickers = constants.available_tickers_dictionary['All']
-        self.available_venues = constants.available_venues_dictionary['All']
+        self.available_tickers = self._constants.available_tickers_dictionary['All']
+        self.available_venues = self._constants.available_venues_dictionary['All']
 
-        self.available_brokers = constants.available_brokers_dictionary['All']
-        self.available_algos = constants.available_algos_dictionary['All']
-        self.available_market_data = constants.available_market_data
+        self.available_brokers = self._constants.available_brokers_dictionary['All']
+        self.available_algos = self._constants.available_algos_dictionary['All']
+        self.available_market_data = self._constants.available_market_data
 
         self.available_order_plot_lines = ['candlestick', 'mid', 'bid', 'ask', 'arrival', 'twap', 'vwap',
                                            'buy trade', 'sell trade']
         self.available_execution_plot_lines = ['candlestick', 'mid', 'bid', 'ask', 'buy trade', 'sell trade']
 
         # For aggregated page only
-        self.available_grouped_tickers = self._flatten_dictionary(constants.available_tickers_dictionary)
-        self.available_grouped_venues = self._flatten_dictionary(constants.available_venues_dictionary)
-        self.available_grouped_brokers = self._flatten_dictionary(constants.available_brokers_dictionary)
-        self.available_grouped_algos = self._flatten_dictionary(constants.available_algos_dictionary)
+        self.available_grouped_tickers = self._flatten_dictionary(self._constants.available_tickers_dictionary)
+        self.available_grouped_venues = self._flatten_dictionary(self._constants.available_venues_dictionary)
+        self.available_grouped_brokers = self._flatten_dictionary(self._constants.available_brokers_dictionary)
+        self.available_grouped_algos = self._flatten_dictionary(self._constants.available_algos_dictionary)
 
-        self.available_event_types = constants.available_event_types
-        self.available_metrics = constants.available_metrics
+        self.available_event_types = self._constants.available_event_types
+        self.available_metrics = self._constants.available_metrics
 
         self.available_reload = ['no', 'yes']
 
-        # For local images we need to encode as binary first for Dash output
-        self.image_filename = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'logo.png')
-        self.encoded_image = None
-
-        try:
-            self.encoded_image = base64.b64encode(open(self.image_filename, 'rb').read())
-        except:
-            pass
-
-        self.create_layouts()
+        self.construct_layout()
 
     def _flatten_dictionary(self, dictionary):
         available = dictionary['All']
@@ -98,7 +83,7 @@ class LayoutImplBoardGen(Layout):
 
         return self.flatten_list_of_strings([available_groups, available])
 
-    def create_layouts(self):
+    def construct_layout(self):
         self.page_content = html.Div([
             dcc.Location(id='url', refresh=False),
             html.Div(id='page-content')
@@ -108,7 +93,7 @@ class LayoutImplBoardGen(Layout):
 
         markout_cols = self._util_func.flatten_list_of_lists(
             ['Date', 'exec not', 'not cur', 'side',
-             [str(x) + constants.markout_unit_of_measure for x in constants.markout_windows], 'markout'])
+             [str(x) + self._constants.markout_unit_of_measure for x in self._constants.markout_windows], 'markout'])
 
         # Main page for detailed analysing of (eg. over the course of a few days)
 
@@ -118,40 +103,39 @@ class LayoutImplBoardGen(Layout):
 
         self.pages['aggregated'] = html.Div([
 
-            self.header_bar('FX: Aggregated - Trader Analysis'),
-            self.link_bar(link_bar_dict),
-            self.width_cel(html.B("Status: ok", id='aggregated-status'), margin_left=5),
+            self._sc.header_bar('FX: Aggregated - Trader Analysis', img='logo.png'),
+            self._sc.link_bar(link_bar_dict),
+            self._sc.width_row_cell(html.B("Status: ok", id='aggregated-status'), margin_left=5),
 
-
-            self.horizontal_bar(),
+            self._sc.horizontal_bar(),
 
             # dropdown selection boxes
             html.Div([
-                self.drop_down(caption='Market Data', id='market-data-val', prefix_id='aggregated',
+                self._sc.drop_down(caption='Market Data', id='market-data-val', prefix_id='aggregated',
                                drop_down_values=self.available_market_data),
             ]),
 
-            self.horizontal_bar(),
-            self.uploadbox(caption='Aggregated trade CSV', id='csv-uploadbox', prefix_id='aggregated'),
+            self._sc.horizontal_bar(),
+            self._sc.uploadbox(caption='Aggregated trade CSV', id='csv-uploadbox', prefix_id='aggregated'),
 
-            self.horizontal_bar(),
-            self.button(caption='Calculate', id='calculation-button', prefix_id='aggregated'),
+            self._sc.horizontal_bar(),
+            self._sc.button(caption='Calculate', id='calculation-button', prefix_id='aggregated'),
 
             # , msg_id='aggregated-status'),
-            self.horizontal_bar(),
+            self._sc.horizontal_bar(),
 
             # self.date_picker_range(caption='Start/Finish Dates', id='aggregated-date-val', offset=[-7,-1]),
-            self.plot(caption='Aggregated Trader: Summary',
-                      id=['execution-by-ticker-bar-plot', 'execution-by-venue-bar-plot', 'execution-by-broker_id-bar-plot'], prefix_id='aggregated'),
-            self.horizontal_bar(),
-            self.plot(caption='Aggregated Trader: Timeline', id='execution-by-ticker-timeline-plot',
-                      prefix_id='aggregated'),
-            self.horizontal_bar(),
-            self.plot(caption='Aggregated Trader: PDF fit (' + constants.reporting_currency + ' notional)',
+            self._sc.plot(caption='Aggregated Trader: Summary',
+                      id=['execution-by-ticker-bar-plot', 'execution-by-venue-bar-plot', 'execution-by-broker_id-bar-plot'], prefix_id='aggregated', height=500),
+            self._sc.horizontal_bar(),
+            self._sc.plot(caption='Aggregated Trader: Timeline', id='execution-by-ticker-timeline-plot',
+                      prefix_id='aggregated', height=500),
+            self._sc.horizontal_bar(),
+            self._sc.plot(caption='Aggregated Trader: PDF fit (' + self._constants.reporting_currency + ' notional)',
                       id=['execution-by-ticker-dist-plot', 'execution-by-broker_id-dist-plot', 'execution-by-venue-dist-plot'],
-                      prefix_id='aggregated'),
-            self.horizontal_bar(),
-            self.table(caption='Executions: Markout Table', id='execution-table', prefix_id='aggregated', columns=markout_cols,
+                      prefix_id='aggregated', height=500),
+            self._sc.horizontal_bar(),
+            self._sc.table(caption='Executions: Markout Table', id='execution-table', prefix_id='aggregated', columns=markout_cols,
                        downloadplot_caption=['Markout CSV', 'Full execution CSV'],
                        downloadplot_tag=['execution-markout-download-link', 'execution-full-download-link'],
                        download_file=['download_execution_markout.csv', 'download_execution_full.csv']

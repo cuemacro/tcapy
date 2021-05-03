@@ -70,7 +70,7 @@ class DisplayListeners(object):
         self._metric_wide = MetricWideBenchmarkMarkout()
 
         # create callbacks for each display component (plots/tables) in every page of the application
-        self.create_callbacks(app, layout, callback_manager)
+        self.attach_callbacks(app, layout, callback_manager)
 
         self._url_prefix = url_prefix
 
@@ -602,7 +602,7 @@ class DisplayListeners(object):
 
     ##### click/change callback listeners on each plot, table component etc. ###########################################
 
-    def create_callbacks(self, app, layout, callback_manager):
+    def attach_callbacks(self, app, layout, callback_manager):
         """Create input/output callbacks for each display component (plot/table) on each page of the Dash application,
         associating appropriate GUI input/outputs, to trigger a particular method in this class.
 
@@ -611,7 +611,7 @@ class DisplayListeners(object):
         app : dash.App
             Dash application (wraps around Flask mini webserver)
 
-        layout : Layout
+        layout : LayoutDash
             HTML/Dash layout of the application
 
         callback_manager : CallbackManager

@@ -1,5 +1,5 @@
 """This provides the entry point for the GUI web application, which uses the Dash library on top lightweight server
-web application (eg. Flask). It queries TCAEngine, which returns appropriate TCA output (via TCACaller). Uses Layout
+web application (eg. Flask). It queries TCAEngine, which returns appropriate TCA output (via TCACaller). Uses LayoutDash
 class to render the layout and SessionManager to keep track of each user session.
 
 """
@@ -70,8 +70,7 @@ from tcapy.util.utilfunc import UtilFunc
 # for caching data (in Redis)
 
 # creates the HTML layout of the web pages
-from tcapy.vis.sessionmanager import SessionManager
-from tcapy.vis.sessionmanager import CallbackManager
+from chartpy.dashboard import CallbackManager, SessionManager
 
 constants = Constants()
 util_func = UtilFunc()
@@ -80,7 +79,7 @@ util_func = UtilFunc()
 session_manager = SessionManager()
 
 # manage creation of callback for Dash
-callback_manager = CallbackManager()
+callback_manager = CallbackManager(constants)
 
 logger = LoggerManager.getLogger(__name__)
 

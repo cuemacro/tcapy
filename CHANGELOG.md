@@ -2,6 +2,8 @@
 
 ## Coding log
 
+* 03 May 2021
+  * Spinning out some Dash visualization code into chartpy
 * 14 Feb 2021
   * Added script to convert Parquet to Arrow
 * 05 Feb 2021

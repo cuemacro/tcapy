@@ -1,7 +1,7 @@
 """This provides the entry point for the GUI web application, which uses the Dash library on top lightweight server
 web application (eg. Flask). This version allows users to upload a CSV file with their trades.
 
-It queries TCAEngine, which returns appropriate TCA output (via TCACaller). Uses Layout
+It queries TCAEngine, which returns appropriate TCA output (via TCACaller). Uses LayoutDash
 class to render the layout and SessionManager to keep track of each user session.
 
 """
@@ -71,19 +71,19 @@ if constants.tcapy_version == 'user':
         # user customised version (not currently available so disable)
         from tcapyuser.layoutboarduser import *;
 
-        layout = LayoutImplBoardUser(url_prefix=url_prefix)
+        layout = LayoutImplBoardUser(app=app, constants=constants, url_prefix=url_prefix)
         from tcapyuser.tcacallerboarduser import TCACallerImplBoardUser as TCACaller
     except:
         from tcapygen.layoutboardgen import *;
 
-        layout = LayoutImplBoardGen(url_prefix=url_prefix)
+        layout = LayoutDashImplBoardGen(app=app, constants=constants, url_prefix=url_prefix)
         from tcapygen.tcacallerboardgen import TCACallerImplBoardGen as TCACaller
 
 # this loads up a generic version of the layout and TCA application
 elif constants.tcapy_version == 'test_tcapy' or constants.tcapy_version == 'gen':
     from tcapygen.layoutboardgen import *;
 
-    layout = LayoutImplBoardGen(url_prefix=url_prefix)
+    layout = LayoutDashImplBoardGen(url_prefix=url_prefix)
     from tcapygen.tcacallerboardgen import TCACallerImplBoardGen as TCACaller
 
 # you can add your own additional layout versions here
@@ -113,7 +113,7 @@ stylesheets = ['tcapy.css']
 # for css in stylesheets:
 #     app.css.append_css({"external_url": static_css_route + css})
 
-# create the HTML layout for the pages (note: this is in a separate file layout.py)
+# create the HTML layout for the pages (note: this is in a separate file layoutdash.py)
 app.layout = layout.page_content
 
 plain_css = open(os.path.join(os.path.dirname(os.path.realpath(__file__)), 'tcapy.css'), 'r').read()

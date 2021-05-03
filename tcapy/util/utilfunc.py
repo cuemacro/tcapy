@@ -27,14 +27,23 @@ import pickle as pkl
 import json
 
 from tcapy.util.loggermanager import LoggerManager
-from tcapy.conf.constants import Constants
 
-constants = Constants()
+try:
+    from tcapy.conf.constants import Constants
+
+    constants = Constants()
+except:
+    from findatapy.util.dataconstants import DataConstants
+
+    constants = DataConstants()
 
 pkl.DEFAULT_PROTOCOL = 2    # for backward compatability with Python 2
 pkl.HIGHEST_PROTOCOL = 2    # for backward compatability with Python 2
 
-from plotly.utils import PlotlyJSONEncoder
+try:
+    from plotly.utils import PlotlyJSONEncoder
+except:
+    pass
 
 class UtilFunc(object):
     """Contains utility methods which are commonly used throughout the project to
@@ -230,121 +239,6 @@ class UtilFunc(object):
                 dictionary.pop(k, None)
 
         return dictionary
-
-    def read_dataframe_from_binary(self, fname, format=constants.binary_default_dump_format):
-        """Reads a DataFrame which is in HDF5/Parquet file format which was previously written by tcapy
-
-        Parameters
-        ----------
-        fname : str
-            Path of binary file
-
-        format : str (default: 'parquet')
-            What is the binary format? ('parquet' or 'hdf5' are supported)
-
-        Returns
-        -------
-        pd.DataFrame
-        """
-        logger = LoggerManager.getLogger(__name__)
-
-        # parquet is default choice in tcapy
-        if format == 'parquet':
-            data_frame = None
-
-            try:
-                if not (os.path.exists(fname)):
-                    logger.error("Path doesn't exist for " + fname)
-
-                    return data_frame
-
-                return pd.read_parquet(fname, engine=constants.parquet_engine)
-            except Exception as e:
-                logger.error("No valid data for " + fname + ': ' + str(e))
-
-                return data_frame
-
-        elif format == 'hdf5':
-            # Needs pytables tables
-            data_frame = None
-            store = None
-
-            try:
-                if not (os.path.exists(fname)):
-                    logger.error("Path doesn't exist for " + fname)
-
-                    return data_frame
-
-                store = pd.HDFStore(fname)
-                data_frame = store.select("data")
-            except Exception as e:
-                logger.error("No valid data for " + fname + ': ' + str(e))
-
-                return data_frame
-
-            finally:
-                try:
-                    if store is not None:
-                        store.close()
-                except:
-                    pass
-
-            return data_frame
-        else:
-            logger.warning("Cannot read file " + fname + ", invalid format specified")
-
-            return None
-
-
-    def write_dataframe_to_binary(self, data_frame, fname, format=constants.binary_default_dump_format):
-        """Writes a DataFrame to disk in Parquet (default), HDF5, CSV or CSV.GZ format
-
-        Parameters
-        ----------
-        data_frame : DateFrame
-            Time series to be written
-
-        fname : str
-            Path of file to be written
-
-        format : str (default: 'parquet')
-            What is the format? ('parquet', 'hdf5', 'csv' or 'csv.gz' are supported)
-
-        Returns
-        -------
-
-        """
-
-        # Try to delete the old copy
-        try:
-            os.remove(fname)
-        except:
-            pass
-
-        # Parquet is preferred
-        if format == 'parquet':
-            if data_frame is not None:
-                if not (data_frame.empty):
-                    data_frame.to_parquet(fname, compression=constants.parquet_compression, engine=constants.parquet_engine)
-
-        elif format == 'hdf5':
-            # Needs pytables tables as an additional install
-            if data_frame is not None:
-                if not(data_frame.empty):
-                    store = pd.HDFStore(fname)
-
-                    store.put(key='data', value=data_frame, format='fixed')
-                    store.close()
-
-        elif format == 'csv':
-            if data_frame is not None:
-                if not (data_frame.empty):
-                    data_frame.to_csv(fname)
-
-        elif format == 'csv.gz':
-            if data_frame is not None:
-                if not (data_frame.empty):
-                    data_frame.to_csv(fname, compression='gzip')
 
     ####################################################################################################################
 
@@ -934,6 +828,121 @@ class UtilFunc(object):
 
         return json.dumps({'data': json.loads(json.dumps(fig.data, cls=PlotlyJSONEncoder)),
                            'layout': json.loads(json.dumps(fig.layout, cls=PlotlyJSONEncoder))})
+
+    def read_dataframe_from_binary(self, fname, format=constants.binary_default_dump_format):
+        """Reads a DataFrame which is in HDF5/Parquet file format which was previously written by tcapy
+
+        Parameters
+        ----------
+        fname : str
+            Path of binary file
+
+        format : str (default: 'parquet')
+            What is the binary format? ('parquet' or 'hdf5' are supported)
+
+        Returns
+        -------
+        pd.DataFrame
+        """
+        logger = LoggerManager.getLogger(__name__)
+
+        # parquet is default choice in tcapy
+        if format == 'parquet':
+            data_frame = None
+
+            try:
+                if not (os.path.exists(fname)):
+                    logger.error("Path doesn't exist for " + fname)
+
+                    return data_frame
+
+                return pd.read_parquet(fname, engine=constants.parquet_engine)
+            except Exception as e:
+                logger.error("No valid data for " + fname + ': ' + str(e))
+
+                return data_frame
+
+        elif format == 'hdf5':
+            # Needs pytables tables
+            data_frame = None
+            store = None
+
+            try:
+                if not (os.path.exists(fname)):
+                    logger.error("Path doesn't exist for " + fname)
+
+                    return data_frame
+
+                store = pd.HDFStore(fname)
+                data_frame = store.select("data")
+            except Exception as e:
+                logger.error("No valid data for " + fname + ': ' + str(e))
+
+                return data_frame
+
+            finally:
+                try:
+                    if store is not None:
+                        store.close()
+                except:
+                    pass
+
+            return data_frame
+        else:
+            logger.warning("Cannot read file " + fname + ", invalid format specified")
+
+            return None
+
+    def write_dataframe_to_binary(self, data_frame, fname, format=constants.binary_default_dump_format):
+        """Writes a DataFrame to disk in Parquet (default), HDF5, CSV or CSV.GZ format
+
+        Parameters
+        ----------
+        data_frame : DateFrame
+            Time series to be written
+
+        fname : str
+            Path of file to be written
+
+        format : str (default: 'parquet')
+            What is the format? ('parquet', 'hdf5', 'csv' or 'csv.gz' are supported)
+
+        Returns
+        -------
+
+        """
+
+        # Try to delete the old copy
+        try:
+            os.remove(fname)
+        except:
+            pass
+
+        # Parquet is preferred
+        if format == 'parquet':
+            if data_frame is not None:
+                if not (data_frame.empty):
+                    data_frame.to_parquet(fname, compression=constants.parquet_compression,
+                                          engine=constants.parquet_engine)
+
+        elif format == 'hdf5':
+            # Needs pytables tables as an additional install
+            if data_frame is not None:
+                if not (data_frame.empty):
+                    store = pd.HDFStore(fname)
+
+                    store.put(key='data', value=data_frame, format='fixed')
+                    store.close()
+
+        elif format == 'csv':
+            if data_frame is not None:
+                if not (data_frame.empty):
+                    data_frame.to_csv(fname)
+
+        elif format == 'csv.gz':
+            if data_frame is not None:
+                if not (data_frame.empty):
+                    data_frame.to_csv(fname, compression='gzip')
 
     # # generic list style functions
     # def check_emp(self, obj):

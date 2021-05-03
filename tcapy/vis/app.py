@@ -1,7 +1,7 @@
 """This provides the entry point for the GUI web application, which uses the Dash library on top lightweight server
 web application (eg. Flask). This version fetches data from various databases for market data and trade data.
 
-It queries TCAEngine, which returns appropriate TCA output (via TCACaller). Uses Layout
+It queries TCAEngine, which returns appropriate TCA output (via TCACaller). Uses LayoutDash
 class to render the layout and SessionManager to keep track of each user session.
 
 """
@@ -38,39 +38,39 @@ else:
     static_css_route = '/' + url_prefix + '/static/'
 
 stylesheets_path = []
+
+# Allow tcapy to be hosted on a different url eg. not on root
+if debug_start_flask_server_directly:
+    routes_pathname_prefix = '/'
+else:
+    routes_pathname_prefix = constants.routes_pathname_prefix
+
 for css in stylesheets:
     # app.css.append_css({"external_url": static_css_route + css})
     stylesheets_path.append(static_css_route + css)
 
-app = dash.Dash(name='tcapy', server=server, suppress_callback_exceptions=True, serve_locally=True, external_stylesheets=stylesheets_path,
-                 meta_tags=[{"name": "viewport", "content": "width=1000px"}])
+app = dash.Dash(name='tcapy', server=server, url_base_pathname=routes_pathname_prefix,
+                suppress_callback_exceptions=True, serve_locally=True, external_stylesheets=stylesheets_path,
+                meta_tags=[{"name": "viewport", "content": "width=1000px"}])
 app.title = 'tcapy'
 app.server.secret_key = constants.secret_key
 
 cur_directory = app.server.root_path
 
 # Allow tcapy to be hosted on a different url eg. not on root
-if debug_start_flask_server_directly:
-
-    app.config.update({
-        'routes_pathname_prefix': '/',
-        'requests_pathname_prefix': '/',
-    })
-
-else:
-    app.config.update({
-        'routes_pathname_prefix': constants.routes_pathname_prefix,
-        'requests_pathname_prefix': constants.requests_pathname_prefix
-    })
+# app.config.update({
+#     'routes_pathname_prefix': routes_pathname_prefix,
+#     'requests_pathname_prefix': routes_pathname_prefix,
+# })
 
 # This loads up a user specific version of the layout and TCA application
 if constants.tcapy_version == 'user':
-    from tcapyuser.layoutuser import *; layout = LayoutImplUser(url_prefix=url_prefix)
+    from tcapyuser.layoutuser import *; layout = LayoutImplUser(app=app, constants=constants, url_prefix=url_prefix)
     from tcapyuser.tcacalleruser import TCACallerImplUser as TCACaller
 
 # this loads up a generic version of the layout and TCA application
 elif constants.tcapy_version == 'test_tcapy' or constants.tcapy_version == 'gen':
-    from tcapygen.layoutgen import *; layout = LayoutImplGen(url_prefix=url_prefix)
+    from tcapygen.layoutgen import *; layout = LayoutDashImplGen(app=app, constants=constants, url_prefix=url_prefix)
     from tcapygen.tcacallergen import TCACallerImplGen as TCACaller
 
 # you can add your own additional layout versions here
@@ -86,7 +86,7 @@ app.scripts.config.serve_locally = True # had issues fetching JS scripts remotel
 
 logger.info("Connected to volatile cache/Redis server_host")
 
-# Create the HTML layout for the pages (note: this is in a separate file layout.py)
+# Create the HTML layout for the pages (note: this is in a separate file layoutdash.py)
 app.layout = layout.page_content
 
 plain_css = open(os.path.join(os.path.dirname(os.path.realpath(__file__)), 'tcapy.css'), 'r').read()

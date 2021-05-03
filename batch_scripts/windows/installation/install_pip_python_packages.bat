@@ -22,8 +22,9 @@ if %TCAPY_PYTHON_ENV_TYPE%==virtualenv (
         pytest==5.4.3 pytest-cov==2.5.1 ^
         mysql-connector-python==8.0.19 ^
         chartpy==0.1.8 findatapy==0.1.19 IPython==7.14.0 dash-auth==1.4.0 ^
-        cufflinks==0.17.3 plotly==4.9.0 chart-studio==1.1.0 kaleido==0.0.2 dash-bootstrap-components==0.10.3 ^
-        dash==1.12.0 dash-html-components==1.0.3 dash-core-components==1.10.0 dash-table==4.7.0 jupyter-dash==0.2.1 dtale==1.8.1 ^
+        cufflinks==0.17.3 plotly==4.14.3 kaleido ^
+        dash==1.20.0 dash-html-components==1.1.3 dash-core-components==1.16.0 dash-table==4.11.3 jupyter-dash==0.4.0 chart_studio==1.1.0 dtale kaleido ^
+        dash-bootstrap-components==0.12.0 ^
         qpython==2.0.0 influxdb==5.2.3 ^
         Flask-Session==0.3.1 ^
         celery==celery==5.0.5 msgpack-python pytest-tap kombu==4.6.7 python-memcached==1.59 ^
@@ -51,9 +52,9 @@ if %TCAPY_PYTHON_ENV_TYPE%==conda (
             dask distributed cloudpickle python-snappy bokeh msgpack-python --yes
 
         REM Install charting libraries for flash recording of session variables to allow celery to use Redis
-        call pip install arctic==1.79.4 mysql-connector-python==8.0.19 chartpy==0.1.8 findatapy==0.1.19 dash-auth==1.3.2 cufflinks==0.17.3 ^
-          plotly==4.9.0 chart-studio==1.1.0 kaleido==0.0.2 dash-bootstrap-components==0.10.3 ^
-          dash==1.12.0 dash-html-components==1.0.3 dash-core-components==1.10.0 dash-table==4.7.0 jupyter-dash==0.2.1 dtale==1.8.1 ^
+        call pip install arctic==1.79.4 mysql-connector-python==8.0.19 chartpy==0.1.8 findatapy==0.1.19 dash-auth==1.3.2 cufflinks==0.17.3 plotly==4.14.3 kaleido \
+        dash==1.20.0 dash-html-components==1.1.3 dash-core-components==1.16.0 dash-table==4.11.3 jupyter-dash==0.4.0 chart_studio==1.1.0 dtale kaleido \
+        dash-bootstrap-components==0.12.0 ^
           qpython==2.0.0 influxdb==5.2.3 ^
           Flask-Session==0.3.1 ^
           celery==5.0.5 pytest-tap kombu python-memcached==1.59 boto3==1.5.11 pdfkit==0.6.1 WeasyPrint==51 pystore==0.1.22 ^
