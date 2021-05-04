@@ -2,6 +2,8 @@
 
 ## Coding log
 
+* 04 May 2021
+  * Updated requirements.txt
 * 03 May 2021
   * Spinning out some Dash visualization code into chartpy
 * 14 Feb 2021
