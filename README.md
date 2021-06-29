@@ -1,6 +1,9 @@
 <img src="cuemacro_logo.png?raw=true"/>
 
 # [tcapy - Python library for transaction cost analysis (TCA)](https://github.com/cuemacro/tcapy)
+
+[![Downloads](https://pepy.tech/badge/tcapy)](https://pepy.tech/project/tcapy)
+
 [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/cuemacro/tcapy/master?filepath=tcapy_notebooks)
 
 tcapy is a Python library for doing transaction cost analysis (TCA), essentially finding the cost of your trading activity. 

@@ -1,7 +1,8 @@
 # tcapy change log
 
 ## Coding log
-
+* 29 Jun 2021
+  * Added downloads badge
 * 04 May 2021
   * Updated requirements.txt
 * 03 May 2021
