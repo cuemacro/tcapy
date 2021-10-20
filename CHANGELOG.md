@@ -1,6 +1,8 @@
 # tcapy change log
 
 ## Coding log
+* 20 Oct 2021
+  * Fixed docker-compose.xml (removed trailing /) for newer Docker versions
 * 29 Jun 2021
   * Added downloads badge
 * 04 May 2021

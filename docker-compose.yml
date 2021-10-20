@@ -127,7 +127,7 @@ services:
       - 27017:27017
     volumes:
       - /data/db_mongodb:/data/db
-      - ./log/:/var/log/mongodb/
+      - ./log:/var/log/mongodb
 
   mysql:
     image: mysql
