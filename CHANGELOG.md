@@ -1,6 +1,8 @@
 # tcapy change log
 
 ## Coding log
+* 20 May 2022
+  * Fixed Redis caching (now uses Parquet)
 * 20 Oct 2021
   * Fixed docker-compose.xml (removed trailing /) for newer Docker versions
 * 29 Jun 2021

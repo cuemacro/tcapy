@@ -25,7 +25,7 @@ sudo rm -f /etc/nginx/conf.d/000-default.conf
 sudo rm -f /etc/nginx/conf.d/default.conf
 
 # Allows reading of files outside of nginx folder (just for Red Hat/Centos
-if [ $DISTRO == "redhat"  ]; then
+if [ $DISTRO == "redhat" ]; then
   sudo setenforce 0
 fi
 

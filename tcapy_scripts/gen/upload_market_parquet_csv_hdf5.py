@@ -43,7 +43,7 @@ if __name__ == '__main__':
 
     csv_folder = '/data/csv_dump/' + data_vendor + '/'
 
-    if_exists_table = 'replace'  # 'replace' or 'append' to database table
+    if_exists_table = 'append'  # 'replace' or 'append' to database table
     if_append_replace_ticker = 'replace'  # 'replace' or 'append' to ticker
 
     file_extension = 'parquet'  # 'parquet' (recommended) or 'csv' or 'h5' on disk

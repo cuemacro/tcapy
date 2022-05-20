@@ -83,7 +83,7 @@ if constants.tcapy_version == 'user':
 elif constants.tcapy_version == 'test_tcapy' or constants.tcapy_version == 'gen':
     from tcapygen.layoutboardgen import *;
 
-    layout = LayoutDashImplBoardGen(url_prefix=url_prefix)
+    layout = LayoutDashImplBoardGen(app=app, url_prefix=url_prefix, constants=constants)
     from tcapygen.tcacallerboardgen import TCACallerImplBoardGen as TCACaller
 
 # you can add your own additional layout versions here

@@ -81,8 +81,8 @@ class Constants(object):
     temp_large_data_folder = os.path.join(test_data_folder, 'large')
 
     # For backward compatibility with Python 2
-    pickle.DEFAULT_PROTOCOL = 2
-    pickle.HIGHEST_PROTOCOL = 2
+    pickle.DEFAULT_PROTOCOL = 4
+    pickle.HIGHEST_PROTOCOL = 4
 
     # Default format for writing small binary files to disk (eg. by DatabasePopulator, UtilFunc..)
     # 'parquet' (or 'hdf5', but that requires pytables tables Python package installed, which is not done by default)
@@ -605,8 +605,8 @@ class Constants(object):
     # at current stage arrow is not fully tested
     volatile_cache_redis_format = 'arrow' # 'msgpack' or 'arrow'
 
-    volatile_cache_redis_compression = {'msgpack' : 'blosc',
-                                        'arrow' : 'snappy'} # 'lz4' or 'snappy'
+    volatile_cache_redis_compression = {'msgpack': 'blosc',
+                                        'arrow': 'gzip'} # 'lz4' or 'snappy'
 
     # Above this size we need to break apart our keys into different chunks before pushing into Redis
     # Redis has a maximum size of what we can store in a single value (512 is maximum, can tweak lower)

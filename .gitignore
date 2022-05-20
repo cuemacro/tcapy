@@ -7,6 +7,7 @@ __pycache__/
 
 # Credentials files
 *cred.py
+*cred*.py
 *credpro.py
 *creduser.py
 *.env

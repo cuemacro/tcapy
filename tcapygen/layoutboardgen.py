@@ -36,7 +36,7 @@ class LayoutDashImplBoardGen(LayoutDash):
 
     """
 
-    def __init__(self, app=None, onstants=None, url_prefix=''):
+    def __init__(self, app=None, constants=None, url_prefix=''):
         super(LayoutDashImplBoardGen, self).__init__(app=app, constants=constants, url_prefix=url_prefix)
 
         available_dates = pd.date_range(

@@ -11,7 +11,7 @@ __author__ = 'saeedamen'  # Saeed Amen / saeed@cuemacro.com
 import math
 import json
 import pandas as pd
-import pyarrow as pa
+# import pyarrow as pa
 
 from plotly.utils import PlotlyJSONEncoder
 import plotly.graph_objs as go
@@ -21,7 +21,8 @@ from tcapy.util.utilfunc import UtilFunc
 from tcapy.util.timeseries import TimeSeriesOps
 from tcapy.util.loggermanager import LoggerManager
 
-context = pa.default_serialization_context()
+# context = pa.default_serialization_context()
+import io
 
 constants = Constants()
 
@@ -70,38 +71,36 @@ class DeltaizeSerialize(object):
                                     constants.volatile_cache_redis_format])
 
                 elif constants.volatile_cache_redis_format == 'arrow':
-                    # Set the size of each compressed object, so can read back later
-                    # eg. key might be xxxx_size_354534_size_345345_endsize etc.
-                    # Ignore bit before first '_size_' and after '_endsize'
                     for i in range(0, len(obj_list)):
                         if obj_list[i] is not None:
-                            ser = context.serialize(obj_list[i]).to_buffer()
+                            ser = io.BytesIO()
+                            obj_list[i].to_parquet(ser,
+                                                 compression=constants.volatile_cache_redis_compression[
+                                                          constants.volatile_cache_redis_format])
+                            ser.seek(0)
 
-                            obj_list[i] = pa.compress(ser,
-                                                      codec=constants.volatile_cache_redis_compression[
-                                                          constants.volatile_cache_redis_format],
-                                                      asbytes=True)
-
-                            key = key + '_size_' + str(len(ser))
-
-                    key = key + '_endsizearrow_'
-
+                            obj_list[i] = ser.read()
                 else:
-                    raise Exception("Invalid volatile cache format specified.")
+                    raise Exception("Invalid volatile cache format specified " + constants.volatile_cache_redis_format)
             elif '_comp' not in key:
                 if constants.volatile_cache_redis_format == 'msgpack':
 
                     for i in range(0, len(obj_list)):
                         if obj_list[i] is not None:
                             obj_list[i] = obj_list[i].to_msgpack()
-                elif constants.volatile_cache_redis_format == 'arrow':
-                    # context = pa.default_serialization_context()
-
+                elif constants.volatile_cache_redis_format == "arrow":
                     for i in range(0, len(obj_list)):
                         if obj_list[i] is not None:
-                            obj_list[i] = context.serialize(obj_list[i]).to_buffer().to_pybytes()
+                            ser = io.BytesIO()
+                            obj_list[i].to_parquet(ser,
+                                                   compression=
+                                                   constants.volatile_cache_redis_compression[
+                                                       constants.volatile_cache_redis_format])
+                            ser.seek(0)
+
+                            obj_list[i] = ser.read()
                 else:
-                    raise Exception("Invalid volatile cache format specified.")
+                    raise Exception("Invalid volatile cache format specified " + constants.volatile_cache_redis_format)
 
         # For Plotly JSON style objects (assume these will fit in the cache, as they tend to used downsampled data)
         elif '_fig' in key:
@@ -127,39 +126,14 @@ class DeltaizeSerialize(object):
                         obj[i] = pd.read_msgpack(obj[i])
 
             elif constants.volatile_cache_redis_format == 'arrow':
-
-                # If compressed we need to know the size, to decompress it
-                if '_comp' in key:
-                    # Get the size of each compressed object
-                    # eg. key might be xxxx_size_354534_size_345345_endsize etc.
-                    # Ignore bit before first '_size_' and after '_endsize'
-
-                    start = '_size_'
-                    end = '_endsizearrow_'
-
-                    if len(obj) > 0:
-                        key = self._util_func.find_sub_string_between(key, start, end)
-                        siz = self._util_func.keep_numbers_list(key.split('_size_'))
-
-                    for i in range(0, len(obj)):
-                        if obj[i] is not None:
-                            obj[i] = pa.decompress(obj[i],
-                                                   codec=constants.volatile_cache_redis_compression[
-                                                       constants.volatile_cache_redis_format],
-                                                   decompressed_size=siz[i])
-
-                            obj[i] = context.deserialize(obj[i])
-                else:
-                    for i in range(0, len(obj)):
-                        if obj[i] is not None:
-                            obj[i] = context.deserialize(obj[i])
-
-                # Need to copy because Arrow doesn't allow writing on a DataFrame
                 for i in range(0, len(obj)):
                     if obj[i] is not None:
-                        obj[i] = obj[i].copy()
+
+                        obj[i] = io.BytesIO(obj[i])
+                        obj[i] = pd.read_parquet(obj[i])#, compression=constants.volatile_cache_redis_compression[constants.volatile_cache_redis_format])
             else:
-                raise Exception("Invalid volatile cache format specified.")
+                raise Exception("Invalid volatile cache format specified "
+                                + str(constants.volatile_cache_redis_format))
 
             if len(obj) == 1:
                 obj = obj[0]
