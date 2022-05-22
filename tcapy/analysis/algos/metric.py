@@ -169,10 +169,15 @@ class Metric(ABC):
             # mark time of "benchmark" (for slippage and market impact points)
             if output_label_ + '_time' in metric_df.columns:
                 if dt is not None:
+                    dt = pd.to_datetime(dt).astype('datetime64[ns]')
                     metric_df[output_label_ + '_time'][is_side] = pd.Series(index=benchmark.index, data=dt)
+
+                #metric_df[output_label + '_time'] = metric_df[
+                 #   output_label + '_time']
 
             # metric_df[output_label] = pd.Series(index=trade_df.index[is_side.values], data=benchmark.values)
         # TODO metric_df[output_label + '_time'][is_side] = pd.Series(index=is_side.index, data=pd.to_datetime(actual_dt))
+
 
         return metric_df
 
@@ -394,6 +399,7 @@ class MetricMarketImpact(MetricCalc):
 
         metric_df = metric_df.drop(executed_price, axis=1)
         metric_list = [self._metric_name + '_benchmark', self._metric_name + '_benchmark_time', self._metric_name, 'id']
+
 
         #metric_trade_df = pd.merge(market_trade_order_df, metric_df[metric_list],
         #                                how='left', left_index=True, on=['id'])

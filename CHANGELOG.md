@@ -1,6 +1,9 @@
 # tcapy change log
 
 ## Coding log
+
+* 23 May 2022
+  * Cast market impact time to datetime64[ns] as fix for caching
 * 20 May 2022
   * Fixed Redis caching (now uses Parquet)
 * 20 Oct 2021
