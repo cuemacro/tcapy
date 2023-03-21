@@ -41,7 +41,7 @@ jupyter-dash==0.4.0
 dtale
 qpython==2.0.0
 influxdb==5.2.3
-celery==5.0.5
+celery==5.2.2
 pytest-tap
 kombu
 python-memcached==1.59
