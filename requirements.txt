@@ -32,7 +32,7 @@ plotly==4.14.3
 kaleido
 eikon==1.1.2
 chart-studio==1.1.0
-dash==1.20.0
+dash==2.15.0
 dash-bootstrap-components==0.12.0
 dash-html-components==1.1.3
 dash-core-components==1.16.0
